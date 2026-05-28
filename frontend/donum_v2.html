@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DONUM — Performance Coaching by Riz Management</title>
+<meta name="description" content="DONUM by Riz Management. Precision performance coaching built around joint integrity, movement quality, and lifelong capacity. Donum Deus — the body is a gift; train it accordingly."/>
+<meta name="theme-color" content="#0e1a10"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0f0c;
+  --bg1:#111711;
+  --bg2:#161e15;
+  --bg3:#1c261a;
+  --border:#2a3828;
+  --border2:#3d5239;
+  --text:#e8ede3;
+  --text2:#a3b89a;
+  --text3:#6a7d62;
+  --accent:#7caf58;
+  --accent2:rgba(124,175,88,.08);
+  --accent3:rgba(124,175,88,.22);
+  --warm:#c49a52;
+  --warm2:rgba(196,154,82,.1);
+  --warm3:rgba(196,154,82,.28);
+  --red:#b84444;
+  --red2:rgba(184,68,68,.1);
+  --sage:#8ea88a;
+  --play:'Playfair Display',serif;
+  --mono:'DM Mono',monospace;
+  --bask:'Libre Baskerville',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--accent);color:#0b0f0c;}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);}
+
+/* GRAIN OVERLAY */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.32;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;background-size:128px 128px;}
+.grid-line{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(124,175,88,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,175,88,.04) 1px,transparent 1px);background-size:80px 80px;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;border-bottom:1px solid var(--border);background:rgba(11,15,12,.94);backdrop-filter:blur(16px);}
+.nav-brand{display:flex;align-items:baseline;gap:10px;cursor:pointer;}
+.nav-logo{font-family:var(--play);font-weight:900;font-size:17px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);}
+.nav-sub{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);}
+.nav-links{display:flex;gap:30px;align-items:center;}
+.nav-link{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);transition:color .15s;cursor:pointer;background:none;border:none;font-family:var(--mono);}
+.nav-link:hover{color:var(--text);}
+.nav-cta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:9px 22px;background:var(--accent);color:#0b0f0c;font-family:var(--mono);font-weight:500;cursor:pointer;transition:background .15s,opacity .15s;border:none;}
+.nav-cta:hover{opacity:.85;}
+.nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;}
+
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+#page-landing,#page-about,#page-services,#page-method,#page-faq,#page-contact{padding-top:60px;}
+
+/* ===== HERO ===== */
+.hero{padding:110px 48px 96px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:28px;}
+.hero-eyebrow-line{width:24px;height:1px;background:var(--accent);}
+h1{font-family:var(--play);font-weight:900;font-size:clamp(52px,6.5vw,88px);line-height:.94;letter-spacing:-.02em;margin-bottom:32px;color:var(--text);}
+h1 em{font-style:italic;font-weight:400;color:var(--accent);}
+.hero-body{font-family:var(--bask);font-size:17px;font-weight:400;color:var(--text2);line-height:1.85;max-width:420px;margin-bottom:40px;border-left:2px solid var(--border2);padding-left:20px;}
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.btn-primary{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:13px 32px;background:var(--accent);color:#0b0f0c;border:none;cursor:pointer;transition:opacity .15s,transform .1s;}
+.btn-primary:hover{opacity:.85;}
+.btn-primary:active{transform:scale(.98);}
+.btn-ghost{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);cursor:pointer;transition:color .15s;background:none;border:none;font-family:var(--mono);}
+.btn-ghost:hover{color:var(--text);}
+.hero-right{position:relative;}
+.hero-mark-block{border:1px solid var(--border);background:var(--bg1);padding:40px;}
+.hmb-word{font-family:var(--play);font-size:clamp(68px,8vw,112px);font-weight:900;font-style:italic;color:var(--border2);line-height:.9;letter-spacing:-.02em;margin-bottom:20px;}
+.hmb-divider{height:1px;background:var(--border);margin-bottom:20px;}
+.hmb-grid{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.hmb-row{background:var(--bg);display:flex;align-items:stretch;}
+.hmb-latin{padding:14px 18px;font-family:var(--play);font-style:italic;font-size:20px;font-weight:400;color:var(--warm);min-width:120px;border-right:1px solid var(--border);display:flex;align-items:center;}
+.hmb-def{padding:14px 18px;font-size:10px;letter-spacing:.06em;color:var(--text3);display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.hmb-word-label{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text);}
+
+/* ===== MANIFESTO BAND ===== */
+.manifesto{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:72px 48px;position:relative;overflow:hidden;}
+.manifesto::before{content:'\201C';position:absolute;top:-80px;left:20px;font-family:var(--play);font-size:480px;font-weight:900;color:rgba(124,175,88,.04);line-height:1;pointer-events:none;}
+.mf-inner{max-width:860px;margin:0 auto;position:relative;z-index:1;}
+.mf-text{font-family:var(--bask);font-size:clamp(20px,2.8vw,34px);font-weight:400;font-style:italic;color:var(--text);line-height:1.6;letter-spacing:-.005em;margin-bottom:24px;}
+.mf-text em{font-style:normal;font-weight:700;color:var(--accent);}
+.mf-attr{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:14px;}
+.mf-attr::before{content:'';display:block;width:28px;height:1px;background:var(--border2);}
+
+/* ===== TENETS ===== */
+.tenets-section{padding:96px 48px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start;}
+.ts-left{}
+.ts-eyebrow{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;}
+.ts-title{font-family:var(--play);font-weight:900;font-size:clamp(38px,4.8vw,62px);line-height:.94;letter-spacing:-.02em;margin-bottom:36px;color:var(--text);}
+.ts-title em{font-style:italic;font-weight:400;color:var(--warm);}
+.ts-body{font-family:var(--bask);font-size:16px;font-weight:400;color:var(--text2);line-height:1.85;}
+.ts-body p{margin-bottom:20px;}
+.ts-body strong{font-weight:700;color:var(--text);}
+.ts-right{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.tenet{background:var(--bg);padding:30px 28px;border-left:3px solid transparent;transition:border-color .2s,background .2s;}
+.tenet:hover{background:var(--bg1);border-left-color:var(--accent);}
+.tenet-num{font-family:var(--play);font-style:italic;font-size:40px;font-weight:400;color:var(--border2);line-height:1;margin-bottom:10px;}
+.tenet-title{font-family:var(--mono);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;color:var(--accent);}
+.tenet-body{font-size:12px;color:var(--text3);line-height:1.8;}
+
+.section-rule{height:1px;background:var(--border);margin:0 48px;}
+
+/* ===== SCRIPTURE ===== */
+.scripture{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 48px;text-align:center;}
+.scripture-inner{max-width:680px;margin:0 auto;}
+.sq{font-family:var(--bask);font-size:clamp(18px,2.2vw,26px);font-weight:400;font-style:italic;color:var(--text);line-height:1.7;margin-bottom:20px;}
+.sq em{font-style:normal;font-weight:700;color:var(--accent);}
+.ss{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:14px;}
+.ss::before,.ss::after{content:'';display:block;width:36px;height:1px;background:var(--border2);}
+
+/* ===== HIERARCHY ===== */
+.hierarchy{padding:96px 48px;max-width:1280px;margin:0 auto;}
+.hier-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.hier-eyebrow{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.hier-title{font-family:var(--play);font-weight:900;font-size:clamp(32px,4vw,52px);line-height:.94;letter-spacing:-.02em;margin-bottom:8px;color:var(--text);}
+.hier-title em{font-style:italic;font-weight:400;color:var(--warm);}
+.hier-sub{font-family:var(--bask);font-size:15px;font-weight:400;color:var(--text2);margin-bottom:36px;line-height:1.75;}
+.hier-list{display:flex;flex-direction:column;}
+.hier-item{display:flex;align-items:center;gap:18px;padding:14px 0;border-bottom:1px solid var(--border);transition:padding-left .18s;}
+.hier-item:hover{padding-left:6px;}
+.hier-item:last-child{border-bottom:none;}
+.hier-rank{font-family:var(--play);font-weight:400;font-style:italic;font-size:28px;color:var(--border2);line-height:1;min-width:28px;}
+.hier-name{font-family:var(--mono);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text);}
+.hier-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+.hier-visual{border:1px solid var(--border);background:var(--bg1);padding:30px;}
+.hv-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:22px;}
+.hv-bars{display:flex;flex-direction:column;gap:14px;}
+.hv-row{display:flex;align-items:center;gap:12px;}
+.hv-name{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);min-width:120px;}
+.hv-track{flex:1;height:3px;background:var(--border);position:relative;}
+.hv-fill{height:100%;background:var(--accent);transition:width 1.5s ease;}
+.hv-pct{font-size:9px;color:var(--text3);min-width:28px;text-align:right;}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:88px 48px;}
+.tsti-inner{max-width:1280px;margin:0 auto;}
+.tsti-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);margin-top:44px;border:1px solid var(--border);}
+.tc{background:var(--bg);padding:32px 28px;display:flex;flex-direction:column;}
+.tc-quote{font-family:var(--bask);font-style:italic;font-size:16px;font-weight:400;line-height:1.7;color:var(--text);margin-bottom:22px;flex:1;}
+.tc-mark{font-size:44px;font-family:var(--play);color:var(--accent);opacity:.4;line-height:0;display:block;margin-bottom:14px;}
+.tc-attr{display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid var(--border);}
+.tc-av{width:38px;height:38px;background:var(--bg3);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--accent);letter-spacing:.05em;}
+.tc-name{font-family:var(--mono);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text);}
+.tc-meta{font-size:10px;color:var(--text3);letter-spacing:.06em;margin-top:2px;}
+
+/* ===== CTA BAND ===== */
+.cta-section{padding:104px 48px;border-top:1px solid var(--border);text-align:center;position:relative;overflow:hidden;}
+.cta-section::before{content:'DONUM';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--play);font-weight:900;font-size:clamp(80px,16vw,220px);color:rgba(124,175,88,.04);pointer-events:none;z-index:0;line-height:1;white-space:nowrap;letter-spacing:-.02em;}
+.cta-inner{position:relative;z-index:1;}
+.cta-eyebrow{font-family:var(--play);font-style:italic;font-size:17px;font-weight:400;color:var(--warm);margin-bottom:14px;}
+.cta-title{font-family:var(--play);font-weight:900;font-size:clamp(36px,5vw,66px);line-height:.95;letter-spacing:-.02em;margin-bottom:18px;color:var(--text);}
+.cta-title em{font-style:italic;font-weight:400;}
+.cta-sub{font-family:var(--bask);font-size:16px;font-weight:400;color:var(--text2);margin-bottom:40px;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.8;}
+.cta-disc{font-size:9px;color:var(--text3);margin-top:12px;letter-spacing:.1em;}
+
+footer{padding:44px 48px 28px;border-top:1px solid var(--border);}
+.footer-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;padding-bottom:28px;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.ftc-title{font-family:var(--mono);font-weight:500;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
+.ftc-link{display:block;font-size:10px;color:var(--text3);padding:4px 0;cursor:pointer;transition:color .15s;background:none;border:none;font-family:var(--mono);text-align:left;letter-spacing:.04em;}
+.ftc-link:hover{color:var(--text);}
+.footer-about{font-family:var(--bask);font-size:13px;font-weight:400;color:var(--text3);line-height:1.75;max-width:320px;margin-top:12px;}
+.footer-bottom{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-brand-b{display:flex;align-items:baseline;gap:8px;}
+.footer-logo{font-family:var(--play);font-weight:900;font-size:13px;letter-spacing:.18em;color:var(--accent);}
+.footer-sub{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);}
+.footer-latin{font-family:var(--play);font-style:italic;font-size:12px;color:var(--warm);}
+.footer-copy{font-size:9px;color:var(--text3);letter-spacing:.06em;}
+
+/* GENERIC SECTION */
+.sec{padding:96px 48px;max-width:1280px;margin:0 auto;}
+.sec-narrow{max-width:900px;}
+.sec-eyebrow{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.sec-eyebrow::before{content:'';width:24px;height:1px;background:var(--accent);}
+.sec-title{font-family:var(--play);font-weight:900;font-size:clamp(40px,5.5vw,68px);line-height:.94;letter-spacing:-.02em;margin-bottom:28px;color:var(--text);}
+.sec-title em{font-style:italic;font-weight:400;color:var(--warm);}
+.sec-lede{font-family:var(--bask);font-size:18px;font-weight:400;color:var(--text2);max-width:660px;line-height:1.8;margin-bottom:52px;}
+.sec-prose{font-family:var(--bask);font-size:16px;font-weight:400;color:var(--text2);line-height:1.85;}
+.sec-prose p{margin-bottom:20px;}
+.sec-prose strong{font-weight:700;color:var(--text);}
+
+/* ABOUT */
+.coach-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:72px;align-items:start;margin-top:44px;}
+.coach-card{border:1px solid var(--border);background:var(--bg1);padding:40px 32px;position:sticky;top:78px;}
+.coach-portrait{width:100%;aspect-ratio:1;background:linear-gradient(145deg,var(--bg2),var(--bg3));display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:var(--play);font-size:88px;font-weight:900;font-style:italic;color:var(--border2);border:1px solid var(--border);}
+.coach-name{font-family:var(--mono);font-weight:500;font-size:18px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--text);}
+.coach-role{font-family:var(--bask);font-style:italic;font-size:13px;color:var(--warm);margin-bottom:22px;}
+.coach-stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:10px;}
+.coach-stat:last-of-type{border-bottom:none;}
+.coach-stat-k{color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-size:9px;}
+.coach-stat-v{color:var(--text);font-family:var(--mono);font-weight:500;}
+.cred-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px;background:var(--border);margin-top:44px;}
+.cred{background:var(--bg);padding:22px 20px;}
+.cred-label{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;}
+.cred-name{font-family:var(--mono);font-weight:500;font-size:11px;text-transform:uppercase;color:var(--text);margin-bottom:4px;}
+.cred-desc{font-size:10px;color:var(--text3);line-height:1.6;}
+
+/* SERVICES */
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);margin-top:44px;border:1px solid var(--border);}
+.tier{background:var(--bg);padding:40px 30px;display:flex;flex-direction:column;position:relative;transition:background .2s;}
+.tier:hover{background:var(--bg1);}
+.tier.featured{background:var(--bg2);}
+.tier-tag{position:absolute;top:14px;right:14px;font-family:var(--mono);font-weight:500;font-size:8px;letter-spacing:.18em;text-transform:uppercase;background:var(--accent);color:#0b0f0c;padding:4px 10px;}
+.tier-eyebrow{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.tier-name{font-family:var(--play);font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px;color:var(--text);}
+.tier-desc{font-family:var(--bask);font-style:italic;font-size:13px;font-weight:400;color:var(--text3);margin-bottom:24px;line-height:1.6;min-height:40px;}
+.tier-price{font-family:var(--play);font-weight:900;font-size:52px;letter-spacing:-.02em;color:var(--text);line-height:1;margin-bottom:4px;}
+.tier-price em{font-size:20px;font-style:italic;color:var(--text3);margin-right:3px;}
+.tier-period{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:26px;}
+.tier-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;flex:1;}
+.tier-feat{font-size:11px;color:var(--text2);line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
+.tier-feat::before{content:'\2014';color:var(--accent);flex-shrink:0;}
+.tier-cta{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:13px 18px;background:var(--accent);color:#0b0f0c;border:none;cursor:pointer;transition:opacity .15s;width:100%;}
+.tier-cta:hover{opacity:.82;}
+.tier.featured .tier-cta{background:var(--warm);}
+
+/* METHOD */
+.method-pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-top:44px;}
+.pillar{background:var(--bg);padding:32px 26px;transition:background .2s;}
+.pillar:hover{background:var(--bg1);}
+.pillar-num{font-family:var(--play);font-style:italic;font-size:58px;font-weight:400;color:var(--border2);line-height:1;margin-bottom:14px;}
+.pillar-title{font-family:var(--mono);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;color:var(--accent);}
+.pillar-body{font-size:11px;color:var(--text3);line-height:1.8;}
+.flow-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:60px;}
+.flow-step{border:1px solid var(--border);background:var(--bg1);padding:22px;position:relative;}
+.flow-step::after{content:'\2192';position:absolute;right:-14px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--border2);z-index:2;}
+.flow-step:last-child::after{display:none;}
+.flow-num{font-family:var(--play);font-style:italic;font-size:28px;color:var(--warm);line-height:1;margin-bottom:9px;}
+.flow-title{font-family:var(--mono);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;color:var(--text);}
+.flow-desc{font-size:10px;color:var(--text3);line-height:1.65;}
+
+/* FAQ */
+.faq-list{margin-top:44px;border-top:1px solid var(--border);}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{padding:20px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:22px;font-family:var(--mono);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text);transition:color .15s;}
+.faq-q:hover{color:var(--accent);}
+.faq-q-icon{font-family:var(--play);font-size:22px;font-weight:400;color:var(--warm);flex-shrink:0;line-height:1;transition:transform .25s;}
+.faq-item.open .faq-q-icon{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .32s ease,padding .3s ease;font-family:var(--bask);font-size:15px;font-weight:400;color:var(--text3);line-height:1.8;}
+.faq-item.open .faq-a{max-height:600px;padding:0 0 22px;}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:60px;margin-top:44px;align-items:start;}
+.ci{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);}
+.ci-row{background:var(--bg1);padding:22px 26px;}
+.ci-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.ci-value{font-family:var(--mono);font-weight:500;font-size:13px;color:var(--text);letter-spacing:.04em;}
+.ci-desc{font-size:10px;color:var(--text3);margin-top:5px;line-height:1.55;}
+.contact-form{border:1px solid var(--border);background:var(--bg1);padding:32px;}
+.cf-row{margin-bottom:16px;}
+.cf-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.cf-label{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
+.cf-success{margin-top:16px;padding:12px 16px;background:rgba(124,175,88,.08);border:1px solid rgba(124,175,88,.2);color:var(--accent);font-size:11px;letter-spacing:.04em;display:none;}
+.cf-success.show{display:block;}
+
+/* INTAKE */
+#page-intake{padding-top:60px;min-height:100vh;display:none;flex-direction:column;}
+#page-intake.active{display:flex;}
+.intake-layout{flex:1;display:grid;grid-template-columns:260px 1fr;max-width:1160px;margin:0 auto;width:100%;padding:44px;gap:44px;align-items:start;}
+.intake-sidebar{position:sticky;top:78px;}
+.intake-brand{font-family:var(--play);font-weight:900;font-size:18px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
+.intake-brand-sub{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.intake-latin{font-family:var(--play);font-style:italic;font-size:12px;color:var(--warm);margin-bottom:32px;}
+.steps-list{display:flex;flex-direction:column;}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);opacity:.35;transition:opacity .2s;}
+.step-item:last-child{border-bottom:none;}
+.step-item.active{opacity:1;}
+.step-item.done{opacity:.6;}
+.step-circle{width:26px;height:26px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:500;font-size:10px;color:var(--text3);flex-shrink:0;transition:all .2s;}
+.step-item.active .step-circle{border-color:var(--accent);color:var(--accent);background:var(--accent2);}
+.step-item.done .step-circle{border-color:var(--accent);background:var(--accent);color:#0b0f0c;}
+.step-title{font-size:11px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text);}
+.step-sub{font-size:9px;color:var(--text3);margin-top:2px;}
+.intake-progress{margin-top:28px;height:2px;background:var(--border);}
+.intake-progress-fill{height:100%;background:var(--accent);transition:width .4s ease;}
+.form-card{border:1px solid var(--border);background:var(--bg);}
+.form-card-header{padding:16px 26px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;justify-content:space-between;}
+.fch-title{font-family:var(--mono);font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--text);}
+.fch-step{font-size:9px;color:var(--text3);letter-spacing:.16em;text-transform:uppercase;}
+.form-step-content{padding:28px 26px;display:none;}
+.form-step-content.active{display:block;}
+.field-group{margin-bottom:20px;}
+.field-label{display:flex;align-items:center;justify-content:space-between;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
+.field-hint{font-size:9px;color:var(--text3);margin-top:5px;font-style:italic;}
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+/* UNIT TOGGLE */
+.unit-toggle{display:flex;border:1px solid var(--border);overflow:hidden;width:fit-content;}
+.ut-btn{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;background:var(--bg);color:var(--text3);border:none;cursor:pointer;transition:all .12s;}
+.ut-btn.active{background:var(--accent3);color:var(--accent);}
+/* INPUT FIELD WITH UNIT */
+.input-unit-wrap{position:relative;display:flex;}
+.input-unit-wrap input{flex:1;padding-right:44px;}
+.input-unit-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.1em;color:var(--text3);pointer-events:none;text-transform:uppercase;}
+/* height dual field */
+.height-dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+input[type="number"],input[type="text"],input[type="email"],select,textarea{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;transition:border-color .15s;border-radius:0;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent3);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236a7d62'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;}
+textarea{resize:vertical;min-height:70px;}
+.days-picker{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.dp-btn{padding:9px 4px;text-align:center;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .12s;user-select:none;}
+.dp-btn:hover{border-color:var(--border2);color:var(--text);}
+.dp-btn.sel{background:var(--accent2);border-color:var(--accent3);color:var(--accent);}
+.fatigue-pips{display:flex;gap:7px;}
+.fp{flex:1;height:48px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .12s;}
+.fp-num{font-family:var(--mono);font-weight:500;font-size:15px;line-height:1;color:var(--text3);}
+.fp-label{font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.fp:hover{border-color:var(--border2);}
+.fp.sel-low{background:rgba(124,175,88,.08);border-color:rgba(124,175,88,.28);}
+.fp.sel-low .fp-num,.fp.sel-low .fp-label{color:var(--accent);}
+.fp.sel-mid{background:var(--warm2);border-color:var(--warm3);}
+.fp.sel-mid .fp-num,.fp.sel-mid .fp-label{color:var(--warm);}
+.fp.sel-high{background:var(--red2);border-color:rgba(184,68,68,.28);}
+.fp.sel-high .fp-num,.fp.sel-high .fp-label{color:var(--red);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.chip{display:flex;align-items:center;gap:5px;font-size:10px;padding:4px 9px;background:var(--accent2);border:1px solid var(--accent3);color:var(--accent);}
+.chip-remove{cursor:pointer;font-size:9px;opacity:.55;}
+.chip-remove:hover{opacity:1;}
+.form-nav{padding:16px 26px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg1);}
+.btn-back{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--mono);transition:color .15s;}
+.btn-back:hover{color:var(--text);}
+.btn-next{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:11px 26px;background:var(--accent);color:#0b0f0c;border:none;cursor:pointer;transition:opacity .15s;}
+.btn-next:hover{opacity:.82;}
+.btn-next:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
+.form-error{font-size:10px;color:var(--red);letter-spacing:.06em;}
+
+/* GENERATING */
+#page-generating{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding-top:60px;}
+#page-generating.active{display:flex;}
+.gen-inner{text-align:center;max-width:460px;padding:48px;}
+.gen-icon{font-family:var(--play);font-weight:900;font-size:64px;color:var(--border2);line-height:1;margin-bottom:4px;animation:genPulse 2s ease-in-out infinite;font-style:italic;}
+.gen-latin{font-family:var(--play);font-style:italic;font-size:13px;color:var(--warm);margin-bottom:24px;}
+@keyframes genPulse{0%,100%{opacity:.3;transform:scale(1);}50%{opacity:.9;transform:scale(1.01);}}
+.gen-title{font-family:var(--mono);font-weight:500;font-size:17px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;color:var(--text);}
+.gen-msg{font-size:11px;color:var(--text3);min-height:18px;margin-bottom:24px;letter-spacing:.04em;}
+.gen-bar{width:280px;height:2px;background:var(--border);margin:0 auto 24px;overflow:hidden;}
+.gen-bar-fill{height:100%;background:var(--accent);animation:genBar 1.6s ease-in-out infinite;}
+@keyframes genBar{0%{width:0;margin-left:0;}50%{width:55%;margin-left:0;}100%{width:0;margin-left:100%;}}
+.gen-steps{text-align:left;display:flex;flex-direction:column;gap:6px;width:280px;margin:0 auto;}
+.gen-step-item{display:flex;align-items:center;gap:10px;font-size:10px;color:var(--text3);padding:7px 10px;border:1px solid var(--border);transition:all .3s;}
+.gen-step-item.done{border-color:var(--accent3);color:var(--accent);background:var(--accent2);}
+.gen-step-item.active{border-color:var(--border2);color:var(--text);}
+.gen-step-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s;}
+.gen-step-item.done .gen-step-dot{background:var(--accent);}
+.gen-step-item.active .gen-step-dot{background:var(--warm);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.15;}}
+
+/* PROGRAM */
+#page-program{padding-top:60px;display:none;}
+#page-program.active{display:block;}
+.program-header{padding:32px 48px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+.ph-eyebrow{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;}
+.ph-name{font-family:var(--play);font-weight:900;font-size:26px;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:9px;color:var(--text);}
+.ph-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.ph-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 11px;border:1px solid var(--border);color:var(--text3);background:var(--bg);}
+.ph-tag.accent{border-color:var(--accent3);color:var(--accent);background:var(--accent2);}
+.ph-actions{display:flex;gap:10px;align-items:center;}
+.btn-export{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:10px 18px;background:none;border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .15s;}
+.btn-export:hover{border-color:var(--accent);color:var(--accent);}
+.btn-new{font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:10px 18px;background:var(--accent);color:#0b0f0c;border:none;cursor:pointer;transition:opacity .15s;}
+.btn-new:hover{opacity:.82;}
+.program-body{max-width:1180px;margin:0 auto;padding:44px 48px;}
+.week-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:40px;}
+.wsc{border:1px solid var(--border);background:var(--bg);padding:14px;position:relative;overflow:hidden;}
+.wsc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border);}
+.wsc.high::after{background:var(--accent);}
+.wsc.low::after{background:var(--warm);}
+.wsc-day{font-family:var(--play);font-weight:900;font-size:18px;text-transform:uppercase;line-height:1;margin-bottom:4px;color:var(--text);}
+.wsc-cns{font-size:7px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:3px;}
+.wsc.high .wsc-cns{color:var(--accent);}
+.wsc.low .wsc-cns{color:var(--sage);}
+.wsc-focus{font-size:10px;color:var(--text3);line-height:1.35;}
+.sessions-grid{display:flex;flex-direction:column;gap:16px;}
+.session-card{border:1px solid var(--border);background:var(--bg);overflow:hidden;}
+.session-head{padding:13px 20px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sh-day{font-family:var(--play);font-weight:900;font-size:18px;text-transform:uppercase;color:var(--text);}
+.sh-badge{font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--border);color:var(--text3);background:var(--bg);}
+.sh-badge.high{border-color:var(--accent3);color:var(--accent);background:var(--accent2);}
+.sh-focus{font-size:10px;color:var(--text3);margin-left:auto;}
+.block-section{padding:16px 20px;border-bottom:1px solid var(--border);}
+.block-section:last-child{border-bottom:none;}
+.bs-type{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--warm);margin-bottom:11px;display:flex;align-items:center;gap:10px;}
+.bs-type::after{content:'';flex:1;height:1px;background:var(--border);}
+table.ex-tbl{width:100%;border-collapse:collapse;}
+table.ex-tbl th{font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);text-align:left;padding:0 0 7px;border-bottom:1px solid var(--border);}
+table.ex-tbl td{padding:8px 0;font-size:11px;border-bottom:1px solid var(--border);vertical-align:top;}
+table.ex-tbl tr:last-child td{border-bottom:none;}
+table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left:16px;}
+.td-name{color:var(--text);font-weight:500;}
+.td-vol{color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.td-rest{color:var(--text3);white-space:nowrap;}
+.td-notes{color:var(--text3);font-size:10px;max-width:240px;line-height:1.45;}
+.flags-wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:24px;padding:18px;border:1px solid var(--border);background:var(--bg1);}
+.flag-chip{font-size:8px;letter-spacing:.16em;text-transform:uppercase;padding:4px 11px;border:1px solid var(--border);color:var(--text3);}
+.flag-chip.progress{border-color:rgba(124,175,88,.3);color:var(--accent);background:var(--accent2);}
+.flag-chip.deload{border-color:rgba(184,68,68,.3);color:var(--red);background:var(--red2);}
+.flag-chip.maintain{border-color:var(--warm3);color:var(--warm);background:var(--warm2);}
+
+@media print{
+  .grain,.grid-line,nav,.ph-actions,footer{display:none!important;}
+  :root{--bg:#fff;--bg1:#f5f5f0;--bg2:#eee;--text:#000;--text2:#333;--text3:#666;--border:#ccc;--accent:#2a6e0e;--warm:#9a7020;}
+}
+@media(max-width:960px){
+  nav{padding:0 18px;}
+  .nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--bg);flex-direction:column;align-items:flex-start;padding:16px 18px;border-bottom:1px solid var(--border);gap:14px;}
+  .nav-links.show{display:flex;}
+  .nav-toggle{display:block;}
+  .nav-cta{display:none;}
+  .hero{grid-template-columns:1fr;padding:72px 20px 56px;gap:0;}
+  .hero-right{display:none;}
+  .tenets-section{grid-template-columns:1fr;padding:60px 20px;gap:44px;}
+  .manifesto{padding:52px 20px;}
+  .scripture{padding:52px 20px;}
+  .hierarchy{padding:60px 20px;}
+  .hier-grid{grid-template-columns:1fr;}
+  .cta-section{padding:68px 20px;}
+  footer{padding:28px 20px;}
+  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .section-rule{margin:0 20px;}
+  .intake-layout{grid-template-columns:1fr;padding:20px;}
+  .intake-sidebar{display:none;}
+  .program-header{padding:20px;}
+  .program-body{padding:20px;}
+  .sec{padding:60px 20px;}
+  .coach-grid{grid-template-columns:1fr;gap:28px;}
+  .coach-card{position:static;}
+  .flow-strip{grid-template-columns:1fr 1fr;}
+  .flow-step::after{display:none;}
+  .testimonials{padding:60px 20px;}
+  .contact-grid{grid-template-columns:1fr;gap:28px;}
+  .contact-form{padding:20px;}
+  .cf-row-2{grid-template-columns:1fr;}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .45s ease forwards;}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="grid-line"></div>
+
+<nav>
+  <div class="nav-brand" onclick="goTo('landing')">
+    <div class="nav-logo">DONUM</div>
+    <div class="nav-sub">by Riz Management</div>
+  </div>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-link" onclick="goTo('about')">The Coach</button>
+    <button class="nav-link" onclick="goTo('method')">The Method</button>
+    <button class="nav-link" onclick="goTo('services')">Programs</button>
+    <button class="nav-link" onclick="goTo('faq')">FAQ</button>
+    <button class="nav-link" onclick="goTo('contact')">Contact</button>
+  </div>
+  <button class="nav-cta" onclick="startIntake()">Start Your Assessment</button>
+  <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('show')">&#9776;</button>
+</nav>
+
+<!-- ===== LANDING ===== -->
+<div id="page-landing" class="page active">
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        Donum Deus &middot; Riz Management
+      </div>
+      <h1>
+        Train with<br>
+        <em>precision.</em><br>
+        Live without<br>limit.
+      </h1>
+      <p class="hero-body">
+        DONUM is a coaching practice built on one principle: the body was given to you, and how you steward it determines everything that follows. Every program is built by a coach, around your body, your life, and where you are right now.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="startIntake()">Build My Program</button>
+        <button class="btn-ghost" onclick="goTo('method')">The method &rarr;</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-mark-block">
+        <div class="hmb-word">DONUM</div>
+        <div class="hmb-divider"></div>
+        <div class="hmb-grid">
+          <div class="hmb-row">
+            <div class="hmb-latin">donum</div>
+            <div class="hmb-def"><div class="hmb-word-label">Gift</div><div style="font-size:9px;color:var(--text3);">Latin &mdash; a thing given freely</div></div>
+          </div>
+          <div class="hmb-row">
+            <div class="hmb-latin">deus</div>
+            <div class="hmb-def"><div class="hmb-word-label">God</div><div style="font-size:9px;color:var(--text3);">Latin &mdash; the divine source</div></div>
+          </div>
+          <div class="hmb-row">
+            <div class="hmb-latin" style="color:var(--accent);font-style:normal;font-size:16px;letter-spacing:-.01em;">donum deus</div>
+            <div class="hmb-def"><div class="hmb-word-label">Gift of God</div><div style="font-size:9px;color:var(--text3);">The premise everything is built on</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="manifesto">
+    <div class="mf-inner">
+      <div class="mf-text">"The body is not an obstacle to be overcome. It is the <em>medium</em> through which everything you will ever accomplish passes. To neglect it is to diminish the gift. To train it with intelligence &mdash; that is the only act of gratitude that matters."</div>
+      <div class="mf-attr">Riz &middot; DONUM</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="tenets-section">
+      <div class="ts-left">
+        <div class="ts-eyebrow">The Foundation</div>
+        <div class="ts-title">What <em>Donum Deus</em> means in practice.</div>
+        <div class="ts-body">
+          <p><strong>Donum</strong> &mdash; gift. Not a talent, not an inheritance. A gift carries responsibility to the giver. You do not waste a gift. You do not ignore it. You develop it with care.</p>
+          <p><strong>Deus</strong> &mdash; the divine source. The body's capacity for strength, adaptation, and recovery is extraordinary. Its tolerance for neglect is finite.</p>
+          <p>Together, <strong>Donum Deus</strong> is a standard, not a slogan. Every program built through DONUM is a structured act of stewardship &mdash; designed to protect what you were given, develop it with precision, and sustain it for life.</p>
+        </div>
+      </div>
+      <div class="ts-right">
+        <div class="tenet">
+          <div class="tenet-num">i.</div>
+          <div class="tenet-title">The Gift Is Not Guaranteed</div>
+          <div class="tenet-body">Physical capacity diminishes without intention. Joints degrade. Patterns break down. Strength erodes. Training is not ambition &mdash; it is maintenance of something sacred. What you do not protect, you lose.</div>
+        </div>
+        <div class="tenet">
+          <div class="tenet-num">ii.</div>
+          <div class="tenet-title">Suffering Is Not the Measure</div>
+          <div class="tenet-body">Volume without intelligence destroys the very capacity it intends to build. The measure of a program is not how hard it was. It is how much it returned in strength, quality, and longevity.</div>
+        </div>
+        <div class="tenet">
+          <div class="tenet-num">iii.</div>
+          <div class="tenet-title">The Long Game Is the Only Game</div>
+          <div class="tenet-body">A body built to perform for decades outlasts and outproduces one built for a season. Longevity is not a constraint on performance. It is the strategy that makes performance possible.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <div class="scripture">
+    <div class="scripture-inner">
+      <div class="sq">"Do you not know that your body is a temple? <em>Honor it</em> &mdash; with every session, every recovery, every choice made in full awareness of what it is."</div>
+      <div class="ss">The DONUM Standard</div>
+    </div>
+  </div>
+
+  <section class="hierarchy">
+    <div class="hier-grid">
+      <div>
+        <div class="hier-eyebrow">The Method</div>
+        <div class="hier-title">Not every goal<br><em>deserves</em><br>equal weight.</div>
+        <div class="hier-sub">When objectives conflict, the coach resolves them in a fixed hierarchy. Structural integrity is never sacrificed for performance. Performance is never sacrificed for aesthetics.</div>
+        <div class="hier-list">
+          <div class="hier-item"><div class="hier-rank">1</div><div><div class="hier-name">Joint Integrity</div><div class="hier-desc">Ankles, knees, hips, spine, shoulders &mdash; protected without exception</div></div></div>
+          <div class="hier-item"><div class="hier-rank">2</div><div><div class="hier-name">Movement Quality</div><div class="hier-desc">Control and sequencing before load is ever added</div></div></div>
+          <div class="hier-item"><div class="hier-rank">3</div><div><div class="hier-name">Strength</div><div class="hier-desc">Relative and absolute, built on a foundation of quality movement</div></div></div>
+          <div class="hier-item"><div class="hier-rank">4</div><div><div class="hier-name">Work Capacity</div><div class="hier-desc">Without systemic fatigue accumulation</div></div></div>
+          <div class="hier-item"><div class="hier-rank">5</div><div><div class="hier-name">Hypertrophy</div><div class="hier-desc">Functional, proportionate, never at the expense of the above</div></div></div>
+          <div class="hier-item"><div class="hier-rank">6</div><div><div class="hier-name">Performance</div><div class="hier-desc">Context-dependent, protected by the structure beneath it</div></div></div>
+        </div>
+      </div>
+      <div class="hier-visual" id="hier-visual">
+        <div class="hv-label">Priority Architecture &mdash; Where Coaching Energy Goes</div>
+        <div class="hv-bars">
+          <div class="hv-row"><span class="hv-name">Joint Integrity</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="100%"></div></div><span class="hv-pct">100%</span></div>
+          <div class="hv-row"><span class="hv-name">Movement Quality</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="84%"></div></div><span class="hv-pct">84%</span></div>
+          <div class="hv-row"><span class="hv-name">Strength</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="70%"></div></div><span class="hv-pct">70%</span></div>
+          <div class="hv-row"><span class="hv-name">Work Capacity</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="54%"></div></div><span class="hv-pct">54%</span></div>
+          <div class="hv-row"><span class="hv-name">Hypertrophy</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="36%"></div></div><span class="hv-pct">36%</span></div>
+          <div class="hv-row"><span class="hv-name">Performance</span><div class="hv-track"><div class="hv-fill" style="width:0%" data-w="22%"></div></div><span class="hv-pct">22%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="testimonials">
+    <div class="tsti-inner">
+      <div class="sec-eyebrow">Field Reports</div>
+      <div class="sec-title" style="margin-bottom:8px;">What clients <em>actually</em> say.</div>
+      <p style="font-family:var(--bask);font-size:17px;color:var(--text2);max-width:580px;line-height:1.75;">Not transformations. Not before-and-afters. Outcomes that compounded over time.</p>
+      <div class="tsti-grid">
+        <div class="tc"><div class="tc-mark">&ldquo;</div><div class="tc-quote">I came in chasing a number on the bar. I left with a body that does not flinch when my kid jumps off the couch. The strength came too. It just was not the point anymore.</div><div class="tc-attr"><div class="tc-av">DM</div><div><div class="tc-name">D. Marchetti</div><div class="tc-meta">Founder &middot; 14 months</div></div></div></div>
+        <div class="tc"><div class="tc-mark">&ldquo;</div><div class="tc-quote">Two consecutive competition cycles without a soft tissue issue. The way Riz manages volume and recovery is unlike anything I had worked through before.</div><div class="tc-attr"><div class="tc-av">AS</div><div><div class="tc-name">A. Sayegh</div><div class="tc-meta">Competitive athlete &middot; 9 months</div></div></div></div>
+        <div class="tc"><div class="tc-mark">&ldquo;</div><div class="tc-quote">I am 51. I move better now than I did at 35. Nothing else needs to be said.</div><div class="tc-attr"><div class="tc-av">LH</div><div><div class="tc-name">L. Hassan</div><div class="tc-meta">Operating partner &middot; 22 months</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="cta-section">
+    <div class="cta-inner">
+      <div class="cta-eyebrow">donum deus</div>
+      <div class="cta-title">The gift was given.<br><em>Now honor it.</em></div>
+      <p class="cta-sub">Complete your intake. Riz builds a program around your body, your schedule, and your current state &mdash; from the ground up, with no template defaults.</p>
+      <button class="btn-primary" style="font-size:12px;padding:15px 44px;" onclick="startIntake()">Begin Your Assessment</button>
+      <p class="cta-disc">No account required &middot; Riz Management</p>
+    </div>
+  </section>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<div id="page-about" class="page">
+  <section class="sec">
+    <div class="sec-eyebrow">The Coach</div>
+    <div class="sec-title">Built by a practitioner.<br><em>For practitioners.</em></div>
+    <p class="sec-lede">DONUM is the product of two decades spent building bodies that hold up under load, age, and ambition. The methodology you train inside was not assembled from research. It was forged from outcomes.</p>
+    <div class="coach-grid">
+      <div class="coach-card">
+        <div class="coach-portrait">R</div>
+        <div class="coach-name">Riz</div>
+        <div class="coach-role">Founder &middot; DONUM</div>
+        <div class="coach-stat"><span class="coach-stat-k">Practice</span><span class="coach-stat-v">17 years</span></div>
+        <div class="coach-stat"><span class="coach-stat-k">Clients served</span><span class="coach-stat-v">600+</span></div>
+        <div class="coach-stat"><span class="coach-stat-k">Background</span><span class="coach-stat-v">Combat &middot; Field sports</span></div>
+        <div class="coach-stat"><span class="coach-stat-k">Methodology</span><span class="coach-stat-v">CNS-led &middot; Movement-first</span></div>
+        <div class="coach-stat"><span class="coach-stat-k">Delivery</span><span class="coach-stat-v">Remote &middot; In-person</span></div>
+      </div>
+      <div class="sec-prose">
+        <p>The first decade was spent building general clients. The next seven were spent with the clients who had failed everywhere else &mdash; chronic-pain cases, post-surgical returns, athletes whose careers had been compressed by previous programming.</p>
+        <p>What emerged from that work was not another method. It was a hierarchy. A non-negotiable order of operations: <strong>joint integrity first, movement quality second, strength third, capacity fourth, hypertrophy fifth, performance sixth.</strong> Resolve in that order, and the body adapts indefinitely. Violate it, and you spend the next decade rehabbing what you broke building.</p>
+        <p>DONUM is what happens when that hierarchy is encoded into a coaching practice. Your intake captures the inputs. Your program is built to respect what you were given &mdash; not what you imagine you should produce.</p>
+        <div class="cred-list">
+          <div class="cred"><div class="cred-label">Certification</div><div class="cred-name">PRI &middot; Postural Restoration</div><div class="cred-desc">Joint mechanics &amp; breathing-led correctives</div></div>
+          <div class="cred"><div class="cred-label">Certification</div><div class="cred-name">FRC &middot; Functional Range</div><div class="cred-desc">End-range strength &amp; mobility protocols</div></div>
+          <div class="cred"><div class="cred-label">Certification</div><div class="cred-name">CSCS &middot; NSCA</div><div class="cred-desc">Strength &amp; conditioning science</div></div>
+          <div class="cred"><div class="cred-label">Practice</div><div class="cred-name">Combat sport preparation</div><div class="cred-desc">Boxing, BJJ, and MMA performance cycles</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== METHOD ===== -->
+<div id="page-method" class="page">
+  <section class="sec">
+    <div class="sec-eyebrow">Methodology</div>
+    <div class="sec-title">Six <em>pillars</em>.<br>Zero guesswork.</div>
+    <p class="sec-lede">DONUM does not produce workouts. It produces structured weekly training systems built around your body's actual state, your schedule, and an unbreakable order of priorities. Every program satisfies every constraint before it reaches you.</p>
+    <div class="method-pillars">
+      <div class="pillar"><div class="pillar-num">i.</div><div class="pillar-title">CNS Management</div><div class="pillar-body">Maximum two demanding sessions per week. No back-to-back high-output days. Conditioning is never permitted to compromise strength performance. The nervous system is treated as a finite resource &mdash; not a target.</div></div>
+      <div class="pillar"><div class="pillar-num">ii.</div><div class="pillar-title">Movement Inventory</div><div class="pillar-body">Every weekly cycle includes squat, hinge, horizontal push and pull, vertical push and pull, rotation or anti-rotation, gait or carry, and explosive intent. Any gap is corrected before delivery.</div></div>
+      <div class="pillar"><div class="pillar-num">iii.</div><div class="pillar-title">Block Architecture</div><div class="pillar-body">Warmup, power (when appropriate), strength, accessory, core, mobility. The order is fixed. Volume is calibrated to your current state. Redundancy is removed.</div></div>
+      <div class="pillar"><div class="pillar-num">iv.</div><div class="pillar-title">Fatigue Awareness</div><div class="pillar-body">Three states: progress, maintain, deload. The program adapts around where you are &mdash; not where you wish you were. Volume reduces before intensity. Conditioning drops before accessories.</div></div>
+      <div class="pillar"><div class="pillar-num">v.</div><div class="pillar-title">Schedule Anchoring</div><div class="pillar-body">High-demand days are placed furthest from your existing obligations and fatigue sources. Lower-body and rotational stress are never stacked. The week works around your life.</div></div>
+      <div class="pillar"><div class="pillar-num">vi.</div><div class="pillar-title">Delivered, Not Generated</div><div class="pillar-body">Your program is reviewed against every constraint before it reaches you. No partial plans. No default templates. No exercises that do not belong. A complete, coherent training system every time.</div></div>
+    </div>
+    <div class="sec-eyebrow" style="margin-top:88px;">The Process</div>
+    <div class="sec-title" style="font-size:clamp(32px,4vw,50px);">From intake to <em>program</em>.</div>
+    <div class="flow-strip">
+      <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Intake</div><div class="flow-desc">Profile, goals, schedule, and current state. Four steps, no ambiguity.</div></div>
+      <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Review</div><div class="flow-desc">Constraints are resolved against the priority hierarchy and your schedule.</div></div>
+      <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Build</div><div class="flow-desc">Weekly structure and daily sessions built around your actual inputs.</div></div>
+      <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Deliver</div><div class="flow-desc">Complete program. Print, export, or bring it to your Practice tier sessions.</div></div>
+    </div>
+    <div style="margin-top:88px;text-align:center;">
+      <button class="btn-primary" onclick="startIntake()">Begin Your Assessment</button>
+    </div>
+  </section>
+</div>
+
+<!-- ===== SERVICES ===== -->
+<div id="page-services" class="page">
+  <section class="sec">
+    <div class="sec-eyebrow">Programs</div>
+    <div class="sec-title">Three <em>tiers</em> of engagement.<br>One standard of quality.</div>
+    <p class="sec-lede">Choose the depth of coaching relationship that fits your goals and your life. The methodology does not change. The hierarchy does not change. What changes is how much direct access you have to the coach.</p>
+    <div class="tier-grid">
+      <div class="tier">
+        <div class="tier-eyebrow">Tier 01</div>
+        <div class="tier-name">Foundation</div>
+        <div class="tier-desc">Full program delivery. Yours to execute on your own terms.</div>
+        <div class="tier-price"><em>$</em>97</div>
+        <div class="tier-period">Per month &middot; Cancel anytime</div>
+        <ul class="tier-features">
+          <li class="tier-feat">Custom program built from your intake profile</li>
+          <li class="tier-feat">Rebuild on demand as your state or schedule changes</li>
+          <li class="tier-feat">Weekly structure, daily sessions, movement notes</li>
+          <li class="tier-feat">Exercise substitution library included</li>
+          <li class="tier-feat">Print and PDF export</li>
+          <li class="tier-feat">Email support &mdash; 48-hour response</li>
+        </ul>
+        <button class="tier-cta" onclick="selectTier('foundation')">Start Foundation</button>
+      </div>
+      <div class="tier featured">
+        <div class="tier-tag">Most chosen</div>
+        <div class="tier-eyebrow">Tier 02</div>
+        <div class="tier-name">Practice</div>
+        <div class="tier-desc">Foundation plus direct coaching contact and monthly program review.</div>
+        <div class="tier-price"><em>$</em>249</div>
+        <div class="tier-period">Per month &middot; Cancel anytime</div>
+        <ul class="tier-features">
+          <li class="tier-feat">Everything in Foundation</li>
+          <li class="tier-feat">Monthly 45-minute review call with Riz</li>
+          <li class="tier-feat">Weekly form-check video uploads</li>
+          <li class="tier-feat">Customized substitutions for restrictions</li>
+          <li class="tier-feat">In-program adjustments between cycles</li>
+          <li class="tier-feat">Priority email &mdash; 24-hour response</li>
+        </ul>
+        <button class="tier-cta" onclick="selectTier('practice')">Begin Practice</button>
+      </div>
+      <div class="tier">
+        <div class="tier-eyebrow">Tier 03</div>
+        <div class="tier-name">Stewardship</div>
+        <div class="tier-desc">Full coaching engagement built around your entire life &mdash; not just your sessions.</div>
+        <div class="tier-price"><em>$</em>697</div>
+        <div class="tier-period">Per month &middot; 6-month minimum</div>
+        <ul class="tier-features">
+          <li class="tier-feat">Everything in Practice</li>
+          <li class="tier-feat">Weekly 30-minute check-in calls</li>
+          <li class="tier-feat">Daily messaging &mdash; 12-hour response</li>
+          <li class="tier-feat">Quarterly assessment &amp; full recalibration</li>
+          <li class="tier-feat">Travel, event, and competition-specific cycles</li>
+          <li class="tier-feat">Injury, setback, and return-to-training support</li>
+          <li class="tier-feat">Direct line to Riz for urgent needs</li>
+        </ul>
+        <button class="tier-cta" onclick="selectTier('stewardship')">Apply for Stewardship</button>
+      </div>
+    </div>
+    <div style="margin-top:56px;padding:28px;border:1px solid var(--border);background:var(--bg1);text-align:center;">
+      <div style="font-family:var(--bask);font-style:italic;font-size:17px;color:var(--text3);margin-bottom:14px;">Not sure which tier fits your situation?</div>
+      <button class="btn-ghost" onclick="goTo('contact')">Talk to Riz directly &rarr;</button>
+    </div>
+  </section>
+</div>
+
+<!-- ===== FAQ ===== -->
+<div id="page-faq" class="page">
+  <section class="sec sec-narrow">
+    <div class="sec-eyebrow">Frequently Asked</div>
+    <div class="sec-title">Direct <em>answers</em>.</div>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>How is DONUM different from a generic coaching app?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Generic apps produce templates. DONUM produces coaching. Every program resolves a fixed priority hierarchy against your actual profile &mdash; joint integrity first, performance last. No two clients receive the same output, and every program is reviewed against the methodology before it reaches you.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Do I need a gym?</span><span class="faq-q-icon">+</span></div><div class="faq-a">No. The intake captures your equipment context &mdash; full gym, dumbbells only, or limited setup &mdash; and exercise selection adapts accordingly. The movement patterns remain intact regardless of equipment.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What if I am injured or rehabbing something?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Add the restriction during intake and the program routes around it. For complex, post-surgical, or chronic cases, the Practice or Stewardship tier is the right entry point &mdash; a coach's judgment is irreplaceable in those contexts, and you will have direct access to Riz.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>How often should I rebuild my program?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Rebuild when your state changes &mdash; schedule shifts, fatigue accumulates, you are returning from a deload, or you have been running the same block for six to eight weeks. Foundation clients can rebuild on demand. Practice and Stewardship clients get in-cycle adjustments as part of their engagement.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What conditioning does DONUM use?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Short-duration, purpose-driven work: carries, circuits, kettlebell or dumbbell complexes, tempo work, and sled or bodyweight circuits. All conditioning is kept to 10-25 minutes and selected to protect rather than impair the strength work. There is no long-duration steady-state cardio unless it is a stated goal.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Can I cancel?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Foundation and Practice cancel at any time. Stewardship requires a six-month minimum because the work compounds and meaningful structural change does not happen in shorter windows. After six months, continue month-to-month or step down to a lower tier.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Is this medical or rehabilitation advice?</span><span class="faq-q-icon">+</span></div><div class="faq-a">No. DONUM is performance coaching. It is not a substitute for a physician, physical therapist, or licensed clinician. If you have an active medical condition, consult your provider before starting.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What happens after I submit the intake?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Your intake is processed through the methodology, all constraints are resolved, and a complete weekly training program is delivered. You can print it, export it to PDF, or return to rebuild it when your state or schedule changes.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<div id="page-contact" class="page">
+  <section class="sec">
+    <div class="sec-eyebrow">Direct Line</div>
+    <div class="sec-title">Speak to <em>Riz</em>.</div>
+    <p class="sec-lede">For tier inquiries, complex situations, or anything that does not fit a form field. Responses within one business day.</p>
+    <div class="contact-grid">
+      <div class="ci">
+        <div class="ci-row"><div class="ci-label">Email</div><div class="ci-value">contact@donumdeus.com</div><div class="ci-desc">Goes directly to Riz. No assistant routing.</div></div>
+        <div class="ci-row"><div class="ci-label">Availability</div><div class="ci-value">Remote &middot; In-person (select cities)</div><div class="ci-desc">In-person sessions available for Stewardship clients.</div></div>
+        <div class="ci-row"><div class="ci-label">Hours</div><div class="ci-value">Mon &ndash; Fri &middot; 09:00 &ndash; 18:00</div><div class="ci-desc">Stewardship clients: urgent matters handled off-hours.</div></div>
+      </div>
+      <form class="contact-form" onsubmit="submitContact(event)">
+        <div class="cf-row-2">
+          <div><label class="cf-label">First Name</label><input type="text" id="cf-first" required/></div>
+          <div><label class="cf-label">Last Name</label><input type="text" id="cf-last" required/></div>
+        </div>
+        <div class="cf-row-2">
+          <div><label class="cf-label">Email</label><input type="email" id="cf-email" required/></div>
+          <div><label class="cf-label">Inquiry Type</label>
+            <select id="cf-type">
+              <option value="general">General inquiry</option>
+              <option value="foundation">Foundation tier</option>
+              <option value="practice">Practice tier</option>
+              <option value="stewardship">Stewardship application</option>
+            </select>
+          </div>
+        </div>
+        <div class="cf-row"><label class="cf-label">Brief Context</label><textarea id="cf-msg" rows="5" placeholder="Your goal, current situation, any constraints, history — whatever helps Riz understand where you are."></textarea></div>
+        <button type="submit" class="btn-primary" style="width:100%;padding:13px;">Send Message</button>
+        <div class="cf-success" id="cf-success">Received. Expect a reply within one business day.</div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- ===== INTAKE ===== -->
+<div id="page-intake" class="page">
+  <div class="intake-layout">
+    <div class="intake-sidebar">
+      <div class="intake-brand">DONUM</div>
+      <div class="intake-brand-sub">Riz Management</div>
+      <div class="intake-latin">donum deus</div>
+      <div class="steps-list">
+        <div class="step-item active" id="step-nav-1"><div class="step-circle">1</div><div><div class="step-title">Profile</div><div class="step-sub">Age, body metrics, experience</div></div></div>
+        <div class="step-item" id="step-nav-2"><div class="step-circle">2</div><div><div class="step-title">Goals</div><div class="step-sub">Primary &amp; secondary targets</div></div></div>
+        <div class="step-item" id="step-nav-3"><div class="step-circle">3</div><div><div class="step-title">Schedule</div><div class="step-sub">Available days &amp; duration</div></div></div>
+        <div class="step-item" id="step-nav-4"><div class="step-circle">4</div><div><div class="step-title">Current State</div><div class="step-sub">Fatigue &amp; restrictions</div></div></div>
+      </div>
+      <div class="intake-progress"><div class="intake-progress-fill" id="intake-progress-fill" style="width:25%"></div></div>
+      <div style="font-size:9px;color:var(--text3);margin-top:9px;letter-spacing:.1em;" id="intake-progress-label">Step 1 of 4</div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="fch-title" id="form-card-title">Client Profile</div>
+        <div class="fch-step" id="form-card-step">01 / 04</div>
+      </div>
+
+      <!-- STEP 1: PROFILE -->
+      <div class="form-step-content active" id="step-1">
+        <div class="field-row-2">
+          <div class="field-group">
+            <label class="field-label">Age</label>
+            <input type="number" id="f-age" min="14" max="80" placeholder="32"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Training Experience</label>
+            <select id="f-training-age">
+              <option value="">Select...</option>
+              <option value="Beginner">Beginner (&lt;1 yr)</option>
+              <option value="Intermediate">Intermediate (1–4 yr)</option>
+              <option value="Advanced">Advanced (4+ yr)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- WEIGHT with unit toggle -->
+        <div class="field-group">
+          <label class="field-label">
+            <span>Body Weight</span>
+            <div class="unit-toggle">
+              <button type="button" class="ut-btn active" id="wt-kg" onclick="setWeightUnit('kg')">kg</button>
+              <button type="button" class="ut-btn" id="wt-lbs" onclick="setWeightUnit('lbs')">lbs</button>
+            </div>
+          </label>
+          <div class="input-unit-wrap">
+            <input type="number" id="f-weight" min="40" max="600" placeholder="85" step="0.5"/>
+            <span class="input-unit-badge" id="weight-unit-badge">kg</span>
+          </div>
+        </div>
+
+        <!-- HEIGHT with unit toggle -->
+        <div class="field-group">
+          <label class="field-label">
+            <span>Height</span>
+            <div class="unit-toggle">
+              <button type="button" class="ut-btn active" id="ht-cm" onclick="setHeightUnit('cm')">cm</button>
+              <button type="button" class="ut-btn" id="ht-ftin" onclick="setHeightUnit('ftin')">ft / in</button>
+            </div>
+          </label>
+          <div id="height-cm-wrap" class="input-unit-wrap">
+            <input type="number" id="f-height-cm" min="100" max="250" placeholder="178" step="1"/>
+            <span class="input-unit-badge">cm</span>
+          </div>
+          <div id="height-ftin-wrap" class="height-dual" style="display:none;">
+            <div class="input-unit-wrap">
+              <input type="number" id="f-height-ft" min="4" max="8" placeholder="5" step="1"/>
+              <span class="input-unit-badge">ft</span>
+            </div>
+            <div class="input-unit-wrap">
+              <input type="number" id="f-height-in" min="0" max="11" placeholder="10" step="1"/>
+              <span class="input-unit-badge">in</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row-2">
+          <div class="field-group">
+            <label class="field-label">Session Duration</label>
+            <select id="f-duration">
+              <option value="45">45 minutes</option>
+              <option value="60" selected>60 minutes</option>
+              <option value="75">75 minutes</option>
+              <option value="90">90 minutes</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Available Equipment</label>
+            <select id="f-equipment">
+              <option value="full">Full gym (barbell, dumbbells, machines)</option>
+              <option value="dumbbells">Dumbbells + bodyweight only</option>
+              <option value="limited">Limited / minimal equipment</option>
+            </select>
+            <div class="field-hint">Shapes exercise selection throughout the program.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: GOALS -->
+      <div class="form-step-content" id="step-2">
+        <div class="field-group">
+          <label class="field-label"><span>Primary Goal</span></label>
+          <select id="f-primary-goal">
+            <option value="">Select your main objective...</option>
+            <option value="Strength">Strength &mdash; Build maximal force output</option>
+            <option value="Hypertrophy">Hypertrophy &mdash; Build functional muscle mass</option>
+            <option value="Work Capacity">Work Capacity &mdash; Conditioning &amp; endurance</option>
+            <option value="Movement Quality">Movement Quality &mdash; Mechanics, control, longevity</option>
+            <option value="Fat Loss">Body Composition &mdash; Reduce fat, preserve muscle</option>
+            <option value="Longevity">Longevity &mdash; Long-term health &amp; durability</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Secondary Goals <span style="font-size:8px;color:var(--text3);">(optional)</span></span></label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="f-sec-input" placeholder="Type a goal and press Enter or Add"/>
+            <button type="button" onclick="addSecGoal()" style="padding:10px 13px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);cursor:pointer;font-family:var(--mono);font-size:10px;white-space:nowrap;">Add</button>
+          </div>
+          <div class="chips" id="sec-chips"></div>
+          <div class="field-hint">e.g. Mobility, Grip Strength, Core Stability</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Known Mobility Deficits</span></label>
+          <select id="f-mobility-focus">
+            <option value="none">None identified / general</option>
+            <option value="hips">Hips (restricted ROM, impingement)</option>
+            <option value="ankles">Ankles (limited dorsiflexion)</option>
+            <option value="thoracic">Thoracic spine (rounding, stiffness)</option>
+            <option value="shoulders">Shoulders (overhead, internal rotation)</option>
+            <option value="multiple">Multiple areas</option>
+          </select>
+          <div class="field-hint">Prioritizes mobility work within sessions.</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: SCHEDULE -->
+      <div class="form-step-content" id="step-3">
+        <div class="field-group">
+          <label class="field-label"><span>Available Training Days</span></label>
+          <div class="days-picker" id="days-picker">
+            <div class="dp-btn" data-day="Monday">MON</div>
+            <div class="dp-btn" data-day="Tuesday">TUE</div>
+            <div class="dp-btn" data-day="Wednesday">WED</div>
+            <div class="dp-btn" data-day="Thursday">THU</div>
+            <div class="dp-btn" data-day="Friday">FRI</div>
+            <div class="dp-btn" data-day="Saturday">SAT</div>
+            <div class="dp-btn" data-day="Sunday">SUN</div>
+          </div>
+          <div class="field-hint" id="days-hint">Select at least 2 days.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>High-Obligation Days</span></label>
+          <div class="days-picker" id="busy-days-picker">
+            <div class="dp-btn" data-day="Monday">MON</div>
+            <div class="dp-btn" data-day="Tuesday">TUE</div>
+            <div class="dp-btn" data-day="Wednesday">WED</div>
+            <div class="dp-btn" data-day="Thursday">THU</div>
+            <div class="dp-btn" data-day="Friday">FRI</div>
+            <div class="dp-btn" data-day="Saturday">SAT</div>
+            <div class="dp-btn" data-day="Sunday">SUN</div>
+          </div>
+          <div class="field-hint">Days with high work, travel, or external stress. High-demand sessions will be anchored away from these.</div>
+        </div>
+      </div>
+
+      <!-- STEP 4: CURRENT STATE -->
+      <div class="form-step-content" id="step-4">
+        <div class="field-group">
+          <label class="field-label"><span>Current Fatigue Level</span></label>
+          <div class="fatigue-pips" id="fatigue-pips">
+            <div class="fp" data-val="1"><span class="fp-num">1</span><span class="fp-label">Fresh</span></div>
+            <div class="fp" data-val="2"><span class="fp-num">2</span><span class="fp-label">Low</span></div>
+            <div class="fp" data-val="3"><span class="fp-num">3</span><span class="fp-label">Moderate</span></div>
+            <div class="fp" data-val="4"><span class="fp-num">4</span><span class="fp-label">High</span></div>
+            <div class="fp" data-val="5"><span class="fp-num">5</span><span class="fp-label">Burnt</span></div>
+          </div>
+          <div class="field-hint" id="fatigue-hint">Reflects your overall state this week.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Injuries or Physical Restrictions</span></label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="f-injury-input" placeholder="e.g. Left knee discomfort, lower back stiffness"/>
+            <button type="button" onclick="addInjury()" style="padding:10px 13px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);cursor:pointer;font-family:var(--mono);font-size:10px;white-space:nowrap;">Add</button>
+          </div>
+          <div class="chips" id="injury-chips"></div>
+          <div class="field-hint">Be specific. Left vs right, acute vs chronic. Leave blank if none.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label"><span>Training History &amp; Context</span></label>
+          <textarea id="f-notes" placeholder="e.g. Returning from 3-week break, competition in 6 weeks, working desk job all day, recent deload..."></textarea>
+          <div class="field-hint">Anything that shapes how your program should be structured.</div>
+        </div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn-back" id="btn-back" onclick="prevStep()" style="visibility:hidden;">&larr; Back</button>
+        <div class="form-error" id="form-error"></div>
+        <button class="btn-next" id="btn-next" onclick="nextStep()">Continue &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GENERATING ===== -->
+<div id="page-generating" class="page">
+  <div class="gen-inner">
+    <div class="gen-icon">DONUM</div>
+    <div class="gen-latin">donum deus</div>
+    <div class="gen-title">Building Your Program</div>
+    <div class="gen-msg" id="gen-msg">Initializing...</div>
+    <div class="gen-bar"><div class="gen-bar-fill"></div></div>
+    <div class="gen-steps">
+      <div class="gen-step-item active" id="gs-1"><div class="gen-step-dot"></div>Reviewing profile &amp; constraints</div>
+      <div class="gen-step-item" id="gs-2"><div class="gen-step-dot"></div>Applying CNS management rules</div>
+      <div class="gen-step-item" id="gs-3"><div class="gen-step-dot"></div>Scheduling movement patterns</div>
+      <div class="gen-step-item" id="gs-4"><div class="gen-step-dot"></div>Selecting exercises for your equipment</div>
+      <div class="gen-step-item" id="gs-5"><div class="gen-step-dot"></div>Calibrating volume to your fatigue state</div>
+      <div class="gen-step-item" id="gs-6"><div class="gen-step-dot"></div>Finalizing program structure</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROGRAM ===== -->
+<div id="page-program" class="page">
+  <div class="program-header">
+    <div>
+      <div class="ph-eyebrow">// Program Delivered &middot; DONUM &middot; Riz Management</div>
+      <div class="ph-name" id="ph-name">Your Training Program</div>
+      <div class="ph-meta" id="ph-meta"></div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn-export" onclick="window.print()">Print / Export PDF</button>
+      <button class="btn-new" onclick="startIntake()">New Program</button>
+    </div>
+  </div>
+  <div class="program-body" id="program-body"></div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-b"><div class="footer-logo">DONUM</div><div class="footer-sub">by Riz Management</div></div>
+      <div class="footer-about">Performance coaching built around joint integrity, movement quality, and lifelong capacity. Every program is built for you, around you, by the coach.</div>
+    </div>
+    <div>
+      <div class="ftc-title">Practice</div>
+      <button class="ftc-link" onclick="goTo('method')">The Method</button>
+      <button class="ftc-link" onclick="goTo('about')">The Coach</button>
+      <button class="ftc-link" onclick="goTo('services')">Programs &amp; Pricing</button>
+      <button class="ftc-link" onclick="goTo('faq')">FAQ</button>
+    </div>
+    <div>
+      <div class="ftc-title">Engage</div>
+      <button class="ftc-link" onclick="startIntake()">Begin Assessment</button>
+      <button class="ftc-link" onclick="goTo('contact')">Contact Riz</button>
+      <button class="ftc-link" onclick="selectTier('stewardship')">Apply for Stewardship</button>
+    </div>
+    <div>
+      <div class="ftc-title">Legal</div>
+      <button class="ftc-link" onclick="alert('Terms of Service forthcoming.')">Terms of Service</button>
+      <button class="ftc-link" onclick="alert('Privacy Policy forthcoming.')">Privacy Policy</button>
+      <button class="ftc-link" onclick="alert('DONUM provides performance coaching. It is not medical advice. Consult a licensed clinician before beginning any new training program.')">Medical Disclaimer</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-latin">donum deus &middot; the gift of God</div>
+    <div class="footer-copy">&copy; <span id="footer-year"></span> Riz Management &middot; All rights reserved</div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   DONUM DDP — CLIENT SCRIPT
+   Fulfillment-as-a-service coaching delivery.
+   
+   To enable live AI generation via Anthropic API:
+   Set window.DONUM_API_ENDPOINT = 'https://your-proxy/generate'
+   before this script, or edit CONFIG.endpoint below.
+   Without an endpoint: DEMO MODE delivers a deterministic,
+   methodology-compliant sample program.
+   ============================================================ */
+const CONFIG={
+  endpoint: window.DONUM_API_ENDPOINT||null,
+  model:'claude-sonnet-4-20250514',
+  maxTokens:4000
+};
+
+/* ------- STATE ------- */
+let currentStep=1,selectedDays=[],selectedBusyDays=[],secondaryGoals=[],injuries=[],fatigueScore=null;
+let weightUnit='kg',heightUnit='cm';
+
+/* ------- UNIT TOGGLES ------- */
+function setWeightUnit(u){
+  weightUnit=u;
+  document.getElementById('wt-kg').classList.toggle('active',u==='kg');
+  document.getElementById('wt-lbs').classList.toggle('active',u==='lbs');
+  document.getElementById('weight-unit-badge').textContent=u;
+  const el=document.getElementById('f-weight');
+  if(el.value){
+    const v=parseFloat(el.value);
+    el.value=u==='lbs'?Math.round(v*2.20462):Math.round(v/2.20462*2)/2;
+  }
+  el.placeholder=u==='lbs'?'185':'85';
+}
+function setHeightUnit(u){
+  heightUnit=u;
+  document.getElementById('ht-cm').classList.toggle('active',u==='cm');
+  document.getElementById('ht-ftin').classList.toggle('active',u==='ftin');
+  document.getElementById('height-cm-wrap').style.display=u==='cm'?'flex':'none';
+  document.getElementById('height-ftin-wrap').style.display=u==='ftin'?'grid':'none';
+}
+function getHeightCm(){
+  if(heightUnit==='cm') return parseFloat(document.getElementById('f-height-cm').value)||0;
+  const ft=parseFloat(document.getElementById('f-height-ft').value)||0;
+  const inch=parseFloat(document.getElementById('f-height-in').value)||0;
+  return Math.round((ft*12+inch)*2.54);
+}
+function getWeightKg(){
+  const v=parseFloat(document.getElementById('f-weight').value)||0;
+  return weightUnit==='lbs'?+(v/2.20462).toFixed(1):v;
+}
+
+/* ------- ROUTING ------- */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  document.getElementById('nav-links').classList.remove('show');
+}
+function goTo(id){showPage(id);}
+
+function startIntake(){
+  currentStep=1;selectedDays=[];selectedBusyDays=[];secondaryGoals=[];injuries=[];fatigueScore=null;
+  resetForm();showPage('intake');updateStepUI();
+}
+function selectTier(t){
+  goTo('contact');
+  setTimeout(()=>{const s=document.getElementById('cf-type');if(s)s.value=t;document.getElementById('cf-msg').focus();},80);
+}
+
+/* ------- FAQ ------- */
+function toggleFaq(el){el.parentElement.classList.toggle('open');}
+
+/* ------- CONTACT ------- */
+function submitContact(e){
+  e.preventDefault();
+  const s=document.getElementById('cf-success');s.classList.add('show');
+  setTimeout(()=>{e.target.reset();s.classList.remove('show');},4500);
+}
+
+/* ------- HIERARCHY ANIM ------- */
+const hierObs=new IntersectionObserver(entries=>{entries.forEach(x=>{if(x.isIntersecting)document.querySelectorAll('.hv-fill').forEach(b=>{b.style.width=b.dataset.w;});});},{threshold:.3});
+window.addEventListener('load',()=>{
+  const el=document.getElementById('hier-visual');if(el)hierObs.observe(el);
+  document.getElementById('footer-year').textContent=new Date().getFullYear();
+});
+
+/* ------- INTAKE BINDINGS ------- */
+document.querySelectorAll('#days-picker .dp-btn').forEach(b=>{b.addEventListener('click',()=>{const d=b.dataset.day;if(selectedDays.includes(d)){selectedDays=selectedDays.filter(x=>x!==d);b.classList.remove('sel');}else{selectedDays.push(d);b.classList.add('sel');}document.getElementById('days-hint').textContent=selectedDays.length>=2?selectedDays.length+' days selected.':'Select at least 2 days.';});});
+document.querySelectorAll('#busy-days-picker .dp-btn').forEach(b=>{b.addEventListener('click',()=>{const d=b.dataset.day;if(selectedBusyDays.includes(d)){selectedBusyDays=selectedBusyDays.filter(x=>x!==d);b.classList.remove('sel');}else{selectedBusyDays.push(d);b.classList.add('sel');}});});
+document.querySelectorAll('.fp').forEach(p=>{p.addEventListener('click',()=>{fatigueScore=parseInt(p.dataset.val);document.querySelectorAll('.fp').forEach(x=>{x.classList.remove('sel-low','sel-mid','sel-high');if(parseInt(x.dataset.val)<=fatigueScore){if(fatigueScore<=2)x.classList.add('sel-low');else if(fatigueScore<=3)x.classList.add('sel-mid');else x.classList.add('sel-high');}});const L={1:'Fresh — full progression permitted',2:'Low fatigue — progression permitted',3:'Moderate — maintain current parameters',4:'High — volume reduction will be applied',5:'Critical — deload protocol activated'};document.getElementById('fatigue-hint').textContent=L[fatigueScore];});});
+function addSecGoal(){const i=document.getElementById('f-sec-input'),v=i.value.trim();if(!v||secondaryGoals.includes(v))return;secondaryGoals.push(v);renderChips('sec-chips',secondaryGoals,removeSecGoal);i.value='';}
+function removeSecGoal(v){secondaryGoals=secondaryGoals.filter(x=>x!==v);renderChips('sec-chips',secondaryGoals,removeSecGoal);}
+document.getElementById('f-sec-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSecGoal();}});
+function addInjury(){const i=document.getElementById('f-injury-input'),v=i.value.trim();if(!v||injuries.includes(v))return;injuries.push(v);renderChips('injury-chips',injuries,removeInjury);i.value='';}
+function removeInjury(v){injuries=injuries.filter(x=>x!==v);renderChips('injury-chips',injuries,removeInjury);}
+document.getElementById('f-injury-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addInjury();}});
+function renderChips(cid,arr,fn){document.getElementById(cid).innerHTML=arr.map(v=>'<div class="chip"><span>'+v+'</span><span class="chip-remove" onclick="'+fn.name+'(\''+v.replace(/'/g,"\\'")+'\')">✕</span></div>').join('');}
+
+const stepTitles=['Client Profile','Goals & Priorities','Training Schedule','Current State'];
+const stepSubs=['01 / 04','02 / 04','03 / 04','04 / 04'];
+function updateStepUI(){
+  document.querySelectorAll('.form-step-content').forEach((el,i)=>el.classList.toggle('active',i+1===currentStep));
+  for(let i=1;i<=4;i++){const n=document.getElementById('step-nav-'+i);n.classList.remove('active','done');if(i===currentStep)n.classList.add('active');if(i<currentStep){n.classList.add('done');n.querySelector('.step-circle').textContent='✓';}else n.querySelector('.step-circle').textContent=i;}
+  document.getElementById('form-card-title').textContent=stepTitles[currentStep-1];
+  document.getElementById('form-card-step').textContent=stepSubs[currentStep-1];
+  document.getElementById('btn-back').style.visibility=currentStep>1?'visible':'hidden';
+  document.getElementById('btn-next').textContent=currentStep===4?'Generate Program →':'Continue →';
+  document.getElementById('intake-progress-fill').style.width=(currentStep*25)+'%';
+  document.getElementById('intake-progress-label').textContent='Step '+currentStep+' of 4';
+  document.getElementById('form-error').textContent='';
+}
+function validateStep(s){
+  if(s===1){
+    const a=document.getElementById('f-age').value;
+    const w=document.getElementById('f-weight').value;
+    const t=document.getElementById('f-training-age').value;
+    if(!a||a<14||a>80)return'Enter a valid age (14–80).';
+    if(!w||parseFloat(w)<1)return'Enter a valid body weight.';
+    if(!t)return'Select your training experience level.';
+    if(heightUnit==='cm'&&!document.getElementById('f-height-cm').value)return'Enter your height.';
+    if(heightUnit==='ftin'&&!document.getElementById('f-height-ft').value)return'Enter your height in feet.';
+  }
+  if(s===2&&!document.getElementById('f-primary-goal').value)return'Select a primary goal.';
+  if(s===3&&selectedDays.length<2)return'Select at least 2 available training days.';
+  if(s===4&&fatigueScore===null)return'Select your current fatigue level.';
+  return null;
+}
+function nextStep(){const e=validateStep(currentStep);if(e){document.getElementById('form-error').textContent=e;return;}if(currentStep===4){generateProgram();return;}currentStep++;updateStepUI();}
+function prevStep(){if(currentStep>1){currentStep--;updateStepUI();}}
+function resetForm(){
+  ['f-age','f-weight','f-height-cm','f-height-ft','f-height-in','f-notes','f-sec-input','f-injury-input'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-training-age','f-primary-goal','f-equipment','f-duration','f-mobility-focus'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  ['sec-chips','injury-chips'].forEach(id=>document.getElementById(id).innerHTML='');
+  document.querySelectorAll('#days-picker .dp-btn,#busy-days-picker .dp-btn').forEach(b=>b.classList.remove('sel'));
+  document.querySelectorAll('.fp').forEach(p=>p.classList.remove('sel-low','sel-mid','sel-high'));
+  document.getElementById('fatigue-hint').textContent='Reflects your overall state this week.';
+  document.getElementById('days-hint').textContent='Select at least 2 days.';
+  document.getElementById('form-error').textContent='';
+  for(let i=1;i<=4;i++){const n=document.getElementById('step-nav-'+i);n.querySelector('.step-circle').textContent=i;n.classList.remove('active','done');}
+  weightUnit='kg';heightUnit='cm';
+  document.getElementById('wt-kg').classList.add('active');document.getElementById('wt-lbs').classList.remove('active');
+  document.getElementById('weight-unit-badge').textContent='kg';
+  document.getElementById('ht-cm').classList.add('active');document.getElementById('ht-ftin').classList.remove('active');
+  document.getElementById('height-cm-wrap').style.display='flex';
+  document.getElementById('height-ftin-wrap').style.display='none';
+}
+function animateGenSteps(){
+  const steps=['gs-1','gs-2','gs-3','gs-4','gs-5','gs-6'];
+  const msgs=['Reviewing profile and constraints...','Applying CNS management rules...','Scheduling movement patterns...','Selecting exercises for your equipment...','Calibrating volume to your fatigue state...','Finalizing program structure...'];
+  let idx=0;
+  const tick=()=>{if(idx>0){document.getElementById(steps[idx-1]).classList.remove('active');document.getElementById(steps[idx-1]).classList.add('done');}if(idx<steps.length){document.getElementById(steps[idx]).classList.add('active');document.getElementById('gen-msg').textContent=msgs[idx];idx++;setTimeout(tick,850+Math.random()*550);}};tick();
+}
+
+/* ------- EXERCISE LIBRARY (no aquatics, no sport-specific) ------- */
+const LIB={
+  full:{
+    hinge:['Trap Bar Deadlift','Romanian Deadlift','Single Leg RDL'],
+    squat:['Front Squat','Bulgarian Split Squat','ATG Split Squat','Goblet Squat'],
+    push_h:['DB Bench Press','Incline DB Press','Pushups'],
+    push_v:['Arnold Press','Push Press'],
+    pull_h:['Chest Supported Row','Dumbbell Row'],
+    pull_v:['Pullups','Lat Pulldown'],
+    power:['Trap Bar Jump','Broad Jump','Med Ball Slam','Box Jump'],
+    core:['Hanging Leg Raise','Dead Bug','Pallof Press','Ab Wheel Rollout'],
+    carry:['Farmer Carry','Suitcase Carry','KB Swing','Bear Crawl'],
+    mobility:['90/90 Hips','Jefferson Curl','Deep Squat Hold']
+  },
+  dumbbells:{
+    hinge:['Romanian Deadlift','Single Leg RDL','DB Swing'],
+    squat:['Goblet Squat','Bulgarian Split Squat','ATG Split Squat'],
+    push_h:['DB Bench Press','Incline DB Press','Pushups'],
+    push_v:['Arnold Press','DB Shoulder Press'],
+    pull_h:['Dumbbell Row','Chest Supported Row (DB)'],
+    pull_v:['Pullups','DB Pullover'],
+    power:['Broad Jump','Vertical Jump','Med Ball Slam'],
+    core:['Dead Bug','Pallof Press (Band)','Ab Wheel Rollout','Hanging Leg Raise'],
+    carry:['Farmer Carry','Suitcase Carry','DB Swing'],
+    mobility:['90/90 Hips','Jefferson Curl','Deep Squat Hold']
+  },
+  limited:{
+    hinge:['Single Leg RDL','DB Swing','Good Morning'],
+    squat:['Goblet Squat','ATG Split Squat','Jump Squat'],
+    push_h:['Pushups','Pike Pushup','Archer Pushup'],
+    push_v:['Pike Pushup','DB Shoulder Press'],
+    pull_h:['Inverted Row','Dumbbell Row'],
+    pull_v:['Pullups','Band Pulldown'],
+    power:['Broad Jump','Vertical Jump','Explosive Pushup'],
+    core:['Dead Bug','Plank Variations','Mountain Climber'],
+    carry:['Farmer Carry','Suitcase Carry','Bear Crawl'],
+    mobility:['90/90 Hips','Jefferson Curl','Deep Squat Hold']
+  }
+};
+function pick(arr,n=1){const s=[...arr];const out=[];for(let i=0;i<n&&s.length;i++){const j=Math.floor(Math.random()*s.length);out.push(s.splice(j,1)[0]);}return out;}
+
+/* ------- DEMO GENERATOR ------- */
+function demoGenerate(p){
+  const eq=p.schedule.equipment||'full';
+  const lib=LIB[eq]||LIB.full;
+  const order=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const days=[...p.schedule.available_days].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  const busy=p.schedule.busy_days||[];
+  const flag=p.state.fatigue_score>=4?'deload':p.state.fatigue_score>=3?'maintain':'progress';
+  const vMod=flag==='deload'?0.7:1;
+
+  /* Assign CNS — no consecutive High, busy days = Low */
+  const split=[];let highCount=0;
+  for(let i=0;i<days.length;i++){
+    const d=days[i];
+    const prev=split[i-1];
+    const isBusy=busy.includes(d);
+    const canHigh=highCount<2&&(!prev||prev.cns!=='High')&&!isBusy&&flag!=='deload';
+    const cns=canHigh?'High':'Low';
+    if(cns==='High')highCount++;
+    const highFocus=['Lower Power & Strength','Upper Push & Pull Power','Total-Body Strength'];
+    const lowFocus=['Mobility & Unilateral','Upper Accessory & Core','Carry & Conditioning'];
+    split.push({day:d,cns,focus:cns==='High'?highFocus[highCount-1%3]:lowFocus[i%3]});
+  }
+
+  const sets=(base)=>Math.max(2,Math.round(base*vMod));
+
+  const sessions=split.map((s,idx)=>{
+    const blocks=[];
+    /* Warmup */
+    blocks.push({type:'Warmup',exercises:[
+      {name:'90/90 Hips',sets:2,reps:'8/side',rest:'30 sec',notes:'Control rotation, breathe into range.'},
+      {name:'Deep Squat Hold',sets:2,reps:'45 sec',rest:'30 sec',notes:'Heels grounded, expand thoracic.'},
+      {name:lib.mobility[2]||'Jefferson Curl',sets:2,reps:'5',rest:'30 sec',notes:'Light, segmental control.'}
+    ]});
+    if(s.cns==='High'){
+      /* Power */
+      const pEx=pick(lib.power)[0];
+      blocks.push({type:'Power',exercises:[{name:pEx,sets:sets(4),reps:'3',rest:'2 min',notes:'Max intent. Rest fully. Stop if speed drops.'}]});
+      /* Strength */
+      const mainHinge=pick(lib.hinge)[0];
+      const mainSquat=pick(lib.squat)[0];
+      const mainPull=idx%2===0?pick(lib.pull_v)[0]:pick(lib.pull_h)[0];
+      const mainPush=idx%2===0?pick(lib.push_h)[0]:pick(lib.push_v)[0];
+      blocks.push({type:'Strength',exercises:[
+        {name:idx%2===0?mainHinge:mainPush,sets:sets(4),reps:'4-6',rest:'2-3 min',notes:'1-3 reps in reserve. Never to failure.'},
+        {name:idx%2===0?mainSquat:mainPull,sets:sets(3),reps:'5-6',rest:'2 min',notes:'Control the eccentric. Full range.'}
+      ]});
+      /* Accessory */
+      const acc1=pick(lib.pull_h)[0];const acc2=pick(lib.squat.filter(x=>x.includes('Split')||x.includes('ATG')||x.includes('Single')))[0]||lib.squat[0];
+      blocks.push({type:'Accessory',exercises:[
+        {name:acc1,sets:sets(3),reps:'8-10',rest:'75 sec',notes:'Pull through elbows, retract shoulder blades.'},
+        {name:acc2,sets:sets(3),reps:'8/side',rest:'75 sec',notes:'Unilateral. Control descent.'}
+      ]});
+    } else {
+      /* Low CNS strength */
+      const liftA=pick(idx%2===0?lib.push_h:lib.push_v)[0];
+      const liftB=pick(idx%2===0?lib.pull_h:lib.pull_v)[0];
+      blocks.push({type:'Strength',exercises:[
+        {name:liftA,sets:sets(3),reps:'6-8',rest:'2 min',notes:'Submaximal. Technical precision priority.'},
+        {name:liftB,sets:sets(3),reps:'8-10',rest:'90 sec',notes:'Full range. Squeeze at end position.'}
+      ]});
+      /* Accessory */
+      const accSq=pick(lib.squat)[0];const accPush=pick(lib.push_h)[0];
+      blocks.push({type:'Accessory',exercises:[
+        {name:accSq,sets:sets(3),reps:'10/side',rest:'60 sec',notes:'Slow and deliberate. No compensation.'},
+        {name:accPush,sets:sets(2),reps:'12',rest:'60 sec',notes:'Keep tension throughout.'}
+      ]});
+    }
+    /* Core */
+    const coreA=pick(lib.core)[0];const coreB=pick(lib.core.filter(x=>x!==coreA))[0]||lib.core[0];
+    blocks.push({type:'Core',exercises:[
+      {name:coreA,sets:sets(3),reps:'8-10',rest:'45 sec',notes:'Anti-rotation. Brace and control.'},
+      {name:coreB,sets:sets(2),reps:'6-8',rest:'45 sec',notes:'No momentum.'}
+    ]});
+    /* Conditioning — only on non-deload, last day or as assigned */
+    if(flag!=='deload'&&(idx===days.length-1||(days.length>=4&&idx===1))){
+      const carryEx=pick(lib.carry)[0];
+      blocks.push({type:'Conditioning',exercises:[
+        {name:carryEx,sets:sets(4),reps:'30 m',rest:'60 sec',notes:'Heavy. Posture locked. Purposeful pace.'}
+      ]});
+    }
+    /* Mobility cooldown */
+    blocks.push({type:'Mobility',exercises:[
+      {name:'90/90 Hips',sets:1,reps:'4 min',rest:'\u2014',notes:'End-range breathing. Downregulate nervous system.'}
+    ]});
+    return{day:s.day,blocks};
+  });
+
+  return{weekly_split:split,sessions,flags:[flag]};
+}
+
+/* ------- GENERATE ------- */
+async function generateProgram(){
+  showPage('generating');animateGenSteps();
+  const age=parseInt(document.getElementById('f-age').value);
+  const weight_kg=getWeightKg();
+  const height_cm=getHeightCm();
+  const training_age=document.getElementById('f-training-age').value;
+  const primary=document.getElementById('f-primary-goal').value;
+  const duration=parseInt(document.getElementById('f-duration').value);
+  const equipment=document.getElementById('f-equipment').value;
+  const notes=document.getElementById('f-notes').value.trim();
+  const mobility_focus=document.getElementById('f-mobility-focus').value;
+  const fatigue_state=fatigueScore>=4?'high':fatigueScore>=3?'moderate':'low';
+
+  const payload={
+    client_profile:{age,weight_kg,height_cm,training_age},
+    goals:{primary,secondary:secondaryGoals,mobility_focus},
+    schedule:{available_days:selectedDays,busy_days:selectedBusyDays,session_duration:duration,equipment},
+    state:{fatigue_score:fatigueScore,fatigue_state,injuries:injuries.length?injuries:['none'],notes:notes||''}
+  };
+
+  const minMs=5200;const tStart=Date.now();
+  try{
+    let parsed;
+    if(CONFIG.endpoint){
+      const res=await fetch(CONFIG.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!res.ok)throw new Error('Endpoint returned '+res.status);
+      parsed=await res.json();
+    } else {
+      parsed=demoGenerate(payload);
+    }
+    const wait=Math.max(0,minMs-(Date.now()-tStart));
+    setTimeout(()=>renderProgram(parsed,payload),wait);
+  } catch(err){
+    showPage('intake');currentStep=4;updateStepUI();
+    document.getElementById('form-error').textContent='Error: '+err.message;
+  }
+}
+
+/* ------- RENDER PROGRAM ------- */
+function renderProgram(data,payload){
+  showPage('program');
+  const flag=(data.flags||[])[0]||'maintain';
+  const flagColors={progress:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),maintain:getComputedStyle(document.documentElement).getPropertyValue('--warm').trim(),deload:getComputedStyle(document.documentElement).getPropertyValue('--red').trim()};
+  const fc=flagColors[flag]||'#888';
+
+  document.getElementById('ph-name').textContent=payload.client_profile.training_age+' · '+payload.goals.primary;
+  const wDisp=weightUnit==='lbs'?Math.round(payload.client_profile.weight_kg*2.20462)+'lbs':payload.client_profile.weight_kg+'kg';
+  document.getElementById('ph-meta').innerHTML=
+    '<span class="ph-tag">'+payload.schedule.available_days.length+'&times;/week</span>'+
+    '<span class="ph-tag">'+payload.schedule.session_duration+' min</span>'+
+    '<span class="ph-tag">'+wDisp+'</span>'+
+    '<span class="ph-tag accent">Fatigue: '+payload.state.fatigue_state+'</span>'+
+    '<span class="ph-tag" style="border-color:'+fc+'44;color:'+fc+';">// '+flag.toUpperCase()+'</span>';
+
+  const body=document.getElementById('program-body');body.innerHTML='';
+
+  /* Weekly strip */
+  const ws=document.createElement('div');
+  ws.innerHTML='<div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">// Weekly Structure</div>';
+  const strip=document.createElement('div');strip.className='week-strip fade-up';
+  (data.weekly_split||[]).forEach(w=>{
+    const c=document.createElement('div');c.className='wsc '+(w.cns==='High'?'high':'low');
+    c.innerHTML='<div class="wsc-day">'+w.day.substring(0,3)+'</div><div class="wsc-cns">'+w.cns+' CNS</div><div class="wsc-focus">'+w.focus+'</div>';
+    strip.appendChild(c);
+  });
+  ws.appendChild(strip);body.appendChild(ws);
+
+  const sh=document.createElement('div');sh.innerHTML='<div style="font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);margin:36px 0 12px;">// Daily Sessions</div>';body.appendChild(sh);
+
+  const sg=document.createElement('div');sg.className='sessions-grid';
+  (data.sessions||[]).forEach((sess,si)=>{
+    const splitInfo=(data.weekly_split||[]).find(w=>w.day===sess.day);
+    const card=document.createElement('div');card.className='session-card fade-up';
+    card.style.animationDelay=(si*.06)+'s';card.style.opacity='0';
+    let html='<div class="session-head"><div class="sh-day">'+sess.day+'</div>'+
+      (splitInfo?'<div class="sh-badge '+(splitInfo.cns==='High'?'high':'')+'">'+splitInfo.cns+' CNS</div>':'')+
+      (splitInfo?'<div class="sh-focus">'+splitInfo.focus+'</div>':'')+'</div>';
+    (sess.blocks||[]).forEach(block=>{
+      const rows=(block.exercises||[]).map(ex=>
+        '<tr><td class="td-name">'+ex.name+'</td><td class="td-vol">'+ex.sets+'&times;'+ex.reps+'</td><td class="td-rest">'+ex.rest+'</td><td class="td-notes">'+ex.notes+'</td></tr>'
+      ).join('');
+      html+='<div class="block-section"><div class="bs-type">'+block.type+'</div>'+
+        '<table class="ex-tbl"><thead><tr><th>Exercise</th><th>Volume</th><th>Rest</th><th>Notes</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    });
+    card.innerHTML=html;sg.appendChild(card);
+  });
+  body.appendChild(sg);
+
+  /* Flags */
+  if(data.flags&&data.flags.length){
+    const fw=document.createElement('div');fw.className='flags-wrap fade-up';
+    data.flags.forEach(f=>{const ch=document.createElement('div');ch.className='flag-chip '+f.toLowerCase();ch.textContent='// '+f.toUpperCase();fw.appendChild(ch);});
+    const fDesc={progress:'Progression permitted — load or reps may increase this cycle.',maintain:'Maintain current parameters — monitor fatigue before next session.',deload:'Deload protocol active — volume reduced 30%, conditioning removed.'};
+    const nd=document.createElement('div');nd.style.cssText='font-size:10px;color:var(--text3);margin-left:auto;';nd.textContent=fDesc[flag]||'';
+    fw.appendChild(nd);body.appendChild(fw);
+  }
+}
+</script>
+</body>
+</html>
