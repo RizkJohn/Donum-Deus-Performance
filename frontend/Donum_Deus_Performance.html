@@ -415,7 +415,177 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
 .dp-cell-value{font-family:var(--mono);font-weight:500;font-size:10px;color:var(--text);}
 .dp-cell-value.em{color:var(--accent);}
 
-@media print{.grain,.grid-line,nav,.ph-actions,footer{display:none!important;}:root{--bg:#fff;--bg1:#f8f5ef;--bg2:#f0ece3;--text:#000;--text2:#333;--text3:#666;--border:#ddd;--accent:#1e4d42;--warm:#6b4418;}}
+@media print{
+  /* ── HIDE UI CHROME ────────────────────────────────────────── */
+  .grain,.grid-line,nav,.ph-actions,footer,
+  .btn-export,.btn-restart{display:none!important;}
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+  .fade-up{opacity:1!important;}
+
+  /* ── PAGE SETUP ─────────────────────────────────────────────── */
+  @page{size:A4;margin:20mm 18mm 18mm 18mm;}
+
+  /* ── OLD MONEY PALETTE — PRINT-OPTIMISED ───────────────────── */
+  :root{
+    --bg:#faf8f3;--bg1:#f3efe6;--bg2:#e9e3d8;--bg3:#ddd7ca;
+    --border:#c4bead;--border2:#aea597;
+    --text:#1a1f1b;--text2:#3d4f3b;--text3:#6e8078;
+    --accent:#2a5548;--accent2:rgba(42,85,72,.10);--accent3:rgba(42,85,72,.22);
+    --warm:#7a5020;--warm2:rgba(122,80,32,.10);--warm3:rgba(122,80,32,.22);
+    --red:#8b2e2e;--red2:rgba(139,46,46,.09);
+  }
+
+  body{
+    background:var(--bg);
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+    color-adjust:exact;
+    font-size:10pt;
+    line-height:1.5;
+  }
+
+  /* ── PROGRAM PAGE ───────────────────────────────────────────── */
+  #page-program{padding-top:0!important;display:block!important;}
+
+  /* Letterhead header */
+  .program-header{
+    padding:0 0 12pt;
+    border-bottom:1.5pt solid var(--accent);
+    background:transparent!important;
+    display:block;
+    margin-bottom:16pt;
+  }
+  .program-header::before{
+    content:'DONUM DEUS PERFORMANCE';
+    display:block;
+    font-family:var(--mono);
+    font-size:6.5pt;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:10pt;
+    padding-bottom:7pt;
+    border-bottom:.5pt solid var(--border);
+  }
+  .ph-kicker{font-size:7pt;letter-spacing:.2em;color:var(--text3);margin-bottom:4pt;}
+  .ph-name{font-family:var(--play);font-size:19pt;font-weight:700;letter-spacing:-.01em;color:var(--text);margin-bottom:8pt;}
+  .ph-meta{display:flex;flex-wrap:wrap;gap:5pt;align-items:center;}
+  .ph-tag{font-size:7pt;padding:2pt 7pt;border:.5pt solid var(--border2);color:var(--text2);background:var(--bg1);}
+  .ph-tag.accent{border-color:var(--accent3);color:var(--accent);background:var(--accent2);}
+
+  /* Program body */
+  .program-body{max-width:100%!important;padding:0!important;margin:0!important;}
+
+  /* ── ASSESSMENT DIRECTIVE PANEL ─────────────────────────────── */
+  .directive-panel{
+    border:.75pt solid var(--border2);
+    background:transparent;
+    overflow:visible;
+    margin-bottom:18pt;
+    page-break-inside:avoid;
+  }
+  .dp-header{padding:6pt 10pt;border-bottom:.5pt solid var(--border);background:var(--bg2);}
+  .dp-header-title{font-size:7pt;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600;}
+  .dp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5pt;background:var(--border);}
+  .dp-cell{background:var(--bg);padding:6pt 9pt;}
+  .dp-cell-label{font-size:6pt;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:2pt;}
+  .dp-cell-value{font-family:var(--mono);font-weight:600;font-size:9pt;color:var(--text);}
+  .dp-cell-value.em{color:var(--accent);}
+
+  /* ── WEEKLY STRUCTURE STRIP ─────────────────────────────────── */
+  .week-strip{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(72pt,1fr));
+    gap:4pt;
+    margin-bottom:18pt;
+    page-break-inside:avoid;
+  }
+  .wsc{border:.5pt solid var(--border);background:var(--bg1);padding:7pt 8pt;position:relative;overflow:visible;}
+  .wsc::after{content:'';position:absolute;top:0;left:0;right:0;height:2pt;background:var(--border);}
+  .wsc.high::after{background:var(--accent);}
+  .wsc.low::after{background:var(--warm);}
+  .wsc-day{font-family:var(--play);font-weight:700;font-size:11pt;text-transform:uppercase;color:var(--text);margin-bottom:2pt;}
+  .wsc-cns{font-size:6pt;letter-spacing:.15em;text-transform:uppercase;margin-bottom:2pt;}
+  .wsc.high .wsc-cns{color:var(--accent);}
+  .wsc.low  .wsc-cns{color:var(--warm);}
+  .wsc-focus{font-size:7.5pt;color:var(--text3);line-height:1.3;}
+
+  /* ── SESSION CARDS ──────────────────────────────────────────── */
+  .sessions-grid{display:flex;flex-direction:column;gap:12pt;}
+  .session-card{border:.75pt solid var(--border2);background:var(--bg);page-break-inside:avoid;}
+  .session-head{
+    padding:8pt 12pt;
+    border-bottom:.75pt solid var(--border2);
+    background:var(--bg1);
+    display:flex;
+    align-items:center;
+    gap:8pt;
+    flex-wrap:wrap;
+  }
+  .sh-day{font-family:var(--play);font-size:14pt;font-weight:700;text-transform:uppercase;color:var(--text);}
+  .sh-badge{font-size:7pt;letter-spacing:.1em;text-transform:uppercase;padding:2pt 6pt;border:.5pt solid var(--border);color:var(--text3);}
+  .sh-badge.high{border-color:var(--accent);color:var(--accent);background:var(--accent2);}
+  .sh-focus{font-size:8pt;color:var(--text3);margin-left:auto;}
+
+  /* Block sections */
+  .block-section{padding:8pt 12pt;border-bottom:.5pt solid var(--border);page-break-inside:avoid;}
+  .block-section:last-child{border-bottom:none;}
+  .bs-type{
+    font-size:7pt;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--warm);margin-bottom:6pt;
+    display:flex;align-items:center;gap:7pt;
+  }
+  .bs-type::after{content:'';flex:1;height:.5pt;background:var(--border);}
+
+  /* Tables */
+  table.ex-tbl{width:100%;border-collapse:collapse;}
+  table.ex-tbl th{
+    font-size:7pt;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--text3);text-align:left;
+    padding:0 0 5pt;
+    border-bottom:.5pt solid var(--border2);
+  }
+  table.ex-tbl td{
+    padding:5pt 0;font-size:9.5pt;
+    border-bottom:.5pt solid var(--border);
+    vertical-align:top;
+  }
+  table.ex-tbl tr:last-child td{border-bottom:none;}
+  table.ex-tbl th:not(:first-child),
+  table.ex-tbl td:not(:first-child){padding-left:9pt;}
+  .td-name{color:var(--text);font-weight:600;font-size:9.5pt;}
+  .td-vol{color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:9pt;}
+  .td-rest{color:var(--text3);white-space:nowrap;font-size:9pt;}
+  .td-notes{color:var(--text3);font-size:8.5pt;line-height:1.4;max-width:160pt;}
+
+  /* ── FLAGS ──────────────────────────────────────────────────── */
+  .flags-wrap{
+    border:.5pt solid var(--border);background:var(--bg1);
+    padding:8pt 12pt;margin-top:14pt;
+    display:flex;flex-wrap:wrap;gap:6pt;align-items:center;
+    page-break-inside:avoid;
+  }
+  .flag-chip{font-size:7pt;letter-spacing:.15em;text-transform:uppercase;padding:2pt 7pt;border:.5pt solid var(--border);color:var(--text3);}
+  .flag-chip.progress{border-color:var(--accent3);color:var(--accent);background:var(--accent2);}
+  .flag-chip.deload  {border-color:rgba(139,46,46,.28);color:var(--red);background:var(--red2);}
+  .flag-chip.maintain{border-color:var(--warm3);color:var(--warm);background:var(--warm2);}
+  .flags-wrap>div:last-child{font-size:9pt;color:var(--text3);margin-left:auto;}
+
+  /* ── DOCUMENT FOOTER ────────────────────────────────────────── */
+  #page-program::after{
+    content:'Donum Deus Performance  ·  Physical stewardship, built from first principles.';
+    display:block;
+    font-family:var(--mono);
+    font-size:6.5pt;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--text3);
+    border-top:.5pt solid var(--border);
+    padding-top:8pt;
+    margin-top:22pt;
+    text-align:center;
+  }
+}
 @media(max-width:960px){
   nav{padding:0 18px;}
   .nav-links{display:none;position:absolute;top:58px;left:0;right:0;background:var(--bg);flex-direction:column;align-items:flex-start;padding:13px 18px;border-bottom:1px solid var(--border);gap:13px;z-index:99;}
@@ -495,12 +665,12 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
 <div id="page-landing" class="page active">
   <section class="hero">
     <div>
-      <div class="hero-kicker">A doctrine of physical stewardship</div>
+      <div class="hero-kicker">A standard of physical stewardship</div>
       <h1 class="inst">The body is not<br>a project.<br>It is a <em>practice.</em></h1>
-      <p class="hero-prose">Donum Deus Performance is a structured practice of physical development grounded in one doctrine: the body was given without condition, and demands to be treated accordingly. Every programme produced here is built from that premise.</p>
+      <p class="hero-prose">Donum Deus Performance is built on a single premise: the body was given, not earned — and it demands to be treated accordingly. Every programme starts there.</p>
       <div class="hero-actions">
         <button class="btn-primary" onclick="startIntake()">Begin the Assessment</button>
-        <button class="btn-ghost" onclick="goTo('philosophy')">Read the doctrine →</button>
+        <button class="btn-ghost" onclick="goTo('philosophy')">Explore the philosophy →</button>
       </div>
     </div>
     <div id="hero-etym-panel">
@@ -546,34 +716,15 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
         <div class="ps-kicker">Foundational Principles</div>
         <div class="ps-title">What <em>donum deus</em><br>demands in <strong>practice.</strong></div>
         <div class="ps-prose">
-          <p><strong>Donum</strong> — gift. A gift carries the 
-obligation to receive it well. You do not discard a gift or let it 
-deteriorate through indifference. You develop it with the care the giver
- intended.</p>
-          <p><strong>Deus</strong> — the divine source. The body's 
-capacity for adaptation, strength, and recovery is extraordinary by 
-design. Its tolerance for sustained neglect is not.</p>
-          <p>The institution holds that physical development is not a 
-pursuit of aesthetics or performance metrics. It is an act of 
-stewardship over something that was given rather than earned. That 
-framing changes everything about how a programme is built.</p>
+          <p><strong>Donum</strong> — gift. A gift carries the obligation to receive it well. You do not discard a gift or let it deteriorate through indifference. You develop it with the care the giver intended.</p>
+          <p><strong>Deus</strong> — the divine source. The body's capacity for adaptation, strength, and recovery is extraordinary by design. Its tolerance for sustained neglect is not.</p>
+          <p>Physical development is not a pursuit of aesthetics or performance metrics. It is an act of stewardship over something that was given rather than earned. That distinction changes everything about how a programme is built.</p>
         </div>
       </div>
       <div class="principles-right">
-        <div class="principle-card"><div class="pc-num">i.</div><div class="pc-title">The Gift Is Not Permanent by Default</div><div class="pc-body">Joints
- degrade without protection. Movement patterns dissolve without 
-practice. Strength erodes without intelligent load. The body's capacity 
-is not a fixed inheritance — it is a living account that requires 
-deposits.</div></div>
-        <div class="principle-card"><div class="pc-num">ii.</div><div class="pc-title">Intensity Is Not Evidence of Care</div><div class="pc-body">Volume
- that destroys the infrastructure it was meant to develop is not 
-diligence — it is waste. The measure of a sound programme is not its 
-severity. It is the structural integrity it protects and the capacity it
- returns over time.</div></div>
-        <div class="principle-card"><div class="pc-num">iii.</div><div class="pc-title">The Decades Are the Measure</div><div class="pc-body">A
- body trained for thirty years of useful life outperforms one that 
-peaked at thirty-two. Longevity is not a concession made to age. It is 
-the strategy that makes sustained performance possible.</div></div>
+        <div class="principle-card"><div class="pc-num">i.</div><div class="pc-title">The Gift Is Not Permanent by Default</div><div class="pc-body">Joints degrade without protection. Movement patterns dissolve without practice. Strength erodes without intelligent load. Capacity is not a fixed inheritance — it is a living account that requires deposits.</div></div>
+        <div class="principle-card"><div class="pc-num">ii.</div><div class="pc-title">Intensity Is Not Evidence of Care</div><div class="pc-body">Volume that destroys the infrastructure it was meant to build is not diligence — it is waste. The measure of a sound programme is not its severity. It is the structural integrity it protects and the capacity it returns over time.</div></div>
+        <div class="principle-card"><div class="pc-num">iii.</div><div class="pc-title">The Decades Are the Measure</div><div class="pc-body">A body trained for thirty years of useful life outperforms one that peaked at thirty-two. Longevity is not a concession made to age — it is the strategy that makes sustained performance possible.</div></div>
       </div>
     </div>
   </section>
@@ -591,11 +742,8 @@ the strategy that makes sustained performance possible.</div></div>
     <div class="order-grid">
       <div>
         <div class="os-kicker">The Order of Priority</div>
-        <div class="os-title">When objectives<br>conflict, the doctrine<br><em>resolves</em> them.</div>
-        <div class="os-sub">Every programme produced by this institution
- resolves competing demands in a fixed hierarchy. Structural integrity 
-is never traded for performance. Performance is never traded for 
-aesthetics. The order is non-negotiable.</div>
+        <div class="os-title">When objectives<br>compete, the hierarchy<br><em>decides.</em></div>
+        <div class="os-sub">Every programme resolves competing demands through a fixed hierarchy. Structural integrity is never traded for performance. Performance is never traded for aesthetics. This order holds.</div>
         <div class="order-list">
           <div class="oi"><div class="oi-n">1</div><div><div class="oi-title">Joint Integrity</div><div class="oi-desc">Ankles, knees, hips, spine, shoulders — protected without exception</div></div></div>
           <div class="oi"><div class="oi-n">2</div><div><div class="oi-title">Movement Quality</div><div class="oi-desc">Coordination and sequencing before any load is added</div></div></div>
@@ -615,9 +763,9 @@ aesthetics. The order is non-negotiable.</div>
     <div class="eb-inner">
       <div class="eb-kicker">donum deus</div>
       <div class="eb-title">The gift was given.<br><strong>Now honor it.</strong></div>
-      <p class="eb-sub">Complete the intake. A programme is constructed around your current state, your schedule, and your body's actual constraints — from first principles, not from defaults.</p>
+      <p class="eb-sub">Complete the intake. Your programme is built around your current state, your schedule, and your body's actual constraints — not a template.</p>
       <button class="btn-primary" style="font-size:11px;padding:13px 40px;" onclick="startIntake()">Begin the Assessment</button>
-      <p class="eb-note">No account required to begin</p>
+      <p class="eb-note">No account needed</p>
     </div>
   </div>
 </div>
@@ -626,11 +774,8 @@ aesthetics. The order is non-negotiable.</div>
 <div id="page-philosophy" class="page">
   <section class="sec">
     <div class="sec-kicker">Philosophy</div>
-    <div class="sec-title">Why this institution <em>exists.</em></div>
-    <p class="sec-lede">Performance education has been reduced to a 
-product category. Templates are sold as precision. Volume is sold as 
-care. Generic outputs are sold as personalisation. This institution was 
-founded to work against every part of that.</p>
+    <div class="sec-title">Why this practice <em>exists.</em></div>
+    <p class="sec-lede">The fitness industry sells templates as precision and volume as care. Generic outputs passed off as personalisation. This practice was built to work against every part of that.</p>
   </section>
   <div style="max-width:1300px;margin:0 auto;padding:0 52px 0;">
     <div class="etym-full">
@@ -661,49 +806,22 @@ lack effort. They fail because no one built a system around their actual
     </div>
   </div>
   <section class="sec">
-    <div class="sec-kicker">Institutional Commitments</div>
-    <div class="sec-title">Four <em>premises</em> that<br>define the practice.</div>
+    <div class="sec-kicker">Core Commitments</div>
+    <div class="sec-title">Four <em>principles</em> that<br>define the work.</div>
     <div class="commitment-grid">
-      <div class="cm"><div class="cm-n">i.</div><div class="cm-title">Structure Before Load</div><div class="cm-body">Joint
- integrity is the non-negotiable first priority of every programme. It 
-is not a constraint on development — it is the precondition for 
-development. Without it, all subsequent work is spent compensating for 
-what the structure no longer supports.</div></div>
-      <div class="cm"><div class="cm-n">ii.</div><div class="cm-title">Built From First Principles</div><div class="cm-body">Every
- programme is constructed from the practitioner's actual inputs: age, 
-body composition, schedule density, fatigue state, movement 
-restrictions, and stated objectives. No template is applied. No default 
-fills an unexamined variable.</div></div>
-      <div class="cm"><div class="cm-n">iii.</div><div class="cm-title">Intelligent Overload Only</div><div class="cm-body">The
- programme distinguishes between productive stress — the kind that 
-drives adaptation — and accumulated damage. Volume is modulated to the 
-practitioner's current state. Progression is applied only when the 
-conditions for it exist.</div></div>
-      <div class="cm"><div class="cm-n">iv.</div><div class="cm-title">The Decades Are the Measure</div><div class="cm-body">Every
- decision made in programming today is an investment in the 
-practitioner's capacity twenty years from now. That horizon is what 
-separates the development of a body from the consumption of one.</div></div>
+      <div class="cm"><div class="cm-n">i.</div><div class="cm-title">Structure Before Load</div><div class="cm-body">Joint integrity is the first priority of every programme — not a constraint on development, but its precondition. Without it, all subsequent work is spent compensating for what the structure can no longer support.</div></div>
+      <div class="cm"><div class="cm-n">ii.</div><div class="cm-title">Built From First Principles</div><div class="cm-body">Every programme is constructed from your actual inputs: age, body composition, schedule density, fatigue state, movement restrictions, and stated objectives. No template is applied. No default fills an unexamined variable.</div></div>
+      <div class="cm"><div class="cm-n">iii.</div><div class="cm-title">Intelligent Overload Only</div><div class="cm-body">The programme distinguishes between productive stress — the kind that drives adaptation — and accumulated damage. Volume is calibrated to your current state. Progression is applied only when the conditions for it actually exist.</div></div>
+      <div class="cm"><div class="cm-n">iv.</div><div class="cm-title">The Decades Are the Measure</div><div class="cm-body">Every programming decision today is an investment in your capacity twenty years from now. That horizon is what separates the development of a body from the consumption of one.</div></div>
     </div>
     <div style="margin-top:44px;">
-      <div class="sec-kicker">What the institution will not do</div>
-      <div class="sec-title" style="font-size:clamp(26px,3.2vw,44px);">The limits of the <em>practice.</em></div>
+      <div class="sec-kicker">What this practice will not do</div>
+      <div class="sec-title" style="font-size:clamp(26px,3.2vw,44px);">Non-<em>negotiables.</em></div>
       <div class="refusal-grid">
-        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Present
- a template as a custom programme. If the intake does not materially 
-change the output, the intake serves no purpose and the output is 
-dishonest.</div></div>
-        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Prescribe
- volume that compromises joint integrity in exchange for short-term 
-performance. The structural cost is always paid. Only the timing is 
-uncertain.</div></div>
-        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Disregard
- fatigue state. A programme that cannot adapt to where the practitioner 
-is today is a schedule, not a programme. Schedules do not build anything
- of consequence.</div></div>
-        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Allow
- conditioning to undermine the strength work it is intended to 
-complement. Everything in a session has a fatigue cost. Only 
-expenditures with commensurate returns are permitted.</div></div>
+        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Present a template as a custom programme. If the intake does not materially change the output, the intake serves no purpose and the output is dishonest.</div></div>
+        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Prescribe volume that compromises joint integrity for short-term performance. The structural cost is always paid — only the timing is uncertain.</div></div>
+        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Disregard fatigue state. A programme that cannot adapt to where you are today is a schedule, not a programme. Schedules do not build anything of consequence.</div></div>
+        <div class="rf"><div class="rf-label">Refused</div><div class="rf-body">Allow conditioning to undermine the strength work it is meant to complement. Every exercise carries a fatigue cost. Only expenditures with a real return are permitted.</div></div>
       </div>
     </div>
     <div style="margin-top:44px;text-align:center;"><button class="btn-primary" onclick="startIntake()">Begin the Assessment</button></div>
@@ -714,43 +832,19 @@ expenditures with commensurate returns are permitted.</div></div>
 <div id="page-methodology" class="page">
   <section class="sec">
     <div class="sec-kicker">Methodology</div>
-    <div class="sec-title">Six <em>principles</em><br>of programme construction.</div>
-    <p class="sec-lede">Every programme produced by this institution is a
- structured weekly training system resolved against a fixed set of 
-constraints. No session is delivered unless all constraints are 
-satisfied. The principles below are non-negotiable components of that 
-process.</p>
+    <div class="sec-title">Six <em>principles</em><br>behind every programme.</div>
+    <p class="sec-lede">Every programme is a structured weekly training system resolved against a fixed set of constraints. No session is delivered until all constraints are satisfied. The principles below define that process.</p>
     <div class="meth-grid">
-      <div class="meth-card"><div class="meth-n">i.</div><div class="meth-title">CNS Management</div><div class="meth-body">A
- maximum of two high-demand sessions per week. No consecutive 
-high-output days. Conditioning is never permitted to impair the strength
- work it nominally supports. The nervous system is treated as a finite 
-resource — not a training target.</div></div>
-      <div class="meth-card"><div class="meth-n">ii.</div><div class="meth-title">Movement Inventory</div><div class="meth-body">Every
- weekly cycle must contain a squat pattern, a hinge pattern, horizontal 
-push and pull, vertical push and pull, rotation or anti-rotation, and 
-gait or carry. Any pattern absent from the week is a gap. Gaps are 
-corrected before delivery.</div></div>
-      <div class="meth-card"><div class="meth-n">iii.</div><div class="meth-title">Session Architecture</div><div class="meth-body">Warmup,
- power expression (when appropriate), strength, accessory work, core, 
-and mobility cooldown. The sequence is fixed by logic. Volume within 
-each block is calibrated to the practitioner's current state. Redundant 
-work is removed.</div></div>
-      <div class="meth-card"><div class="meth-n">iv.</div><div class="meth-title">State-Adaptive Volume</div><div class="meth-body">Three
- states are recognised: progress, maintain, deload. The programme is 
-built to the current state, not the desired one. Volume is reduced 
-before intensity. Conditioning is removed before accessories. The 
-hierarchy of reduction is fixed.</div></div>
-      <div class="meth-card"><div class="meth-n">v.</div><div class="meth-title">Schedule Anchoring</div><div class="meth-body">High-demand sessions are placed furthest from the practitioner's highest-obligation days. Lower-body and rotational stress are never stacked in adjacent sessions. The training week is structured around the practitioner's life, not against it.</div></div>
-      <div class="meth-card"><div class="meth-n">vi.</div><div class="meth-title">Constraint-First Construction</div><div class="meth-body">A
- programme is not generated and then checked. It is built from resolved 
-constraints outward. Every exercise, every volume prescription, every 
-rest interval has a reason. Nothing is present because it was the 
-nearest available option.</div></div>
+      <div class="meth-card"><div class="meth-n">i.</div><div class="meth-title">CNS Management</div><div class="meth-body">A maximum of two high-demand sessions per week. No consecutive high-output days. Conditioning never impairs the strength work it supports. The nervous system is a finite resource — not a training target.</div></div>
+      <div class="meth-card"><div class="meth-n">ii.</div><div class="meth-title">Movement Inventory</div><div class="meth-body">Every week must include a squat pattern, a hinge, horizontal push and pull, vertical push and pull, rotation or anti-rotation, and gait or carry. Any pattern absent from the week is a gap. Gaps are resolved before delivery.</div></div>
+      <div class="meth-card"><div class="meth-n">iii.</div><div class="meth-title">Session Architecture</div><div class="meth-body">Warmup, power expression (when appropriate), strength, accessory work, core, and mobility cooldown. The sequence is fixed by logic. Volume within each block is calibrated to your current state. Redundant work is removed.</div></div>
+      <div class="meth-card"><div class="meth-n">iv.</div><div class="meth-title">State-Adaptive Volume</div><div class="meth-body">Three states: progress, maintain, deload. The programme is built to your current state — not the one you want. Volume is reduced before intensity. Conditioning is removed before accessories. The reduction hierarchy is fixed.</div></div>
+      <div class="meth-card"><div class="meth-n">v.</div><div class="meth-title">Schedule Anchoring</div><div class="meth-body">High-demand sessions are placed furthest from your highest-obligation days. Lower-body and rotational stress are never stacked in adjacent sessions. The training week is structured around your life — not against it.</div></div>
+      <div class="meth-card"><div class="meth-n">vi.</div><div class="meth-title">Constraint-First Construction</div><div class="meth-body">A programme is not generated and then checked. It is built from resolved constraints outward. Every exercise, every volume prescription, every rest interval has a reason. Nothing is included because it was the nearest available option.</div></div>
     </div>
     <div style="margin-top:44px;">
       <div class="sec-kicker">The Process</div>
-      <div class="sec-title" style="font-size:clamp(26px,3.2vw,44px);">From assessment <em>to programme.</em></div>
+      <div class="sec-title" style="font-size:clamp(26px,3.2vw,44px);">From intake <em>to programme.</em></div>
       <div class="process-strip">
         <div class="ps"><div class="ps-n">01</div><div class="ps-t">Assessment</div><div class="ps-d">Profile, objectives, schedule density, and current state evaluated. No ambiguous inputs accepted.</div></div>
         <div class="ps"><div class="ps-n">02</div><div class="ps-t">Directive</div><div class="ps-d">Training state classified. Fatigue index computed. Progression direction, movement priorities, and constraints resolved.</div></div>
@@ -768,11 +862,8 @@ scored against novelty, fatigue cost, and equipment.</div></div>
 <div id="page-curriculum" class="page">
   <section class="sec">
     <div class="sec-kicker">Curriculum</div>
-    <div class="sec-title">Three levels of<br><em>engagement.</em></div>
-    <p class="sec-lede">The methodology does not vary by level. The 
-doctrine does not vary by level. What differs is the depth of the 
-relationship between the practitioner and the practice — and 
-accordingly, the degree of direct oversight that relationship requires.</p>
+    <div class="sec-title">Three tiers of<br><em>engagement.</em></div>
+    <p class="sec-lede">The methodology and standards are the same at every level. What changes is the depth of the relationship — and the degree of direct oversight that comes with it.</p>
     <div class="curriculum-grid">
       <div class="level">
         <div class="level-kicker">Level I</div>
@@ -825,7 +916,7 @@ accordingly, the degree of direct oversight that relationship requires.</p>
       </div>
     </div>
     <div style="margin-top:44px;padding:24px;border:1px solid var(--border);background:var(--bg1);text-align:center;">
-      <p style="font-family:var(--bask);font-style:italic;font-size:15px;color:var(--text3);margin-bottom:11px;">Uncertain which level of engagement is appropriate for your situation?</p>
+      <p style="font-family:var(--bask);font-style:italic;font-size:15px;color:var(--text3);margin-bottom:11px;">Not sure which level fits your situation?</p>
       <button class="btn-ghost" onclick="goTo('correspondence')">Submit a correspondence →</button>
     </div>
   </section>
@@ -835,7 +926,7 @@ accordingly, the degree of direct oversight that relationship requires.</p>
 <div id="page-reference" class="page">
   <section class="sec" style="max-width:860px;">
     <div class="sec-kicker">Reference</div>
-    <div class="sec-title">Common <em>questions</em><br>on the practice.</div>
+    <div class="sec-title">Common <em>questions.</em></div>
     <div class="faq-list">
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What distinguishes this institution from a generic coaching application?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Generic applications produce templates. This institution produces programmes through a two-stage process: an assessment engine first classifies the practitioner's training state, producing a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive is then used to construct the sessions. No two intake profiles produce the same output.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Is access to a training facility required?</span><span class="faq-q-icon">+</span></div><div class="faq-a">No.
@@ -868,11 +959,7 @@ continues month to month or transitions to a lower level.</div></div>
 not constitute medical advice, rehabilitation guidance, or clinical 
 counsel of any kind. Practitioners with active medical conditions should
  consult a licensed clinician before enrolling in any programme.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Who administers the programme?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Donum
- Deus Performance operates as an independent practice. All programme 
-delivery, correspondence, and review is handled through the institution.
- For any enquiry outside the scope of this reference, use the 
-Correspondence page.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Who administers the programme?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Donum Deus Performance operates as an independent practice. All programme delivery, correspondence, and review is handled directly. For anything outside the scope of this reference, use the Correspondence page.</div></div>
     </div>
   </section>
 </div>
@@ -881,10 +968,8 @@ Correspondence page.</div></div>
 <div id="page-correspondence" class="page">
   <section class="sec">
     <div class="sec-kicker">Correspondence</div>
-    <div class="sec-title">Direct <em>enquiry.</em></div>
-    <p class="sec-lede">For level enquiries, complex presentations, or 
-any matter that falls outside the intake process. All correspondence is 
-reviewed within one business day.</p>
+    <div class="sec-title">Get in <em>touch.</em></div>
+    <p class="sec-lede">For questions about levels, complex cases, or anything outside the standard intake. All correspondence is reviewed within one business day.</p>
     <div class="corr-grid">
       <div class="ci">
         <div class="ci-row"><div class="ci-label">Address</div><div class="ci-value">contact@donumdeus.com</div><div class="ci-desc">Direct correspondence. No automated routing.</div></div>
@@ -981,7 +1066,7 @@ reviewed within one business day.</p>
 <div id="page-generating" class="page">
   <div class="gen-inner">
     <div class="gen-wordmark"><em>Donum Deus</em> <strong>Performance</strong></div>
-    <div class="gen-sub">constructing programme</div>
+    <div class="gen-sub">constructing your programme</div>
     <div class="gen-title">Building Your Programme</div>
     <div class="gen-msg" id="gen-msg">Assembling sessions from directives...</div>
     <div class="gen-bar"><div class="gen-bar-fill"></div></div>
