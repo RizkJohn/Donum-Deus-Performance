@@ -9,7 +9,17 @@
 
 ```
 deus-performance/
-├── engine/              # Core training system brain
+├── apps/
+│   ├── api/             # FastAPI engine pipeline service (Python)
+│   │   ├── deus_api/               # models, engine (decision/QC/retry), llm providers, routes
+│   │   ├── data/                   # derived JSON (exercise library, substitutions)
+│   │   ├── scripts/port_library.py # markdown → JSON generator
+│   │   └── tests/                  # pytest suite incl. 400+ program contract test
+│   └── web/             # Next.js marketing site + assessment funnel (TypeScript)
+│
+├── packages/schemas/    # Shared JSON Schemas (derived from engine/*.md)
+│
+├── engine/              # Core training system brain (SOURCE OF TRUTH)
 │   ├── engine_instructions.md      # System rules & CNS management
 │   ├── exercise_library.md         # Approved exercise pool
 │   ├── fatigue_model.md            # Fatigue scoring & accumulation rules
@@ -22,9 +32,9 @@ deus-performance/
 │   ├── prompt_wrapper.md           # API prompt wrapping instructions
 │   └── ARCHITECTURE_SUMMARY.md    # High-level system architecture
 │
-├── frontend/            # Client-facing web interfaces
+├── frontend/            # Legacy static mockups (design reference)
 │   ├── deus_v1.html                # Initial landing page / engine interface
-│   └── deus_v2.html                # Redesigned DP site (current)
+│   └── deus_v2.html                # Redesigned DP site (basis for apps/web)
 │
 ├── business/            # Business strategy & planning
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
@@ -77,6 +87,24 @@ Equipment constraints, injury flags, fatigue-adjusted alternatives
 - Maximum 2 High CNS sessions per week. No consecutive High CNS days.
 - Never train to failure on primary lifts (1–3 RIR maintained).
 - Deload every 6–8 weeks or on performance drop.
+
+---
+
+## Running the product
+
+See `docs/ARCHITECTURE.md` for the full system design.
+
+```bash
+docker compose up --build   # postgres + api (:8000) + web (:3000) — no API key needed
+make test                   # engine test suite (offline, mock provider)
+make seed-library           # regenerate derived JSON after editing engine/*.md
+```
+
+The API defaults to `LLM_PROVIDER=mock` (deterministic, offline). For real
+generation set `LLM_PROVIDER=claude` and `ANTHROPIC_API_KEY`. The pipeline:
+input validation → deterministic decision engine (CNS split, volume, coverage,
+fatigue) → LLM exercise-fill → QC gate (one check per hard rule) → retry (≤3)
+→ program or `UNSATISFIABLE_CONSTRAINTS`.
 
 ---
 

@@ -10,12 +10,14 @@
 ## EXAMPLES
 
 Trap Bar Deadlift →
-- DB RDL
 - Barbell Deadlift
 
 Pullups →
-- Inverted Rows
 - Lat Pulldown
+
+(The canonical machine list lives in `substitution_rules.md`; every pair there
+preserves pattern and CNS exactly — e.g. DB RDL is Low-CNS so it substitutes
+Single Leg RDL, not Trap Bar Deadlift.)
 
 ---
 

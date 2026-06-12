@@ -2,16 +2,21 @@
 
 ## LOWER BODY
 - Trap Bar Deadlift
+- Barbell Deadlift
 - Front Squat
+- Back Squat
 - Bulgarian Split Squat
 - ATG Split Squat
 - Single Leg RDL
+- DB RDL
 
 ## UPPER BODY
 - Incline DB Press
 - DB Bench Press
 - Pullups
+- Lat Pulldown
 - Chest Supported Row
+- Inverted Row
 - Arnold Press
 
 ## POWER

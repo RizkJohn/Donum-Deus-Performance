@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b0f0c;
+  --bg1: #111711;
+  --bg2: #161e15;
+  --bg3: #1c261a;
+  --border: #2a3828;
+  --border2: #3d5239;
+  --text: #e8ede3;
+  --text2: #a3b89a;
+  --text3: #6a7d62;
+  --accent: #7caf58;
+  --accent-2: rgba(124, 175, 88, 0.08);
+  --accent-3: rgba(124, 175, 88, 0.22);
+  --warm: #c49a52;
+  --warm-2: rgba(196, 154, 82, 0.1);
+  --warm-3: rgba(196, 154, 82, 0.28);
+  --red: #b84444;
+  --red-2: rgba(184, 68, 68, 0.1);
+  --sage: #8ea88a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #0b0f0c;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+}
+
+/* Visible focus for keyboard users */
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@layer components {
+  /* mono uppercase kicker with leading rule */
+  .kicker {
+    @apply flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.28em] text-accent;
+  }
+  .kicker::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .btn-primary {
+    @apply inline-block cursor-pointer border-0 bg-accent px-8 py-[13px] font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-[#0b0f0c] transition-opacity hover:opacity-85 active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply inline-block cursor-pointer bg-transparent font-mono text-[10px] uppercase tracking-[0.14em] text-ink3 transition-colors hover:text-ink;
+  }
+  .btn-outline {
+    @apply inline-block cursor-pointer border border-line bg-transparent px-[18px] py-[10px] font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink3 transition-colors hover:border-accent hover:text-accent;
+  }
+
+  .field-label {
+    @apply mb-[7px] block font-mono text-[9px] uppercase tracking-[0.18em] text-ink3;
+  }
+  .field-input {
+    @apply w-full appearance-none border border-line bg-bg2 px-3 py-[10px] font-mono text-[12px] text-ink outline-none transition-colors focus:border-accent3;
+  }
+
+  .chip-btn {
+    @apply cursor-pointer select-none border border-line bg-bg2 px-3 py-[9px] text-center font-mono text-[10px] uppercase tracking-[0.1em] text-ink3 transition-colors hover:border-line2 hover:text-ink;
+  }
+  .chip-btn-sel {
+    @apply border-accent3 bg-accent2 text-accent;
+  }
+}
+
+/* fixed grain + grid texture (matches deus_v2.html) */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.32;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+.grid-lines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(rgba(124, 175, 88, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 175, 88, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236a7d62'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}

@@ -5,32 +5,55 @@ Guidance for AI assistants working in this repository.
 ## What this repository is
 
 **Deus Performance (DP)** — by Riz Management LLC — is a
-**constraint-driven adaptive training engine**, specified as documentation
-rather than executable code. The repo contains three things:
+**constraint-driven adaptive training engine**. The repo contains:
 
-1. **`engine/`** — the "brain": a set of markdown spec files that define how an
-   LLM (Claude) should generate weekly training programs from a structured
-   client payload. These specs are loaded as system/developer/user prompts (see
-   `engine/prompt_wrapper.md`), not compiled.
-2. **`frontend/`** — standalone single-file HTML landing pages (no build step,
-   no framework, no dependencies).
-3. **`business/` + `docs/`** — strategy, brand, domain, and redesign reference
-   material.
+1. **`engine/`** — the "brain": markdown spec files defining how an LLM
+   generates weekly training programs from a structured client payload. They
+   are **loaded as prompts at runtime** by the API (see
+   `engine/prompt_wrapper.md` and `apps/api/deus_api/engine/spec_loader.py`),
+   not compiled, and remain the **source of truth** for all training logic.
+2. **`apps/api/`** — FastAPI engine pipeline service (Python 3.11, Pydantic,
+   SQLAlchemy). Provider-agnostic LLM layer: `LLM_PROVIDER=mock` (default;
+   deterministic, offline, no API key) or `claude` (Anthropic SDK). Pipeline:
+   input validation → deterministic decision engine → LLM exercise-fill →
+   QC gate → retry (≤3) → program or `UNSATISFIABLE_CONSTRAINTS`.
+3. **`apps/web/`** — Next.js 15 + Tailwind marketing site + assessment funnel
+   (the live frontend; dark sage design ported from `frontend/deus_v2.html`).
+4. **`packages/schemas/`** — shared JSON Schemas derived from `engine/*.md`.
+5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
+6. **`business/` + `docs/`** — strategy and reference material;
+   `docs/ARCHITECTURE.md` is the system design for the live product.
 
-There is **no application code, no package manager, no build system, and no
-test suite.** This is a content/spec repository. Do not invent tooling
-(`package.json`, CI, linters) unless explicitly asked.
+**Derived-data discipline:** `apps/api/data/*.json` is generated from the
+engine markdown by `make seed-library` — never hand-edit the JSON;
+`apps/api/tests/test_library_sync.py` fails on drift.
 
 ## Repository layout
 
 ```
 .
-├── engine/        # Training-system spec files (the LLM decision engine)
-├── frontend/      # Client-facing static HTML mockups
+├── engine/        # Training-system spec files — SOURCE OF TRUTH
+├── apps/
+│   ├── api/       # FastAPI engine pipeline (deus_api/, data/, scripts/, tests/)
+│   └── web/       # Next.js marketing site + assessment funnel
+├── packages/
+│   └── schemas/   # Shared JSON Schemas (derived)
+├── frontend/      # Legacy static HTML mockups (design reference)
 ├── business/      # Business plan / strategy
-├── docs/          # Reference guides (architecture, domains)
+├── docs/          # ARCHITECTURE.md + reference guides
+├── docker-compose.yml   # postgres + api (:8000) + web (:3000)
+├── Makefile             # make dev / test / seed-library / api / web
 └── README.md      # Top-level overview
 ```
+
+## Running & testing
+
+- `docker compose up --build` — full stack, no API key needed (mock provider).
+- `make test` — pytest suite in `apps/api/tests/` (offline; includes a 400+
+  case program contract test). Run after any engine or API change.
+- `make seed-library` — regenerate `apps/api/data/*.json` after editing
+  `engine/exercise_library.md` or `engine/substitution_rules.md`.
+- Web: `cd apps/web && npm install && npm run dev` (or `npm run build`).
 
 ## The engine (`engine/`)
 
@@ -127,9 +150,8 @@ within a single file and preserve the existing token system.
 
 - **Commits:** Conventional Commits with a scope, e.g.
   `feat(engine): ...`, `feat(frontend): ...`, `docs: ...`, `chore: ...`.
-- **Branch:** active development branch is `claude/claude-md-docs-049pbr`.
-  Develop, commit, and push there; never push to `main` without explicit
-  permission. Push with `git push -u origin <branch>`.
+- **Branch:** develop on the active feature branch; never push to `main`
+  without explicit permission. Push with `git push -u origin <branch>`.
 - **Do not create pull requests** unless the user explicitly asks.
 - **Spec style:** terse, imperative, ALL-CAPS section headers in lowercase
   canonical files (`## DETERMINISM RULES (MANDATORY)`). Match the surrounding
