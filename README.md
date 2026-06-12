@@ -1,14 +1,14 @@
-# Donum Deus Performance
+# Deus Performance
 *by Riz Management LLC*
 
-> *Donum Deus — the body is a gift. Train it accordingly.*
+> *Deus — the body is a gift. Train it accordingly.*
 
 ---
 
 ## Repository Structure
 
 ```
-donum-deus-performance/
+deus-performance/
 ├── engine/              # Core training system brain
 │   ├── engine_instructions.md      # System rules & CNS management
 │   ├── exercise_library.md         # Approved exercise pool
@@ -23,8 +23,8 @@ donum-deus-performance/
 │   └── ARCHITECTURE_SUMMARY.md    # High-level system architecture
 │
 ├── frontend/            # Client-facing web interfaces
-│   ├── donum_v1.html               # Initial landing page / engine interface
-│   └── donum_v2.html               # Redesigned DDP site (current)
+│   ├── deus_v1.html                # Initial landing page / engine interface
+│   └── deus_v2.html                # Redesigned DP site (current)
 │
 ├── business/            # Business strategy & planning
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
@@ -40,7 +40,7 @@ donum-deus-performance/
 
 ## System Overview
 
-Donum Deus Performance (DDP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
+Deus Performance (DP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
 
 1. Joint Integrity
 2. Movement Quality
@@ -82,9 +82,9 @@ Equipment constraints, injury flags, fatigue-adjusted alternatives
 
 ## Brand
 
-- **Institution**: Donum Deus Performance
+- **Institution**: Deus Performance
 - **Operating entity**: Riz Management LLC
-- **Tagline**: *Donum Deus. The body is a gift. Train it accordingly.*
+- **Tagline**: *Deus. The body is a gift. Train it accordingly.*
 - **Service model**: Fulfillment-as-a-service coaching practice
 
 ---
