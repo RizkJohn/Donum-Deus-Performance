@@ -4,7 +4,7 @@ Guidance for AI assistants working in this repository.
 
 ## What this repository is
 
-**Donum Deus Performance (DDP)** — by Riz Management LLC — is a
+**Deus Performance (DP)** — by Riz Management LLC — is a
 **constraint-driven adaptive training engine**, specified as documentation
 rather than executable code. The repo contains three things:
 
@@ -114,9 +114,9 @@ change** to every file that references it (e.g. a new pattern must appear in
 Three standalone HTML files, each self-contained (inline `<style>`, Google
 Fonts via CDN, no JS framework, no build):
 
-- `donum_v1.html` — initial landing page / engine interface.
-- `donum_v2.html` — redesigned DDP site (**current**).
-- `Donum_Deus_Performance.html` — largest/full variant.
+- `deus_v1.html` — initial landing page / engine interface.
+- `deus_v2.html` — redesigned DP site (**current**).
+- `Deus_Performance.html` — largest/full variant.
 
 To preview, open the file directly in a browser — there is nothing to compile or
 serve. Design uses CSS custom properties (dark sage/green palette defined in
@@ -139,6 +139,6 @@ within a single file and preserve the existing token system.
 
 ## Brand voice (for any user-facing copy)
 
-- Institution: **Donum Deus Performance**; operating entity: **Riz Management LLC**.
-- Tagline: *Donum Deus. The body is a gift. Train it accordingly.*
+- Institution: **Deus Performance**; operating entity: **Riz Management LLC**.
+- Tagline: *Deus. The body is a gift. Train it accordingly.*
 - Tone: precise, disciplined, no hype. Movement-based, constraint-driven.
