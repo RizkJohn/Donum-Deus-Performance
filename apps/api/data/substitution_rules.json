@@ -1,0 +1,128 @@
+[
+  {
+    "primary_id": "trap_bar_deadlift",
+    "alternatives": [
+      "barbell_deadlift"
+    ]
+  },
+  {
+    "primary_id": "barbell_deadlift",
+    "alternatives": [
+      "trap_bar_deadlift"
+    ]
+  },
+  {
+    "primary_id": "front_squat",
+    "alternatives": [
+      "back_squat"
+    ]
+  },
+  {
+    "primary_id": "back_squat",
+    "alternatives": [
+      "front_squat"
+    ]
+  },
+  {
+    "primary_id": "bulgarian_split_squat",
+    "alternatives": [
+      "atg_split_squat"
+    ]
+  },
+  {
+    "primary_id": "atg_split_squat",
+    "alternatives": [
+      "bulgarian_split_squat"
+    ]
+  },
+  {
+    "primary_id": "single_leg_rdl",
+    "alternatives": [
+      "db_rdl"
+    ]
+  },
+  {
+    "primary_id": "db_rdl",
+    "alternatives": [
+      "single_leg_rdl"
+    ]
+  },
+  {
+    "primary_id": "pullups",
+    "alternatives": [
+      "lat_pulldown"
+    ]
+  },
+  {
+    "primary_id": "lat_pulldown",
+    "alternatives": [
+      "pullups"
+    ]
+  },
+  {
+    "primary_id": "chest_supported_row",
+    "alternatives": [
+      "inverted_row"
+    ]
+  },
+  {
+    "primary_id": "inverted_row",
+    "alternatives": [
+      "chest_supported_row"
+    ]
+  },
+  {
+    "primary_id": "db_bench_press",
+    "alternatives": [
+      "pushups"
+    ]
+  },
+  {
+    "primary_id": "pushups",
+    "alternatives": [
+      "db_bench_press"
+    ]
+  },
+  {
+    "primary_id": "incline_db_press",
+    "alternatives": [
+      "arnold_press"
+    ]
+  },
+  {
+    "primary_id": "arnold_press",
+    "alternatives": [
+      "incline_db_press"
+    ]
+  },
+  {
+    "primary_id": "broad_jump",
+    "alternatives": [
+      "vertical_jump"
+    ]
+  },
+  {
+    "primary_id": "vertical_jump",
+    "alternatives": [
+      "broad_jump"
+    ]
+  },
+  {
+    "primary_id": "hanging_leg_raise",
+    "alternatives": [
+      "dead_bug"
+    ]
+  },
+  {
+    "primary_id": "dead_bug",
+    "alternatives": [
+      "pallof_press_alternative"
+    ]
+  },
+  {
+    "primary_id": "pallof_press_alternative",
+    "alternatives": [
+      "dead_bug"
+    ]
+  }
+]

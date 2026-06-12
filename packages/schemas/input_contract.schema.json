@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GenerateRequest",
+  "type": "object",
+  "required": ["client_profile", "goals", "schedule", "state"],
+  "additionalProperties": false,
+  "properties": {
+    "client_profile": {
+      "type": "object",
+      "required": ["age", "weight", "training_age"],
+      "additionalProperties": false,
+      "properties": {
+        "age": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 120},
+        "weight": {"type": "number", "exclusiveMinimum": 0},
+        "training_age": {"type": "string", "enum": ["Beginner", "Intermediate", "Advanced"]}
+      }
+    },
+    "goals": {
+      "type": "object",
+      "required": ["primary", "secondary"],
+      "additionalProperties": false,
+      "properties": {
+        "primary": {"type": "string", "minLength": 1},
+        "secondary": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "required": ["available_days", "sport_days", "session_duration"],
+      "additionalProperties": false,
+      "properties": {
+        "available_days": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+        },
+        "sport_days": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+          }
+        },
+        "session_duration": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": ["fatigue_score", "fatigue_state", "injuries"],
+      "additionalProperties": false,
+      "properties": {
+        "fatigue_score": {"type": "number", "minimum": 1, "maximum": 5},
+        "fatigue_state": {"type": "string", "enum": ["low", "moderate", "high"]},
+        "injuries": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

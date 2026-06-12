@@ -1,0 +1,757 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { submitAssessment } from "@/lib/api";
+import {
+  fatigueStateFor,
+  isEngineError,
+  type AssessRequest,
+  type Day,
+  type Goal,
+  type TrainingAge,
+} from "@/lib/types";
+
+const DAYS: Day[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const GOALS: Goal[] = [
+  "Strength",
+  "Fat Loss",
+  "Athletic Performance",
+  "General Health",
+  "Hypertrophy",
+];
+
+const TRAINING_AGES: TrainingAge[] = ["Beginner", "Intermediate", "Advanced"];
+
+const DURATIONS = [30, 45, 60, 75, 90];
+
+const INJURY_OPTIONS = [
+  "Shoulder",
+  "Knee",
+  "Lower Back",
+  "Wrist",
+  "Ankle",
+  "None",
+];
+
+const FATIGUE_SCORES = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+const STEPS = [
+  { title: "Profile", sub: "Who is training" },
+  { title: "Goals", sub: "What it is for" },
+  { title: "Schedule", sub: "When you can train" },
+  { title: "State", sub: "Fatigue & injuries" },
+  { title: "Review", sub: "Confirm & generate" },
+];
+
+type Phase = "form" | "submitting" | "engine_error" | "network_error";
+
+export default function AssessmentFunnel() {
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [phase, setPhase] = useState<Phase>("form");
+  const [errorReasons, setErrorReasons] = useState<string[]>([]);
+  const [validation, setValidation] = useState<string | null>(null);
+
+  // Step 1 — profile
+  const [age, setAge] = useState("");
+  const [weight, setWeight] = useState("");
+  const [trainingAge, setTrainingAge] = useState<TrainingAge | "">("");
+
+  // Step 2 — goals
+  const [primaryGoal, setPrimaryGoal] = useState<Goal | "">("");
+  const [secondaryGoals, setSecondaryGoals] = useState<Goal[]>([]);
+
+  // Step 3 — schedule
+  const [availableDays, setAvailableDays] = useState<Day[]>([]);
+  const [sportName, setSportName] = useState("");
+  const [sportDays, setSportDays] = useState<Day[]>([]);
+  const [duration, setDuration] = useState(60);
+
+  // Step 4 — state
+  const [fatigue, setFatigue] = useState(2.5);
+  const [injuries, setInjuries] = useState<string[]>([]);
+
+  // Step 5 — email
+  const [email, setEmail] = useState("");
+
+  const fatigueState = useMemo(() => fatigueStateFor(fatigue), [fatigue]);
+
+  function toggle<T>(list: T[], value: T, set: (v: T[]) => void) {
+    set(
+      list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
+    );
+  }
+
+  function toggleInjury(value: string) {
+    if (value === "None") {
+      setInjuries(injuries.includes("None") ? [] : ["None"]);
+    } else {
+      const next = injuries.includes(value)
+        ? injuries.filter((v) => v !== value)
+        : [...injuries.filter((v) => v !== "None"), value];
+      setInjuries(next);
+    }
+  }
+
+  function validateStep(s: number): string | null {
+    if (s === 0) {
+      const a = Number(age);
+      const w = Number(weight);
+      if (!age || !Number.isFinite(a) || a < 13 || a > 100)
+        return "Enter an age between 13 and 100.";
+      if (!weight || !Number.isFinite(w) || w < 60 || w > 600)
+        return "Enter a body weight in pounds (60–600).";
+      if (!trainingAge) return "Select your training age.";
+    }
+    if (s === 1) {
+      if (!primaryGoal) return "Select a primary goal.";
+    }
+    if (s === 2) {
+      if (availableDays.length === 0)
+        return "Select at least one available training day.";
+      if (sportName.trim() && sportDays.length === 0)
+        return "Select the days you play your sport, or clear the sport name.";
+      if (!sportName.trim() && sportDays.length > 0)
+        return "Name your sport, or clear the selected sport days.";
+    }
+    if (s === 4) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return "Enter a valid email address.";
+    }
+    return null;
+  }
+
+  function next() {
+    const v = validateStep(step);
+    if (v) {
+      setValidation(v);
+      return;
+    }
+    setValidation(null);
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  }
+
+  function back() {
+    setValidation(null);
+    setStep((s) => Math.max(s - 1, 0));
+  }
+
+  function buildRequest(): AssessRequest {
+    const orderedAvailable = DAYS.filter((d) => availableDays.includes(d));
+    const orderedSport = DAYS.filter((d) => sportDays.includes(d));
+    const sport = sportName.trim().toLowerCase();
+    return {
+      email: email.trim(),
+      payload: {
+        client_profile: {
+          age: Number(age),
+          weight: Number(weight),
+          training_age: trainingAge as TrainingAge,
+        },
+        goals: {
+          primary: primaryGoal as Goal,
+          secondary: secondaryGoals.filter((g) => g !== primaryGoal),
+        },
+        schedule: {
+          available_days: orderedAvailable,
+          sport_days:
+            sport && orderedSport.length > 0 ? { [sport]: orderedSport } : {},
+          session_duration: duration,
+        },
+        state: {
+          fatigue_score: fatigue,
+          fatigue_state: fatigueState,
+          injuries: injuries.filter((i) => i !== "None"),
+        },
+      },
+    };
+  }
+
+  async function submit() {
+    const v = validateStep(4);
+    if (v) {
+      setValidation(v);
+      return;
+    }
+    setValidation(null);
+    setPhase("submitting");
+    try {
+      const res = await submitAssessment(buildRequest());
+      if (isEngineError(res.program)) {
+        setErrorReasons(res.program.reasons);
+        setPhase("engine_error");
+        return;
+      }
+      router.push(`/program/${res.id}`);
+    } catch {
+      setPhase("network_error");
+    }
+  }
+
+  // ---- non-form phases ----
+
+  if (phase === "submitting") {
+    return (
+      <div
+        className="flex flex-col items-center px-6 py-24 text-center"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="animate-pulse font-play text-[64px] font-black italic leading-none text-line2">
+          D.
+        </p>
+        <p className="mb-6 mt-1 font-play text-[13px] italic text-warm">
+          Mensura ante motum.
+        </p>
+        <h2 className="mb-2 font-mono text-[17px] font-medium uppercase tracking-[0.08em] text-ink">
+          Generating your week
+        </h2>
+        <p className="mb-6 max-w-[360px] text-[11px] tracking-[0.04em] text-ink3">
+          The engine is distributing nervous-system load, budgeting volume, and
+          validating movement coverage. This takes a moment.
+        </p>
+        <div className="h-[2px] w-[280px] overflow-hidden bg-line">
+          <div className="h-full w-1/2 animate-pulse bg-accent" />
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === "engine_error") {
+    return (
+      <div className="mx-auto max-w-[560px] px-6 py-24">
+        <p className="kicker mb-4">Unsatisfiable constraints</p>
+        <h2 className="mb-5 font-play text-[32px] font-black leading-[1] tracking-[-0.02em] text-ink">
+          The engine declined to{" "}
+          <em className="font-normal italic text-warm">compromise.</em>
+        </h2>
+        <p className="mb-6 font-bask text-[15px] leading-[1.8] text-ink2">
+          A complete, safe week could not be built from your answers. Rather
+          than hand you a degraded program, the engine returns the conflict.
+          Adjust the inputs below and try again.
+        </p>
+        <ul className="mb-8 flex flex-col gap-px border border-line bg-line">
+          {errorReasons.map((r) => (
+            <li
+              key={r}
+              className="flex items-start gap-3 bg-bg px-5 py-4 text-[12px] leading-[1.7] text-ink2"
+            >
+              <span aria-hidden="true" className="shrink-0 text-danger">
+                —
+              </span>
+              {r}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => {
+            setPhase("form");
+            setStep(2);
+          }}
+        >
+          Adjust your answers
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "network_error") {
+    return (
+      <div className="mx-auto max-w-[560px] px-6 py-24">
+        <p className="kicker mb-4">Connection failed</p>
+        <h2 className="mb-5 font-play text-[32px] font-black leading-[1] tracking-[-0.02em] text-ink">
+          We could not reach the engine.
+        </h2>
+        <p className="mb-8 font-bask text-[15px] leading-[1.8] text-ink2">
+          Your answers are preserved. Check your connection and submit again.
+        </p>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => setPhase("form")}
+        >
+          Return to review
+        </button>
+      </div>
+    );
+  }
+
+  // ---- form ----
+
+  const summary = buildRequestSafe();
+
+  function buildRequestSafe() {
+    try {
+      return buildRequest();
+    } catch {
+      return null;
+    }
+  }
+
+  return (
+    <div className="mx-auto grid w-full max-w-[1160px] items-start gap-11 px-6 py-11 md:px-11 lg:grid-cols-[260px_1fr]">
+      {/* Sidebar */}
+      <aside className="lg:sticky lg:top-[78px]">
+        <p className="font-play text-[18px] font-black uppercase tracking-[0.2em] text-accent">
+          Deus
+        </p>
+        <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-ink3">
+          Free assessment
+        </p>
+        <p className="mb-8 mt-1 font-play text-[12px] italic text-warm">
+          Donum Dei.
+        </p>
+        <ol className="flex flex-col">
+          {STEPS.map((s, i) => (
+            <li
+              key={s.title}
+              aria-current={i === step ? "step" : undefined}
+              className={`flex items-start gap-3 border-b border-line py-[13px] last:border-b-0 transition-opacity ${
+                i === step ? "opacity-100" : i < step ? "opacity-60" : "opacity-35"
+              }`}
+            >
+              <span
+                className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center border font-mono text-[10px] font-medium ${
+                  i < step
+                    ? "border-accent bg-accent text-[#0b0f0c]"
+                    : i === step
+                      ? "border-accent bg-accent2 text-accent"
+                      : "border-line2 text-ink3"
+                }`}
+              >
+                {i < step ? "✓" : i + 1}
+              </span>
+              <span>
+                <span className="block font-mono text-[11px] font-medium uppercase tracking-[0.07em] text-ink">
+                  {s.title}
+                </span>
+                <span className="block text-[9px] text-ink3">{s.sub}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-7 h-[2px] bg-line" aria-hidden="true">
+          <div
+            className="h-full bg-accent transition-all duration-300"
+            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          />
+        </div>
+      </aside>
+
+      {/* Form card */}
+      <div className="border border-line bg-bg">
+        <div className="flex items-center justify-between border-b border-line bg-bg1 px-[26px] py-4">
+          <h1 className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-ink">
+            {STEPS[step].title}
+          </h1>
+          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-ink3">
+            Step {step + 1} / {STEPS.length}
+          </span>
+        </div>
+
+        <div className="px-[26px] py-7">
+          {step === 0 && (
+            <fieldset className="border-0 p-0">
+              <legend className="sr-only">Profile</legend>
+              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="field-label" htmlFor="age">
+                    Age
+                  </label>
+                  <input
+                    id="age"
+                    type="number"
+                    inputMode="numeric"
+                    min={13}
+                    max={100}
+                    className="field-input"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="weight">
+                    Body weight (lbs)
+                  </label>
+                  <input
+                    id="weight"
+                    type="number"
+                    inputMode="numeric"
+                    min={60}
+                    max={600}
+                    className="field-input"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="mb-2">
+                <span className="field-label">Training age</span>
+                <div
+                  className="grid grid-cols-3 gap-2"
+                  role="radiogroup"
+                  aria-label="Training age"
+                >
+                  {TRAINING_AGES.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      role="radio"
+                      aria-checked={trainingAge === t}
+                      onClick={() => setTrainingAge(t)}
+                      className={`chip-btn ${trainingAge === t ? "chip-btn-sel" : ""}`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  Beginner: under 1 year of structured training. Advanced: 4+
+                  years.
+                </p>
+              </div>
+            </fieldset>
+          )}
+
+          {step === 1 && (
+            <fieldset className="border-0 p-0">
+              <legend className="sr-only">Goals</legend>
+              <div className="mb-6">
+                <label className="field-label" htmlFor="primary-goal">
+                  Primary goal
+                </label>
+                <select
+                  id="primary-goal"
+                  className="field-input"
+                  value={primaryGoal}
+                  onChange={(e) => setPrimaryGoal(e.target.value as Goal)}
+                >
+                  <option value="" disabled>
+                    Select a goal
+                  </option>
+                  {GOALS.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <span className="field-label">Secondary goals (optional)</span>
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Secondary goals"
+                >
+                  {GOALS.filter((g) => g !== primaryGoal).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      aria-pressed={secondaryGoals.includes(g)}
+                      onClick={() => toggle(secondaryGoals, g, setSecondaryGoals)}
+                      className={`chip-btn ${
+                        secondaryGoals.includes(g) ? "chip-btn-sel" : ""
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  The objective hierarchy still governs: joint integrity and
+                  movement quality come before everything you select here.
+                </p>
+              </div>
+            </fieldset>
+          )}
+
+          {step === 2 && (
+            <fieldset className="border-0 p-0">
+              <legend className="sr-only">Schedule</legend>
+              <div className="mb-6">
+                <span className="field-label">Available training days</span>
+                <div
+                  className="grid grid-cols-4 gap-[6px] sm:grid-cols-7"
+                  role="group"
+                  aria-label="Available training days"
+                >
+                  {DAYS.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      aria-pressed={availableDays.includes(d)}
+                      onClick={() => toggle(availableDays, d, setAvailableDays)}
+                      className={`chip-btn px-1 text-[9px] ${
+                        availableDays.includes(d) ? "chip-btn-sel" : ""
+                      }`}
+                    >
+                      {d.slice(0, 3)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-6">
+                <label className="field-label" htmlFor="sport-name">
+                  Sport (optional)
+                </label>
+                <input
+                  id="sport-name"
+                  type="text"
+                  className="field-input mb-3"
+                  placeholder="e.g. basketball"
+                  value={sportName}
+                  onChange={(e) => setSportName(e.target.value)}
+                />
+                <span className="field-label">Sport days</span>
+                <div
+                  className="grid grid-cols-4 gap-[6px] sm:grid-cols-7"
+                  role="group"
+                  aria-label="Sport days"
+                >
+                  {DAYS.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      aria-pressed={sportDays.includes(d)}
+                      onClick={() => toggle(sportDays, d, setSportDays)}
+                      className={`chip-btn px-1 text-[9px] ${
+                        sportDays.includes(d) ? "chip-btn-sel" : ""
+                      }`}
+                    >
+                      {d.slice(0, 3)}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  The day before any sport day is automatically kept low-load.
+                </p>
+              </div>
+              <div>
+                <label className="field-label" htmlFor="duration">
+                  Session duration
+                </label>
+                <select
+                  id="duration"
+                  className="field-input"
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                >
+                  {DURATIONS.map((d) => (
+                    <option key={d} value={d}>
+                      {d} minutes
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </fieldset>
+          )}
+
+          {step === 3 && (
+            <fieldset className="border-0 p-0">
+              <legend className="sr-only">Current state</legend>
+              <div className="mb-3">
+                <span className="field-label">
+                  Current fatigue (1 = fresh, 5 = exhausted)
+                </span>
+                <div
+                  className="grid grid-cols-9 gap-[5px]"
+                  role="radiogroup"
+                  aria-label="Fatigue score"
+                >
+                  {FATIGUE_SCORES.map((f) => {
+                    const sel = fatigue === f;
+                    const state = fatigueStateFor(f);
+                    const selClass =
+                      state === "low"
+                        ? "border-accent3 bg-accent2 text-accent"
+                        : state === "moderate"
+                          ? "border-[rgba(196,154,82,0.28)] bg-[rgba(196,154,82,0.1)] text-warm"
+                          : "border-[rgba(184,68,68,0.28)] bg-[rgba(184,68,68,0.1)] text-danger";
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        role="radio"
+                        aria-checked={sel}
+                        aria-label={`Fatigue ${f}`}
+                        onClick={() => setFatigue(f)}
+                        className={`flex h-[46px] items-center justify-center border font-mono text-[12px] font-medium transition-colors ${
+                          sel
+                            ? selClass
+                            : "border-line bg-bg2 text-ink3 hover:border-line2"
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-ink3">
+                  Fatigue state:{" "}
+                  <span
+                    className={
+                      fatigueState === "low"
+                        ? "text-accent"
+                        : fatigueState === "moderate"
+                          ? "text-warm"
+                          : "text-danger"
+                    }
+                  >
+                    {fatigueState}
+                  </span>
+                  {fatigueState === "high" && (
+                    <span className="ml-2 normal-case tracking-normal">
+                      — volume will be reduced ~30%, intensity preserved
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div className="mt-6">
+                <span className="field-label">Current injuries or pain</span>
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Injuries"
+                >
+                  {INJURY_OPTIONS.map((inj) => (
+                    <button
+                      key={inj}
+                      type="button"
+                      aria-pressed={injuries.includes(inj)}
+                      onClick={() => toggleInjury(inj)}
+                      className={`chip-btn ${
+                        injuries.includes(inj) ? "chip-btn-sel" : ""
+                      }`}
+                    >
+                      {inj}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  Affected joints are routed around via approved substitutions —
+                  the week stays complete.
+                </p>
+              </div>
+            </fieldset>
+          )}
+
+          {step === 4 && summary && (
+            <div>
+              <dl className="mb-6 flex flex-col gap-px border border-line bg-line">
+                {[
+                  [
+                    "Profile",
+                    `${summary.payload.client_profile.age} yrs · ${summary.payload.client_profile.weight} lbs · ${summary.payload.client_profile.training_age}`,
+                  ],
+                  [
+                    "Goals",
+                    [
+                      summary.payload.goals.primary,
+                      ...summary.payload.goals.secondary,
+                    ].join(", "),
+                  ],
+                  [
+                    "Schedule",
+                    `${summary.payload.schedule.available_days
+                      .map((d) => d.slice(0, 3))
+                      .join(", ")} · ${summary.payload.schedule.session_duration} min`,
+                  ],
+                  [
+                    "Sport",
+                    Object.entries(summary.payload.schedule.sport_days)
+                      .map(
+                        ([s, ds]) =>
+                          `${s} (${ds.map((d) => d.slice(0, 3)).join(", ")})`
+                      )
+                      .join("; ") || "None",
+                  ],
+                  [
+                    "State",
+                    `Fatigue ${summary.payload.state.fatigue_score} (${summary.payload.state.fatigue_state})${
+                      summary.payload.state.injuries.length
+                        ? ` · ${summary.payload.state.injuries.join(", ")}`
+                        : " · No injuries"
+                    }`,
+                  ],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex bg-bg1 px-5 py-3">
+                    <dt className="min-w-[90px] font-mono text-[8px] uppercase leading-[2.4] tracking-[0.22em] text-accent">
+                      {k}
+                    </dt>
+                    <dd className="font-mono text-[11px] leading-[1.8] text-ink">
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <label className="field-label" htmlFor="email">
+                Email — your program is delivered here
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="field-input"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <p className="mt-2 text-[9px] italic text-ink3">
+                No card required. No spam — the program and nothing else.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-line bg-bg1 px-[26px] py-4">
+          {step > 0 ? (
+            <button type="button" onClick={back} className="btn-ghost">
+              ← Back
+            </button>
+          ) : (
+            <Link href="/" className="btn-ghost">
+              ← Home
+            </Link>
+          )}
+          <div className="flex items-center gap-4">
+            {validation && (
+              <p role="alert" className="text-[10px] tracking-[0.06em] text-danger">
+                {validation}
+              </p>
+            )}
+            {step < STEPS.length - 1 ? (
+              <button
+                type="button"
+                onClick={next}
+                className="cursor-pointer border-0 bg-accent px-[26px] py-[11px] font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#0b0f0c] transition-opacity hover:opacity-80"
+              >
+                Continue →
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={submit}
+                className="cursor-pointer border-0 bg-accent px-[26px] py-[11px] font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#0b0f0c] transition-opacity hover:opacity-80"
+              >
+                Generate my week →
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

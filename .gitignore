@@ -3,5 +3,18 @@
 node_modules/
 .env
 *.env.*
+!.env.example
+!.env.local.example
 dist/
 .cache/
+
+# python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+deus.db
+
+# next.js
+.next/
+out/
+next-env.d.ts
