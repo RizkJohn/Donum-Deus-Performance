@@ -94,7 +94,9 @@ export interface AssessPayload {
 }
 
 export interface AssessRequest {
-  email: string;
+  /** Required for anonymous submissions; omitted when authenticated (the
+   * backend derives it from the account). */
+  email?: string;
   payload: AssessPayload;
 }
 
@@ -108,6 +110,27 @@ export interface ProgramRecord {
   email: string;
   payload: AssessPayload;
   program: ProgramOrError;
+  created_at: string;
+}
+
+// ---- Auth & accounts ----
+
+export interface User {
+  id: string;
+  email: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+/** A program run attached to the signed-in account (GET /v1/me/programs). */
+export interface MyProgram {
+  id: string;
+  payload: AssessPayload;
+  program: ProgramOrError;
+  is_error: boolean;
   created_at: string;
 }
 

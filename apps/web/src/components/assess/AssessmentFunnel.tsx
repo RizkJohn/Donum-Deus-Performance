@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { submitAssessment } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import {
   fatigueStateFor,
   isEngineError,
@@ -58,6 +59,8 @@ type Phase = "form" | "submitting" | "engine_error" | "network_error";
 
 export default function AssessmentFunnel() {
   const router = useRouter();
+  const { token, user } = useAuth();
+  const authed = Boolean(token);
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<Phase>("form");
   const [errorReasons, setErrorReasons] = useState<string[]>([]);
@@ -125,7 +128,7 @@ export default function AssessmentFunnel() {
       if (!sportName.trim() && sportDays.length > 0)
         return "Name your sport, or clear the selected sport days.";
     }
-    if (s === 4) {
+    if (s === 4 && !authed) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
         return "Enter a valid email address.";
     }
@@ -152,7 +155,8 @@ export default function AssessmentFunnel() {
     const orderedSport = DAYS.filter((d) => sportDays.includes(d));
     const sport = sportName.trim().toLowerCase();
     return {
-      email: email.trim(),
+      // When authenticated the backend derives the email from the account.
+      ...(authed ? {} : { email: email.trim() }),
       payload: {
         client_profile: {
           age: Number(age),
@@ -187,7 +191,7 @@ export default function AssessmentFunnel() {
     setValidation(null);
     setPhase("submitting");
     try {
-      const res = await submitAssessment(buildRequest());
+      const res = await submitAssessment(buildRequest(), token);
       if (isEngineError(res.program)) {
         setErrorReasons(res.program.reasons);
         setPhase("engine_error");
@@ -697,21 +701,37 @@ export default function AssessmentFunnel() {
                   </div>
                 ))}
               </dl>
-              <label className="field-label" htmlFor="email">
-                Email — your program is delivered here
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                className="field-input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <p className="mt-2 text-[9px] italic text-ink3">
-                No card required. No spam — the program and nothing else.
-              </p>
+              {authed ? (
+                <div className="border border-line bg-bg1 px-5 py-4">
+                  <p className="mb-1 font-mono text-[8px] uppercase tracking-[0.22em] text-accent">
+                    Delivered to your account
+                  </p>
+                  <p className="font-mono text-[11px] text-ink">
+                    {user?.email}
+                  </p>
+                  <p className="mt-2 text-[9px] italic text-ink3">
+                    This program will be saved to your dashboard.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <label className="field-label" htmlFor="email">
+                    Email — your program is delivered here
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    className="field-input"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <p className="mt-2 text-[9px] italic text-ink3">
+                    No card required. No spam — the program and nothing else.
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>

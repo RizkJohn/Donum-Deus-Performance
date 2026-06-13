@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Mono, Libre_Baskerville } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/Providers";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -80,7 +81,9 @@ export default function RootLayout({
         />
         <div className="grain" aria-hidden="true" />
         <div className="grid-lines" aria-hidden="true" />
-        <div className="relative z-10">{children}</div>
+        <Providers>
+          <div className="relative z-10">{children}</div>
+        </Providers>
       </body>
     </html>
   );
