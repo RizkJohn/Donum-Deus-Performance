@@ -19,6 +19,7 @@ DEVELOPER_SPECS = [
     "output_schema.md",
     "exercise_library.md",
     "substitution_rules.md",
+    "programming.md",
     "progression_engine.md",
     "fatigue_model.md",
     "quality_control.md",

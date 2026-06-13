@@ -186,6 +186,66 @@ def check_plan_adherence(program: Program, plan: PrecomputedPlan) -> CheckResult
     return _ok("plan_adherence")
 
 
+def _rep_bounds(reps: str) -> tuple[int, int] | None:
+    """(min,max) for "n" / "lo-hi"; None for AMRAP or unparseable."""
+    if reps == "AMRAP":
+        return None
+    parts = reps.split("-")
+    try:
+        nums = [int(p) for p in parts]
+    except ValueError:
+        return None
+    return min(nums), max(nums)
+
+
+def check_level_appropriate(
+    program: Program, plan: PrecomputedPlan, library: Library
+) -> CheckResult:
+    allowed = set(plan.allowed_levels)
+    reasons = []
+    for session in program.sessions:
+        for block in session.blocks:
+            for ex in block.exercises:
+                entry = library.by_name.get(ex.name)
+                if entry and entry.level not in allowed:
+                    reasons.append(
+                        f"{session.day}/{block.type}: '{ex.name}' is {entry.level}, "
+                        f"above the client's training level"
+                    )
+    if reasons:
+        return _fail("level_appropriate", reasons, ["sessions"])
+    return _ok("level_appropriate")
+
+
+def check_goal_prescription(program: Program, plan: PrecomputedPlan) -> CheckResult:
+    """Primary (Strength) block reps must fall in the goal's loading band;
+    Power-block reps must stay explosive (≤6)."""
+    reasons = []
+    for session in program.sessions:
+        for block in session.blocks:
+            if block.type not in ("Strength", "Power"):
+                continue
+            for ex in block.exercises:
+                bounds = _rep_bounds(ex.reps)
+                if bounds is None:
+                    continue  # AMRAP already caught by intensity_safety
+                lo, hi = bounds
+                if block.type == "Power" and hi > 6:
+                    reasons.append(f"{session.day}/Power: '{ex.name}' {ex.reps} reps "
+                                   f"is not explosive (max 6)")
+                if block.type == "Strength" and (
+                    lo < plan.strength_rep_min or hi > plan.strength_rep_max
+                ):
+                    reasons.append(
+                        f"{session.day}/Strength: '{ex.name}' {ex.reps} reps outside "
+                        f"the {plan.primary_goal} band "
+                        f"{plan.strength_rep_min}-{plan.strength_rep_max}"
+                    )
+    if reasons:
+        return _fail("goal_prescription", reasons, ["sessions"])
+    return _ok("goal_prescription")
+
+
 def check_injury_blocks(program: Program, plan: PrecomputedPlan, library: Library) -> CheckResult:
     blocked_names = {
         library.by_id[i].name for i in plan.blocked_exercise_ids if i in library.by_id

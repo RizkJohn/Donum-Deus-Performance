@@ -64,50 +64,30 @@ Flow: `input_contract` → `engine_instructions` + `fatigue_model` +
 `progression_engine` → `quality_control` gate → `output_schema`, with
 `substitution_rules` applied for equipment/injury constraints.
 
-### Dual-file naming convention — IMPORTANT
+### One canonical file per concept
 
-Each engine concept exists as **two files**:
-
-- **lowercase** (e.g. `engine_instructions.md`, `output_schema.md`) — the
-  **canonical, terse, machine-spec** version: JSON schemas, enums, rule lists.
-- **UPPERCASE** (e.g. `ENGINE_INSTRUCTIONS_CORE.md`, `OUTPUT_SCHEMA.md`) — a
-  longer, **narrative/explanatory** companion version.
-
-> Note: `engine/README.md` describes the uppercase files as "legacy reference
-> copies (identical content)." This is **not accurate** — the two versions
-> differ in length and content (the uppercase ones are generally more verbose
-> and prose-like). Treat the **lowercase files as the source of truth** for
-> precise schemas and rules. When you change a rule, check whether the
-> corresponding uppercase file also needs updating to stay consistent, and
-> mention the discrepancy if it matters.
-
-Uppercase↔lowercase pairs:
-`engine_instructions` ↔ `ENGINE_INSTRUCTIONS_CORE`,
-`exercise_library` ↔ `EXERCISE_LIBRARY`,
-`fatigue_model` ↔ `FATIGUE_MODEL`,
-`input_contract` ↔ `INPUT_CONTRACT`,
-`output_schema` ↔ `OUTPUT_SCHEMA`,
-`progression_engine` ↔ `PROGRESSION_ENGINE`,
-`quality_control` ↔ `QUALITY_CONTROL_CHECK`,
-`substitution_rules` ↔ `SUBSTITUTION_RULES`.
-`ARCHITECTURE_SUMMARY.md` and `FINAL_STACK.md` exist only in uppercase.
+The engine overhaul consolidated the old dual lowercase/UPPERCASE files into a
+**single canonical markdown file per concept** (the redundant UPPERCASE
+narrative companions and the `ARCHITECTURE_SUMMARY.md` / `FINAL_STACK.md` files
+were removed). Each `engine/*.md` file is the sole source of truth for its
+concept. When you change a rule, propagate it to the code that enforces it
+(`apps/api/deus_api/engine/`) and the tests.
 
 ### Engine file map
 
 | File | Purpose |
 |------|---------|
-| `engine_instructions.md` | Master rules: determinism, priority resolution, exercise selection, ordering, failure mode |
-| `exercise_library.md` | Approved exercise pool + entry format (`id`, `name`, `pattern`, `cns`, `laterality`) |
-| `fatigue_model.md` | Fatigue scoring (0–5) and `low/moderate/high` thresholds |
-| `input_contract.md` | Client payload JSON schema (profile, goals, schedule, state) |
+| `engine_instructions.md` | Master rules: objective hierarchy, determinism, CNS, coverage, session structure, failure mode |
+| `input_contract.md` | Client payload JSON schema + how each parameter drives the engine |
 | `output_schema.md` | Enforced program output JSON schema |
-| `progression_engine.md` | Load steps (+2.5% / +5%) and `progress/maintain/deload` flags |
-| `quality_control.md` | Pre-output QC gate; all checks must pass or regenerate |
+| `exercise_library.md` | Approved pool: `id, name, pattern, cns, laterality, level, equipment, muscles, contraindications` |
 | `substitution_rules.md` | `primary_id -> [alt_ids]`; preserve pattern + cns |
-| `retry_policy.md` | Max 3 attempts, constrain offending fields, simplify on repeat failure |
+| `programming.md` | Goal-driven loading prescriptions (NASM/ACSM/NSCA) + volume budgeting |
+| `fatigue_model.md` | Fatigue scoring (1–5), volume-not-intensity rule, `progress/maintain/deload` |
+| `progression_engine.md` | Load steps (+2.5% / +5%), progression states, deload triggers |
+| `quality_control.md` | Pre-output QC gate — the 14 checks; all must pass or regenerate |
+| `retry_policy.md` | Max 3 attempts, constrain offending fields, simplify, else UNSATISFIABLE |
 | `prompt_wrapper.md` | Which files go in SYSTEM / DEVELOPER / USER roles |
-| `ARCHITECTURE_SUMMARY.md` | High-level runtime architecture (n8n → Claude → workers → Postgres → UI) |
-| `FINAL_STACK.md` | One-line role of each spec file |
 
 ### Hard engine rules (do not violate when editing specs)
 

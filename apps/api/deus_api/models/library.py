@@ -1,5 +1,12 @@
 """Pydantic models for the exercise library + substitution rules
-(derived JSON of engine/exercise_library.md and engine/substitution_rules.md)."""
+(derived JSON of engine/exercise_library.md and engine/substitution_rules.md).
+
+The library schema is enriched to NASM/ACSM/NSCA-grade metadata: each entry
+carries equipment, a minimum training level, primary musculature, and injury
+contraindications, so the deterministic decision engine can gate selection by
+training age, prune by injury, and substitute by equipment — all from data,
+not hard-coded maps.
+"""
 
 from typing import Literal
 
@@ -10,6 +17,16 @@ Pattern = Literal[
     "rotation", "anti_rotation", "carry", "locomotion", "jump",
 ]
 Laterality = Literal["Unilateral", "Bilateral"]
+Level = Literal["Beginner", "Intermediate", "Advanced"]
+Equipment = Literal[
+    "barbell", "dumbbell", "kettlebell", "machine", "cable", "bodyweight",
+    "band", "medicine_ball", "trap_bar", "ez_bar", "bench", "pullup_bar",
+    "box", "sled", "landmine", "suspension", "slider",
+]
+# Canonical injury tags (assessment injury labels normalize to these).
+InjuryTag = Literal[
+    "shoulder", "knee", "lower_back", "wrist", "ankle", "elbow", "hip", "neck",
+]
 
 
 class ExerciseEntry(BaseModel):
@@ -19,6 +36,10 @@ class ExerciseEntry(BaseModel):
     pattern: Pattern
     cns: Literal["High", "Low"]
     laterality: Laterality
+    level: Level
+    equipment: list[Equipment] = Field(min_length=1)
+    muscles: list[str] = Field(min_length=1)
+    contraindications: list[InjuryTag] = Field(default_factory=list)
 
 
 class SubstitutionRule(BaseModel):

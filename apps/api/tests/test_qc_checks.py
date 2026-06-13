@@ -87,3 +87,29 @@ def test_split_deviation_rejected(good, library):
     program["weekly_split"] = program["weekly_split"][:-1]
     report = validate(program, req, plan, library)
     assert "plan_adherence" in _failed_names(report)
+
+
+def test_above_level_exercise_rejected(library):
+    # Beginner client served an Advanced exercise -> level_appropriate fails
+    req = make_request(training_age="Beginner")
+    plan = build_plan(req, library)
+    advanced = next(e for e in library.exercises if e.level == "Advanced")
+    program = MockProvider()._build_program(plan, library)
+    program["sessions"][0]["blocks"][0]["exercises"][0]["name"] = advanced.name
+    report = validate(program, req, plan, library)
+    assert "level_appropriate" in _failed_names(report)
+
+
+def test_goal_prescription_band_enforced(library):
+    # Strength goal: a Strength block with 12 reps is outside the 2-6 band
+    req = make_request(primary_goal="Strength")
+    plan = build_plan(req, library)
+    program = MockProvider()._build_program(plan, library)
+    for session in program["sessions"]:
+        for block in session["blocks"]:
+            if block["type"] == "Strength":
+                block["exercises"][0]["reps"] = "12"
+                report = validate(program, req, plan, library)
+                assert "goal_prescription" in _failed_names(report)
+                return
+    pytest.skip("no strength block in fixture")

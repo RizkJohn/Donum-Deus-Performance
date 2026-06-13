@@ -34,14 +34,17 @@ def make_request(
     fatigue_score=2.5,
     fatigue_state="low",
     injuries=(),
+    primary_goal="Strength",
+    age=30,
+    session_duration=60,
 ) -> GenerateRequest:
     return GenerateRequest.model_validate({
-        "client_profile": {"age": 30, "weight": 180, "training_age": training_age},
-        "goals": {"primary": "Strength", "secondary": ["Athletic Performance"]},
+        "client_profile": {"age": age, "weight": 180, "training_age": training_age},
+        "goals": {"primary": primary_goal, "secondary": ["Athletic Performance"]},
         "schedule": {
             "available_days": list(available_days),
             "sport_days": sport_days or {},
-            "session_duration": 60,
+            "session_duration": session_duration,
         },
         "state": {
             "fatigue_score": fatigue_score,

@@ -48,6 +48,8 @@ def validate(
         checks.check_progression_flag(program, plan),
         checks.check_plan_adherence(program, plan),
         checks.check_injury_blocks(program, plan, library),
+        checks.check_level_appropriate(program, plan, library),
+        checks.check_goal_prescription(program, plan),
     ]
     failures = [r for r in results if not r.passed]
     return QCReport(passed=not failures, failures=failures, program=program)

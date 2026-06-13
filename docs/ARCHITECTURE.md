@@ -79,8 +79,9 @@ every hard rule regardless of what the model returns.
 | `engine_instructions.md` | SYSTEM prompt text, verbatim | `spec_loader` |
 | `output_schema.md` | JSON Schema (extracted) + Pydantic `Program` model + DEVELOPER prompt | schemas, models, prompt |
 | `input_contract.md` | Pydantic `GenerateRequest` model | API validation (422 on malformed) |
-| `exercise_library.md` | Parsed at build time → `data/exercise_library.json` | decision engine, QC, prompt |
+| `exercise_library.md` | Parsed at build time → `data/exercise_library.json` (90 exercises, enriched: level/equipment/muscles/contraindications) | decision engine, QC, prompt |
 | `substitution_rules.md` | Parsed at build time → `data/substitution_rules.json` | substitution resolver |
+| `programming.md` | Goal profiles in `programming.py` (sets/reps/rest/intent, volume bias, conditioning) + DEVELOPER prompt | decision engine |
 | `fatigue_model.md` | Deterministic Python (`fatigue.py`) + DEVELOPER prompt | decision engine |
 | `progression_engine.md` | Deterministic flag computation + DEVELOPER prompt | decision engine |
 | `quality_control.md` | One Python check function per rule + DEVELOPER prompt | QC gate |
@@ -90,27 +91,37 @@ every hard rule regardless of what the model returns.
 **Markdown stays canonical.** Structured data (library, substitutions) is
 ported to JSON by `scripts/port_library.py`; a sync test fails CI if the
 committed JSON drifts from the markdown. Never hand-edit the derived JSON.
-Code reads **lowercase** spec files only (per CLAUDE.md, they are the source
-of truth; UPPERCASE files are narrative companions).
+There is one canonical file per concept (the engine overhaul removed the
+redundant UPPERCASE companions).
 
 ## QC gate — hard-rule checklist
 
 Each is a pure function returning `{name, passed, offending_fields, reasons}`:
 
 1. `schema_valid` — strict structural validation (`additionalProperties:false`, enums, regexes, sets 1–6, notes ≤120)
-2. `cns_limits` — ≤2 High-CNS days/week; no consecutive High days
+2. `cns_limits` — ≤2 High-CNS days/week (≤1 for masters); no consecutive High days
 3. `pre_sport_low_cns` — day before any sport day is Low CNS
 4. `movement_coverage` — week covers squat, hinge, push, pull, rotation/anti-rotation, carry/locomotion, jump
 5. `block_order` — Warmup→Power→Strength→Accessory→Core→Mobility; days Mon→Sun
 6. `library_only` — every exercise name exists exactly in the library
 7. `volume_ok` — ≤8 exercises per session
 8. `intensity_safety` — no AMRAP/failure on Power/Strength primaries (1–3 RIR)
-9. `fatigue_applied` — fatigue ≥4.0 ⇒ volume reduced ~30%, intensity untouched
+9. `fatigue_applied` — volume respects the fatigue-adjusted budget; intensity untouched
 10. `progression_flag` — flags contain the deterministically computed progress/maintain/deload
-11. `training_days_match` — sessions only on available, non-sport days
+11. `plan_adherence` — split matches the plan; sessions only on planned (available, non-sport) days
+12. `injury_blocks` — no exercise contraindicated by the client's injuries
+13. `level_appropriate` — no exercise above the client's training level
+14. `goal_prescription` — Strength-block reps in the goal's band; Power-block reps explosive (≤6)
 
 Failure ⇒ retry (≤3) with offending fields constrained; final failure ⇒
 `{"error":"UNSATISFIABLE_CONSTRAINTS","reasons":[...]}` — never a partial plan.
+
+**Goal-driven & assessment-aligned.** The decision engine consumes every
+assessment parameter: `training_age` (days/volume + exercise-level gating),
+`goals.primary` (loading scheme via goal profiles), `session_duration` (time
+budget), `age` (masters recovery scaling), `fatigue` (volume + flag),
+`schedule`/`sport_days` (CNS spacing), and `injuries` (data-driven
+contraindication pruning with pattern/CNS-preserving substitution).
 
 ## LLM provider interface
 

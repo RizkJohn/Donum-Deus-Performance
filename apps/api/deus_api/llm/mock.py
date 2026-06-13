@@ -2,9 +2,9 @@
 
 Builds a valid program directly from the PrecomputedPlan + library passed in
 `context`, so the full pipeline (decision → generation → QC) runs end-to-end
-in tests and local dev. Prefers the simplest valid solution: exactly one
-exercise per required coverage group (per engine_instructions: minimize
-exercise count while meeting requirements).
+in tests and local dev. It applies the plan's goal-driven block prescriptions
+and selects the simplest valid solution: one exercise per required coverage
+group (engine rule: minimize exercise count while meeting requirements).
 
 `fail_first=True` emits an out-of-library exercise on attempt 1 so the
 retry/QC failure path is testable.
@@ -16,20 +16,19 @@ from ..engine.library_loader import Library
 from ..models.decision import COVERAGE_GROUPS, PrecomputedPlan
 from .base import GenerationResult
 
-# pattern -> session block
+# pattern -> session block type
 _BLOCK_FOR_PATTERN = {
     "jump": "Power",
     "rotation": "Core",
     "anti_rotation": "Core",
     "carry": "Accessory",
     "locomotion": "Accessory",
-}
-
-_BLOCK_PARAMS = {
-    "Power": {"sets": 3, "reps": "3", "rest": "2 min", "notes": "Max intent, full recovery"},
-    "Strength": {"sets": 4, "reps": "5", "rest": "2 min", "notes": "Leave 2 reps in reserve"},
-    "Accessory": {"sets": 3, "reps": "8-12", "rest": "90 sec", "notes": "Controlled tempo"},
-    "Core": {"sets": 3, "reps": "10", "rest": "60 sec", "notes": "Brace and breathe"},
+    "squat": "Strength",
+    "hinge": "Strength",
+    "push_h": "Strength",
+    "push_v": "Strength",
+    "pull_h": "Strength",
+    "pull_v": "Strength",
 }
 
 _BLOCK_ORDER = ["Warmup", "Power", "Strength", "Accessory", "Core", "Mobility"]
@@ -58,70 +57,45 @@ class MockProvider:
 
         program = self._build_program(plan, library)
         if self.fail_first and attempt == 1:
-            # corrupt one exercise name to exercise the QC/retry path
             program["sessions"][0]["blocks"][0]["exercises"][0]["name"] = "Invented Movement"
         return GenerationResult(parsed=program, raw_text="", stop_reason="end_turn")
 
     def _pick_for_group(self, group: str, plan: PrecomputedPlan, library: Library):
-        """First allowed exercise covering the group; prefer Low CNS so picks
-        sit safely on Low-CNS days (jump has only High options — placed on a
-        High day when one exists)."""
         allowed = set(plan.allowed_exercise_ids)
         patterns = COVERAGE_GROUPS[group]
         candidates = [
             e for e in library.exercises if e.id in allowed and e.pattern in patterns
         ]
-        low = [e for e in candidates if e.cns == "Low"]
-        pool = low or candidates
-        return pool[0] if pool else None
+        return candidates[0] if candidates else None
 
     def _build_program(self, plan: PrecomputedPlan, library: Library) -> dict:
-        picks = []
-        for group in plan.required_groups:
-            entry = self._pick_for_group(group, plan, library)
-            if entry is not None:
-                picks.append(entry)
-
-        # distribute: jump goes to the first High day; rest round-robin over
-        # days with remaining budget
+        picks = [
+            e for g in plan.required_groups
+            if (e := self._pick_for_group(g, plan, library)) is not None
+        ]
         days = [d.day for d in plan.days]
-        high_days = [d.day for d in plan.days if d.cns == "High"]
+        # round-robin picks across days (budget >= ceil(len(picks)/n) holds by
+        # the decision engine's n*budget >= coverage feasibility check)
         per_day: dict[str, list] = {d: [] for d in days}
-
-        jump_picks = [e for e in picks if e.pattern == "jump"]
-        other_picks = [e for e in picks if e.pattern != "jump"]
-        for e in jump_picks:
-            target = high_days[0] if high_days else days[0]
-            per_day[target].append(e)
-
-        i = 0
-        for e in other_picks:
-            # next day with capacity
-            for _ in range(len(days)):
-                day = days[i % len(days)]
-                i += 1
-                if len(per_day[day]) < plan.volume_budget:
-                    per_day[day].append(e)
-                    break
+        for i, e in enumerate(picks):
+            per_day[days[i % len(days)]].append(e)
 
         sessions = []
         for day in days:
-            entries = per_day[day]
-            if not entries:
-                continue
             blocks: dict[str, list] = {}
-            for e in entries:
-                block_type = _BLOCK_FOR_PATTERN.get(
-                    e.pattern, "Strength" if e.cns == "High" else "Accessory"
-                )
-                params = _BLOCK_PARAMS[block_type]
-                blocks.setdefault(block_type, []).append({"name": e.name, **params})
+            for e in per_day[day]:
+                bt = _BLOCK_FOR_PATTERN[e.pattern]
+                rx = plan.prescriptions[bt]
+                blocks.setdefault(bt, []).append({
+                    "name": e.name,
+                    "sets": rx.sets, "reps": rx.reps, "rest": rx.rest, "notes": rx.notes,
+                })
             ordered = [
                 {"type": bt, "exercises": blocks[bt]}
-                for bt in _BLOCK_ORDER
-                if bt in blocks
+                for bt in _BLOCK_ORDER if bt in blocks
             ]
-            sessions.append({"day": day, "blocks": ordered})
+            if ordered:
+                sessions.append({"day": day, "blocks": ordered})
 
         return {
             "weekly_split": [d.model_dump() for d in plan.days],
