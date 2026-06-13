@@ -9,16 +9,18 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import get_settings
-from ..db.models import ProgramRun
+from ..db.models import ProgramRun, User
 from ..db.session import get_db
-from ..deps import get_lib, get_provider, get_specs
+from ..deps import get_lib, get_optional_user, get_provider, get_specs
 from ..engine.pipeline import generate_program
 from ..models.input_contract import GenerateRequest
 
 router = APIRouter()
 
 
-async def run_pipeline(req: GenerateRequest, db: AsyncSession) -> ProgramRun:
+async def run_pipeline(
+    req: GenerateRequest, db: AsyncSession, user_id: str | None = None
+) -> ProgramRun:
     provider = get_provider()
     result = await generate_program(
         req,
@@ -28,6 +30,7 @@ async def run_pipeline(req: GenerateRequest, db: AsyncSession) -> ProgramRun:
         max_attempts=get_settings().max_attempts,
     )
     run = ProgramRun(
+        user_id=user_id,
         payload=req.model_dump(),
         program=result.output,
         provider=provider.name,
@@ -40,6 +43,10 @@ async def run_pipeline(req: GenerateRequest, db: AsyncSession) -> ProgramRun:
 
 
 @router.post("/v1/generate")
-async def generate(req: GenerateRequest, db: AsyncSession = Depends(get_db)) -> dict:
-    run = await run_pipeline(req, db)
+async def generate(
+    req: GenerateRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
+) -> dict:
+    run = await run_pipeline(req, db, user_id=user.id if user else None)
     return run.program

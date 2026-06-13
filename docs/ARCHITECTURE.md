@@ -143,12 +143,34 @@ class LLMProvider(Protocol):
   cards, block tables.
 - SEO: per-route metadata, sitemap, robots, OpenGraph, JSON-LD.
 
+## Accounts & client dashboard (Milestone 2)
+
+Turns the one-shot funnel into a persistent client relationship — the
+foundation that tracking, check-ins, and history hang off of.
+
+- **Auth** — native email/password. Passwords hashed with stdlib `scrypt`
+  (`security.py`); sessions are HS256 JWTs signed with `JWT_SECRET`
+  (hand-rolled with stdlib `hmac` — no external crypto dependency, fully
+  offline). Swappable for Clerk/Auth0 behind the same endpoints later.
+- **Endpoints** — `POST /v1/auth/register`, `POST /v1/auth/login` (→ `{token,
+  user}`), `GET /v1/auth/me`, `GET /v1/me/programs` (the signed-in user's
+  history). `get_current_user` / `get_optional_user` deps read the Bearer
+  token.
+- **Ownership** — `program_runs.user_id` (nullable FK). `/v1/generate` and
+  `/v1/assess` attach the run to the user when a token is present; `/v1/assess`
+  stays anonymous-capable (derives email from the account when authed, captures
+  a marketing `lead` only for anonymous submissions).
+- **Web** — `/login`, `/signup`, protected `/dashboard` (program history +
+  generate-new CTA); `AuthProvider` stores the token in localStorage and the
+  funnel becomes account-aware.
+
 ## Local development
 
 ```
 docker compose up        # postgres + api (mock provider) + web — no API key needed
 make test                # pytest: unit + 100-program contract test (mock provider)
 LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
+JWT_SECRET=...           # set in production (signs auth tokens)
 ```
 
 ## Deferred (documented stubs)
@@ -157,5 +179,6 @@ LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
   payload currently carries a single `fatigue_score`; averaging helper exists.
 - Deload-every-6–8-weeks needs training-history persistence (program_runs is
   the seed for this).
-- Auth, payments, dashboard, check-ins, chat coach, Redis/Qdrant — later
-  milestones per the business roadmap.
+- Workout logging, weekly check-ins, progress charts, Claude chat coach,
+  payments/subscriptions, Redis/Qdrant — later milestones per the business
+  roadmap. Auth + dashboard (above) shipped in Milestone 2.

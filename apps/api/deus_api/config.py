@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     data_dir: Path = _API_ROOT / "data"
     cors_origins: str = "http://localhost:3000"
     max_attempts: int = 3
+    # Auth. Override JWT_SECRET in production.
+    jwt_secret: str = "dev-insecure-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60 * 24 * 7  # 7 days
 
 
 @lru_cache

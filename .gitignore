@@ -18,3 +18,4 @@ deus.db
 .next/
 out/
 next-env.d.ts
+apps/api/*.db

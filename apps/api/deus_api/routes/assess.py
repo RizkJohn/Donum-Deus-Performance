@@ -1,6 +1,7 @@
 """Assessment funnel endpoints.
 
-POST /v1/assess        — lead capture + program generation in one call
+POST /v1/assess        — generate a program; captures a lead (anonymous) or
+                         attaches it to the signed-in user (Bearer token)
 GET  /v1/programs/{id} — fetch a stored run for the result page
 """
 
@@ -9,8 +10,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db.models import Lead, ProgramRun
+from ..db.models import Lead, ProgramRun, User
 from ..db.session import get_db
+from ..deps import get_optional_user
 from ..models.input_contract import GenerateRequest
 from .generate import run_pipeline
 
@@ -19,16 +21,25 @@ router = APIRouter()
 
 class AssessRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    email: EmailStr
+    email: EmailStr | None = None  # required for anonymous; derived for authed users
     payload: GenerateRequest
 
 
 @router.post("/v1/assess")
-async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
-    run = await run_pipeline(req.payload, db)
-    lead = Lead(email=str(req.email), run_id=run.id)
-    db.add(lead)
-    await db.commit()
+async def assess(
+    req: AssessRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
+) -> dict:
+    email = req.email or (user.email if user else None)
+    if email is None:
+        raise HTTPException(status_code=422, detail="email is required")
+
+    run = await run_pipeline(req.payload, db, user_id=user.id if user else None)
+    # Capture a marketing lead only for anonymous submissions.
+    if user is None:
+        db.add(Lead(email=str(email), run_id=run.id))
+        await db.commit()
     return {"id": run.id, "program": run.program}
 
 
