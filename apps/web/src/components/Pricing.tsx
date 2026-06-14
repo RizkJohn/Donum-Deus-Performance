@@ -1,8 +1,21 @@
-import Link from "next/link";
+"use client";
 
-const TIERS = [
+import { useState } from "react";
+import Link from "next/link";
+import { createCheckout, ApiError } from "@/lib/api";
+import type { PricingTier } from "@/lib/types";
+
+const TIERS: {
+  name: string;
+  tier: PricingTier;
+  price: number;
+  desc: string;
+  featured: boolean;
+  features: string[];
+}[] = [
   {
     name: "Engine",
+    tier: "engine",
     price: 49,
     desc: "The full adaptive engine, self-directed.",
     featured: false,
@@ -15,6 +28,7 @@ const TIERS = [
   },
   {
     name: "Hybrid",
+    tier: "hybrid",
     price: 199,
     desc: "The engine, reviewed by a human coach.",
     featured: true,
@@ -27,6 +41,7 @@ const TIERS = [
   },
   {
     name: "Premium",
+    tier: "premium",
     price: 750,
     desc: "A dedicated coach, engine-assisted.",
     featured: false,
@@ -38,6 +53,46 @@ const TIERS = [
     ],
   },
 ];
+
+function CheckoutButton({
+  tier,
+  featured,
+}: {
+  tier: PricingTier;
+  featured: boolean;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleClick() {
+    const token = typeof window !== "undefined" ? localStorage.getItem("dp_token") : null;
+    if (!token) {
+      window.location.href = "/sign-in";
+      return;
+    }
+    setLoading(true);
+    try {
+      const { url } = await createCheckout(tier);
+      window.location.href = url;
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        window.location.href = "/sign-in";
+      }
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={loading}
+      className={`block w-full px-[18px] py-[13px] text-center font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#0b0f0c] transition-opacity hover:opacity-80 disabled:opacity-50 ${
+        featured ? "bg-warm" : "bg-accent"
+      }`}
+    >
+      {loading ? "Redirecting…" : "Get started →"}
+    </button>
+  );
+}
 
 export default function Pricing() {
   return (
@@ -99,14 +154,7 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/assess"
-              className={`block w-full px-[18px] py-[13px] text-center font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#0b0f0c] transition-opacity hover:opacity-80 ${
-                t.featured ? "bg-warm" : "bg-accent"
-              }`}
-            >
-              Start free assessment
-            </Link>
+            <CheckoutButton tier={t.tier} featured={t.featured} />
           </div>
         ))}
       </div>

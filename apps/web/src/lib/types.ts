@@ -113,6 +113,28 @@ export interface ProgramRecord {
   created_at: string;
 }
 
+// ---- Auth ----
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  subscription_tier: "free" | "engine" | "hybrid" | "premium";
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: AuthUser;
+}
+
+// ---- Billing ----
+
+export type PricingTier = "engine" | "hybrid" | "premium";
+
+export interface CheckoutResponse {
+  url: string;
+}
+
 export function isEngineError(p: ProgramOrError): p is EngineError {
   return (
     typeof p === "object" &&

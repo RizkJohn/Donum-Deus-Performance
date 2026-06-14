@@ -26,6 +26,21 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     max_attempts: int = 3
 
+    # Auth
+    secret_key: str = "dev-secret-change-in-production"
+    web_url: str = "http://localhost:3000"
+
+    # Email (console | resend)
+    email_provider: str = "console"
+    resend_api_key: str = ""
+
+    # Stripe
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_engine: str = ""    # Self-directed tier
+    stripe_price_hybrid: str = ""    # Coach-reviewed tier
+    stripe_price_premium: str = ""   # Coach-led tier
+
 
 @lru_cache
 def get_settings() -> Settings:

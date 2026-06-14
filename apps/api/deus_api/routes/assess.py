@@ -9,7 +9,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db.models import Lead, ProgramRun
+from ..auth.deps import get_current_user, get_current_user_optional
+from ..db.models import Lead, ProgramRun, User
 from ..db.session import get_db
 from ..models.input_contract import GenerateRequest
 from .generate import run_pipeline
@@ -24,12 +25,42 @@ class AssessRequest(BaseModel):
 
 
 @router.post("/v1/assess")
-async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
+async def assess(
+    req: AssessRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional),
+) -> dict:
     run = await run_pipeline(req.payload, db)
-    lead = Lead(email=str(req.email), run_id=run.id)
+    user_id = current_user.id if current_user else None
+    run.user_id = user_id
+    lead = Lead(email=str(req.email), run_id=run.id, user_id=user_id)
     db.add(lead)
     await db.commit()
     return {"id": run.id, "program": run.program}
+
+
+@router.get("/v1/programs")
+async def list_programs(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list:
+    rows = (
+        await db.execute(
+            select(ProgramRun)
+            .where(ProgramRun.user_id == current_user.id)
+            .order_by(ProgramRun.created_at.desc())
+            .limit(20)
+        )
+    ).scalars().all()
+    return [
+        {
+            "id": r.id,
+            "created_at": r.created_at.isoformat(),
+            "payload": r.payload,
+            "program": r.program,
+        }
+        for r in rows
+    ]
 
 
 @router.get("/v1/programs/{run_id}")
