@@ -236,6 +236,201 @@
     "contraindications": []
   },
   {
+    "id": "bodyweight_squat",
+    "name": "Bodyweight Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "tempo_bodyweight_squat",
+    "name": "Tempo Bodyweight Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "bodyweight_split_squat",
+    "name": "Bodyweight Split Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "adductors"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "step_up",
+    "name": "Step Up",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight",
+      "box"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "hamstrings"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "shrimp_squat",
+    "name": "Shrimp Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "adductors",
+      "core"
+    ],
+    "contraindications": [
+      "knee",
+      "ankle"
+    ]
+  },
+  {
+    "id": "suspension_squat",
+    "name": "Suspension Trainer Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "band_goblet_squat",
+    "name": "Band Goblet Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "band_front_squat",
+    "name": "Band Front Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core",
+      "upper back"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "band_split_squat",
+    "name": "Band Split Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "adductors"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "kettlebell_front_squat",
+    "name": "Kettlebell Front Squat",
+    "pattern": "squat",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "kettlebell"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "core",
+      "upper back"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
     "id": "barbell_deadlift",
     "name": "Barbell Deadlift",
     "pattern": "hinge",
@@ -463,6 +658,189 @@
     "contraindications": []
   },
   {
+    "id": "glute_bridge",
+    "name": "Glute Bridge",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "single_leg_glute_bridge",
+    "name": "Single Leg Glute Bridge",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "bodyweight_good_morning",
+    "name": "Bodyweight Good Morning",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "single_leg_hip_hinge",
+    "name": "Single Leg Hip Hinge",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors",
+      "core"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "nordic_hamstring_curl",
+    "name": "Nordic Hamstring Curl",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "calves"
+    ],
+    "contraindications": [
+      "knee"
+    ]
+  },
+  {
+    "id": "suspension_leg_curl",
+    "name": "Suspension Trainer Leg Curl",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_good_morning",
+    "name": "Band Good Morning",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "band_pull_through",
+    "name": "Band Pull Through",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "erectors"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_rdl",
+    "name": "Band Romanian Deadlift",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "band_kettlebell_swing",
+    "name": "Band Resisted Swing",
+    "pattern": "hinge",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "erectors",
+      "core"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
     "id": "barbell_bench_press",
     "name": "Barbell Bench Press",
     "pattern": "push_h",
@@ -621,6 +999,147 @@
     ]
   },
   {
+    "id": "incline_push_up",
+    "name": "Incline Push Up",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "wrist"
+    ]
+  },
+  {
+    "id": "decline_push_up",
+    "name": "Decline Push Up",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "upper pectorals",
+      "anterior deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "archer_push_up",
+    "name": "Archer Push Up",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "suspension_push_up",
+    "name": "Suspension Trainer Push Up",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_push_up",
+    "name": "Band Resisted Push Up",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band",
+      "bodyweight"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "band_chest_press",
+    "name": "Band Chest Press",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids",
+      "triceps"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_chest_fly",
+    "name": "Band Chest Fly",
+    "pattern": "push_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "pectorals",
+      "anterior deltoids"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
     "id": "overhead_press",
     "name": "Overhead Press",
     "pattern": "push_v",
@@ -743,6 +1262,143 @@
     "level": "Intermediate",
     "equipment": [
       "dumbbell"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "pike_push_up",
+    "name": "Pike Push Up",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "upper traps"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "decline_pike_push_up",
+    "name": "Decline Pike Push Up",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight",
+      "box"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "upper traps"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "wall_handstand_push_up",
+    "name": "Wall Handstand Push Up",
+    "pattern": "push_v",
+    "cns": "High",
+    "laterality": "Bilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "upper traps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
+  },
+  {
+    "id": "suspension_overhead_press",
+    "name": "Suspension Trainer Overhead Press",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_overhead_press",
+    "name": "Band Overhead Press",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps",
+      "upper back"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_arnold_press",
+    "name": "Band Arnold Press",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "deltoids",
+      "triceps"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_single_arm_press",
+    "name": "Band Single Arm Overhead Press",
+    "pattern": "push_v",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
     ],
     "muscles": [
       "deltoids",
@@ -911,6 +1567,98 @@
     ]
   },
   {
+    "id": "feet_elevated_inverted_row",
+    "name": "Feet Elevated Inverted Row",
+    "pattern": "pull_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "bodyweight",
+      "box"
+    ],
+    "muscles": [
+      "lats",
+      "rhomboids",
+      "mid traps",
+      "biceps",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "suspension_row",
+    "name": "Suspension Trainer Row",
+    "pattern": "pull_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "lats",
+      "rhomboids",
+      "mid traps",
+      "biceps",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_row",
+    "name": "Band Seated Row",
+    "pattern": "pull_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "lats",
+      "rhomboids",
+      "mid traps",
+      "biceps"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_face_pull",
+    "name": "Band Face Pull",
+    "pattern": "pull_h",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "rear deltoids",
+      "rhomboids",
+      "mid traps"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_single_arm_row",
+    "name": "Band Single Arm Row",
+    "pattern": "pull_h",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "lats",
+      "rhomboids",
+      "mid traps",
+      "biceps"
+    ],
+    "contraindications": []
+  },
+  {
     "id": "pull_up",
     "name": "Pull Up",
     "pattern": "pull_v",
@@ -1043,6 +1791,126 @@
     "level": "Beginner",
     "equipment": [
       "machine"
+    ],
+    "muscles": [
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_assisted_pull_up",
+    "name": "Band Assisted Pull Up",
+    "pattern": "pull_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band",
+      "pullup_bar"
+    ],
+    "muscles": [
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_assisted_chin_up",
+    "name": "Band Assisted Chin Up",
+    "pattern": "pull_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band",
+      "pullup_bar"
+    ],
+    "muscles": [
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
+    "contraindications": [
+      "shoulder",
+      "elbow"
+    ]
+  },
+  {
+    "id": "band_lat_pulldown",
+    "name": "Band Lat Pulldown",
+    "pattern": "pull_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_straight_arm_pulldown",
+    "name": "Band Straight Arm Pulldown",
+    "pattern": "pull_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "lats",
+      "teres major",
+      "rear deltoids"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "archer_pull_up",
+    "name": "Archer Pull Up",
+    "pattern": "pull_v",
+    "cns": "High",
+    "laterality": "Unilateral",
+    "level": "Advanced",
+    "equipment": [
+      "bodyweight",
+      "pullup_bar"
+    ],
+    "muscles": [
+      "lats",
+      "biceps",
+      "rhomboids",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "elbow"
+    ]
+  },
+  {
+    "id": "suspension_pulldown",
+    "name": "Suspension Trainer Pulldown",
+    "pattern": "pull_v",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "suspension"
     ],
     "muscles": [
       "lats",
@@ -1187,6 +2055,101 @@
     "contraindications": [
       "lower_back",
       "shoulder"
+    ]
+  },
+  {
+    "id": "bicycle_crunch",
+    "name": "Bicycle Crunch",
+    "pattern": "rotation",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "obliques",
+      "rectus abdominis",
+      "hip flexors"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "bodyweight_windmill",
+    "name": "Bodyweight Windmill",
+    "pattern": "rotation",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "obliques",
+      "hamstrings",
+      "shoulders"
+    ],
+    "contraindications": [
+      "lower_back",
+      "shoulder"
+    ]
+  },
+  {
+    "id": "band_woodchop",
+    "name": "Band Woodchop",
+    "pattern": "rotation",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "transverse abdominis",
+      "core"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "band_rotation",
+    "name": "Band Standing Rotation",
+    "pattern": "rotation",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "transverse abdominis"
+    ],
+    "contraindications": [
+      "lower_back"
+    ]
+  },
+  {
+    "id": "band_low_to_high_chop",
+    "name": "Band Low to High Chop",
+    "pattern": "rotation",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "hips",
+      "shoulders"
+    ],
+    "contraindications": [
+      "lower_back"
     ]
   },
   {
@@ -1351,6 +2314,57 @@
     "contraindications": []
   },
   {
+    "id": "band_pallof_press",
+    "name": "Band Pallof Press",
+    "pattern": "anti_rotation",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "transverse abdominis",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_anti_rotation_hold",
+    "name": "Band Anti-Rotation Hold",
+    "pattern": "anti_rotation",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "transverse abdominis",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_dead_bug",
+    "name": "Band Dead Bug",
+    "pattern": "anti_rotation",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "rectus abdominis",
+      "transverse abdominis",
+      "hip flexors"
+    ],
+    "contraindications": []
+  },
+  {
     "id": "farmer_carry",
     "name": "Farmer Carry",
     "pattern": "carry",
@@ -1469,6 +2483,96 @@
     ]
   },
   {
+    "id": "band_resisted_march",
+    "name": "Band Resisted March",
+    "pattern": "carry",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "core",
+      "hip flexors",
+      "glutes"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_anchored_carry",
+    "name": "Band Anchored Carry",
+    "pattern": "carry",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "obliques",
+      "core",
+      "traps",
+      "forearms"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_overhead_carry",
+    "name": "Band Overhead Carry",
+    "pattern": "carry",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "shoulders",
+      "core",
+      "traps"
+    ],
+    "contraindications": [
+      "shoulder"
+    ]
+  },
+  {
+    "id": "weighted_vest_carry",
+    "name": "Weighted Vest Carry",
+    "pattern": "carry",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "core",
+      "glutes",
+      "traps",
+      "calves"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "suspension_anchored_carry",
+    "name": "Suspension Anchored Carry",
+    "pattern": "carry",
+    "cns": "Low",
+    "laterality": "Unilateral",
+    "level": "Beginner",
+    "equipment": [
+      "suspension"
+    ],
+    "muscles": [
+      "obliques",
+      "core",
+      "traps",
+      "forearms"
+    ],
+    "contraindications": []
+  },
+  {
     "id": "walking_lunge",
     "name": "Walking Lunge",
     "pattern": "locomotion",
@@ -1583,6 +2687,79 @@
       "core"
     ],
     "contraindications": []
+  },
+  {
+    "id": "lateral_band_walk",
+    "name": "Lateral Band Walk",
+    "pattern": "locomotion",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "glutes",
+      "abductors",
+      "quadriceps"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "monster_walk",
+    "name": "Monster Walk",
+    "pattern": "locomotion",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "glutes",
+      "abductors",
+      "hip flexors"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "band_resisted_walk",
+    "name": "Band Resisted Forward Walk",
+    "pattern": "locomotion",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "calves",
+      "core"
+    ],
+    "contraindications": []
+  },
+  {
+    "id": "crab_walk",
+    "name": "Crab Walk",
+    "pattern": "locomotion",
+    "cns": "Low",
+    "laterality": "Bilateral",
+    "level": "Beginner",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "shoulders",
+      "core"
+    ],
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ]
   },
   {
     "id": "box_jump",
@@ -1745,6 +2922,88 @@
     ],
     "contraindications": [
       "shoulder"
+    ]
+  },
+  {
+    "id": "band_resisted_squat_jump",
+    "name": "Band Resisted Squat Jump",
+    "pattern": "jump",
+    "cns": "High",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "calves"
+    ],
+    "contraindications": [
+      "knee",
+      "ankle"
+    ]
+  },
+  {
+    "id": "band_resisted_broad_jump",
+    "name": "Band Resisted Broad Jump",
+    "pattern": "jump",
+    "cns": "High",
+    "laterality": "Bilateral",
+    "level": "Advanced",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "quadriceps",
+      "calves"
+    ],
+    "contraindications": [
+      "knee",
+      "ankle"
+    ]
+  },
+  {
+    "id": "band_resisted_vertical_jump",
+    "name": "Band Resisted Vertical Jump",
+    "pattern": "jump",
+    "cns": "High",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "band"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "calves"
+    ],
+    "contraindications": [
+      "knee",
+      "ankle"
+    ]
+  },
+  {
+    "id": "tuck_jump",
+    "name": "Tuck Jump",
+    "pattern": "jump",
+    "cns": "High",
+    "laterality": "Bilateral",
+    "level": "Intermediate",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscles": [
+      "quadriceps",
+      "glutes",
+      "calves",
+      "hip flexors"
+    ],
+    "contraindications": [
+      "knee",
+      "ankle"
     ]
   }
 ]
