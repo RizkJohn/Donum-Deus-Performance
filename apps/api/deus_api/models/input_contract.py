@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 Day = Literal[
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -43,20 +43,28 @@ class State(BaseModel):
     stress: float = Field(ge=1, le=5)     # 1 = calm, 5 = severe
     injuries: list[str]
 
-    @computed_field  # type: ignore[misc]
+    _fatigue_score: float = PrivateAttr()
+    _fatigue_state: FatigueState = PrivateAttr()
+
+    @model_validator(mode="after")
+    def _compute_fatigue(self) -> "State":
+        raw = (self.sleep + self.soreness + self.energy + self.stress) / 4
+        self._fatigue_score = round(max(1.0, min(5.0, raw)), 2)
+        if self._fatigue_score >= 4.0:
+            self._fatigue_state = "high"
+        elif self._fatigue_score >= 3.0:
+            self._fatigue_state = "moderate"
+        else:
+            self._fatigue_state = "low"
+        return self
+
     @property
     def fatigue_score(self) -> float:
-        raw = (self.sleep + self.soreness + self.energy + self.stress) / 4
-        return round(max(1.0, min(5.0, raw)), 2)
+        return self._fatigue_score
 
-    @computed_field  # type: ignore[misc]
     @property
     def fatigue_state(self) -> FatigueState:
-        if self.fatigue_score >= 4.0:
-            return "high"
-        if self.fatigue_score >= 3.0:
-            return "moderate"
-        return "low"
+        return self._fatigue_state
 
 
 class GenerateRequest(BaseModel):
