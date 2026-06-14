@@ -38,6 +38,11 @@
   pattern: squat
   cns: Low
   laterality: Unilateral
+- id: goblet_squat
+  name: Goblet Squat
+  pattern: squat
+  cns: Low
+  laterality: Bilateral
 - id: single_leg_rdl
   name: Single Leg RDL
   pattern: hinge
@@ -50,20 +55,55 @@
   laterality: Bilateral
 
 ### UPPER BODY
-- id: incline_db_press
-  name: Incline DB Press
-  pattern: push_v
-  cns: Low
+- id: barbell_bench_press
+  name: Barbell Bench Press
+  pattern: push_h
+  cns: High
   laterality: Bilateral
 - id: db_bench_press
   name: DB Bench Press
   pattern: push_h
   cns: Low
   laterality: Bilateral
+- id: single_arm_db_press
+  name: Single Arm DB Press
+  pattern: push_h
+  cns: Low
+  laterality: Unilateral
+- id: cable_chest_press
+  name: Cable Chest Press
+  pattern: push_h
+  cns: Low
+  laterality: Bilateral
+- id: incline_db_press
+  name: Incline DB Press
+  pattern: push_v
+  cns: Low
+  laterality: Bilateral
+- id: barbell_overhead_press
+  name: Barbell Overhead Press
+  pattern: push_v
+  cns: High
+  laterality: Bilateral
+- id: single_arm_db_overhead_press
+  name: Single Arm DB Overhead Press
+  pattern: push_v
+  cns: Low
+  laterality: Unilateral
+- id: landmine_press
+  name: Landmine Press
+  pattern: push_v
+  cns: Low
+  laterality: Unilateral
 - id: arnold_press
   name: Arnold Press
   pattern: push_v
   cns: Low
+  laterality: Bilateral
+- id: weighted_pullup
+  name: Weighted Pullup
+  pattern: pull_v
+  cns: High
   laterality: Bilateral
 - id: pullups
   name: Pullups
@@ -75,6 +115,21 @@
   pattern: pull_v
   cns: Low
   laterality: Bilateral
+- id: single_arm_lat_pulldown
+  name: Single Arm Lat Pulldown
+  pattern: pull_v
+  cns: Low
+  laterality: Unilateral
+- id: cable_pullover
+  name: Cable Pullover
+  pattern: pull_v
+  cns: Low
+  laterality: Bilateral
+- id: barbell_row
+  name: Barbell Row
+  pattern: pull_h
+  cns: High
+  laterality: Bilateral
 - id: chest_supported_row
   name: Chest Supported Row
   pattern: pull_h
@@ -82,6 +137,16 @@
   laterality: Bilateral
 - id: inverted_row
   name: Inverted Row
+  pattern: pull_h
+  cns: Low
+  laterality: Bilateral
+- id: single_arm_db_row
+  name: Single Arm DB Row
+  pattern: pull_h
+  cns: Low
+  laterality: Unilateral
+- id: face_pull
+  name: Face Pull
   pattern: pull_h
   cns: Low
   laterality: Bilateral
@@ -97,11 +162,41 @@
   pattern: jump
   cns: High
   laterality: Bilateral
+- id: box_jump
+  name: Box Jump
+  pattern: jump
+  cns: High
+  laterality: Bilateral
+- id: lateral_bound
+  name: Lateral Bound
+  pattern: jump
+  cns: High
+  laterality: Unilateral
+- id: single_leg_hop
+  name: Single Leg Hop
+  pattern: jump
+  cns: High
+  laterality: Unilateral
 - id: med_ball_slam
   name: Med Ball Slam
   pattern: rotation
   cns: High
   laterality: Bilateral
+- id: med_ball_rotational_throw
+  name: Med Ball Rotational Throw
+  pattern: rotation
+  cns: High
+  laterality: Unilateral
+- id: cable_woodchop
+  name: Cable Woodchop
+  pattern: rotation
+  cns: Low
+  laterality: Unilateral
+- id: landmine_rotation
+  name: Landmine Rotation
+  pattern: rotation
+  cns: Low
+  laterality: Unilateral
 
 ### CORE
 - id: hanging_leg_raise
@@ -119,6 +214,16 @@
   pattern: anti_rotation
   cns: Low
   laterality: Unilateral
+- id: side_plank
+  name: Side Plank
+  pattern: anti_rotation
+  cns: Low
+  laterality: Unilateral
+- id: ab_wheel_rollout
+  name: Ab Wheel Rollout
+  pattern: anti_rotation
+  cns: Low
+  laterality: Bilateral
 
 ### CONDITIONING
 - id: farmer_carry
@@ -126,10 +231,50 @@
   pattern: carry
   cns: Low
   laterality: Bilateral
+- id: suitcase_carry
+  name: Suitcase Carry
+  pattern: carry
+  cns: Low
+  laterality: Unilateral
+- id: overhead_carry
+  name: Overhead Carry
+  pattern: carry
+  cns: Low
+  laterality: Bilateral
+- id: waiter_carry
+  name: Waiter Carry
+  pattern: carry
+  cns: Low
+  laterality: Unilateral
+- id: cross_body_carry
+  name: Cross Body Carry
+  pattern: carry
+  cns: Low
+  laterality: Unilateral
 - id: bear_crawl
   name: Bear Crawl
   pattern: locomotion
   cns: Low
+  laterality: Bilateral
+- id: sled_push
+  name: Sled Push
+  pattern: locomotion
+  cns: High
+  laterality: Bilateral
+- id: lateral_shuffle
+  name: Lateral Shuffle
+  pattern: locomotion
+  cns: Low
+  laterality: Bilateral
+- id: carioca
+  name: Carioca
+  pattern: locomotion
+  cns: Low
+  laterality: Bilateral
+- id: sprint
+  name: Sprint
+  pattern: locomotion
+  cns: High
   laterality: Bilateral
 - id: pushups
   name: Pushups

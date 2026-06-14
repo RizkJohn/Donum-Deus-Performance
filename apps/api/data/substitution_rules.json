@@ -36,6 +36,12 @@
     ]
   },
   {
+    "primary_id": "goblet_squat",
+    "alternatives": [
+      "deep_squat_hold"
+    ]
+  },
+  {
     "primary_id": "single_leg_rdl",
     "alternatives": [
       "db_rdl"
@@ -48,44 +54,52 @@
     ]
   },
   {
-    "primary_id": "pullups",
-    "alternatives": [
-      "lat_pulldown"
-    ]
-  },
-  {
-    "primary_id": "lat_pulldown",
-    "alternatives": [
-      "pullups"
-    ]
-  },
-  {
-    "primary_id": "chest_supported_row",
-    "alternatives": [
-      "inverted_row"
-    ]
-  },
-  {
-    "primary_id": "inverted_row",
-    "alternatives": [
-      "chest_supported_row"
-    ]
-  },
-  {
     "primary_id": "db_bench_press",
     "alternatives": [
+      "cable_chest_press",
+      "pushups"
+    ]
+  },
+  {
+    "primary_id": "single_arm_db_press",
+    "alternatives": [
+      "cable_chest_press",
+      "db_bench_press",
+      "pushups"
+    ]
+  },
+  {
+    "primary_id": "cable_chest_press",
+    "alternatives": [
+      "db_bench_press",
       "pushups"
     ]
   },
   {
     "primary_id": "pushups",
     "alternatives": [
-      "db_bench_press"
+      "db_bench_press",
+      "cable_chest_press"
     ]
   },
   {
     "primary_id": "incline_db_press",
     "alternatives": [
+      "arnold_press"
+    ]
+  },
+  {
+    "primary_id": "single_arm_db_overhead_press",
+    "alternatives": [
+      "landmine_press",
+      "arnold_press",
+      "incline_db_press"
+    ]
+  },
+  {
+    "primary_id": "landmine_press",
+    "alternatives": [
+      "single_arm_db_overhead_press",
       "arnold_press"
     ]
   },
@@ -96,33 +110,221 @@
     ]
   },
   {
+    "primary_id": "pullups",
+    "alternatives": [
+      "lat_pulldown"
+    ]
+  },
+  {
+    "primary_id": "lat_pulldown",
+    "alternatives": [
+      "pullups",
+      "cable_pullover"
+    ]
+  },
+  {
+    "primary_id": "single_arm_lat_pulldown",
+    "alternatives": [
+      "cable_pullover",
+      "lat_pulldown",
+      "pullups"
+    ]
+  },
+  {
+    "primary_id": "cable_pullover",
+    "alternatives": [
+      "lat_pulldown",
+      "pullups"
+    ]
+  },
+  {
+    "primary_id": "chest_supported_row",
+    "alternatives": [
+      "inverted_row",
+      "face_pull"
+    ]
+  },
+  {
+    "primary_id": "inverted_row",
+    "alternatives": [
+      "chest_supported_row",
+      "face_pull"
+    ]
+  },
+  {
+    "primary_id": "single_arm_db_row",
+    "alternatives": [
+      "face_pull",
+      "chest_supported_row",
+      "inverted_row"
+    ]
+  },
+  {
+    "primary_id": "face_pull",
+    "alternatives": [
+      "chest_supported_row",
+      "inverted_row"
+    ]
+  },
+  {
     "primary_id": "broad_jump",
     "alternatives": [
-      "vertical_jump"
+      "vertical_jump",
+      "box_jump"
     ]
   },
   {
     "primary_id": "vertical_jump",
     "alternatives": [
-      "broad_jump"
+      "broad_jump",
+      "box_jump"
+    ]
+  },
+  {
+    "primary_id": "box_jump",
+    "alternatives": [
+      "broad_jump",
+      "vertical_jump"
+    ]
+  },
+  {
+    "primary_id": "lateral_bound",
+    "alternatives": [
+      "single_leg_hop"
+    ]
+  },
+  {
+    "primary_id": "single_leg_hop",
+    "alternatives": [
+      "lateral_bound"
+    ]
+  },
+  {
+    "primary_id": "med_ball_slam",
+    "alternatives": [
+      "med_ball_rotational_throw"
+    ]
+  },
+  {
+    "primary_id": "med_ball_rotational_throw",
+    "alternatives": [
+      "med_ball_slam"
+    ]
+  },
+  {
+    "primary_id": "cable_woodchop",
+    "alternatives": [
+      "landmine_rotation",
+      "ninety_ninety_hips"
+    ]
+  },
+  {
+    "primary_id": "landmine_rotation",
+    "alternatives": [
+      "cable_woodchop",
+      "ninety_ninety_hips"
     ]
   },
   {
     "primary_id": "hanging_leg_raise",
     "alternatives": [
-      "dead_bug"
+      "dead_bug",
+      "ab_wheel_rollout"
     ]
   },
   {
     "primary_id": "dead_bug",
     "alternatives": [
-      "pallof_press_alternative"
+      "pallof_press_alternative",
+      "hanging_leg_raise"
     ]
   },
   {
     "primary_id": "pallof_press_alternative",
     "alternatives": [
+      "side_plank",
       "dead_bug"
+    ]
+  },
+  {
+    "primary_id": "side_plank",
+    "alternatives": [
+      "pallof_press_alternative",
+      "dead_bug"
+    ]
+  },
+  {
+    "primary_id": "ab_wheel_rollout",
+    "alternatives": [
+      "dead_bug",
+      "hanging_leg_raise"
+    ]
+  },
+  {
+    "primary_id": "farmer_carry",
+    "alternatives": [
+      "overhead_carry",
+      "suitcase_carry"
+    ]
+  },
+  {
+    "primary_id": "suitcase_carry",
+    "alternatives": [
+      "waiter_carry",
+      "cross_body_carry"
+    ]
+  },
+  {
+    "primary_id": "overhead_carry",
+    "alternatives": [
+      "farmer_carry"
+    ]
+  },
+  {
+    "primary_id": "waiter_carry",
+    "alternatives": [
+      "suitcase_carry",
+      "cross_body_carry"
+    ]
+  },
+  {
+    "primary_id": "cross_body_carry",
+    "alternatives": [
+      "suitcase_carry",
+      "waiter_carry"
+    ]
+  },
+  {
+    "primary_id": "bear_crawl",
+    "alternatives": [
+      "lateral_shuffle",
+      "carioca"
+    ]
+  },
+  {
+    "primary_id": "sled_push",
+    "alternatives": [
+      "sprint"
+    ]
+  },
+  {
+    "primary_id": "lateral_shuffle",
+    "alternatives": [
+      "carioca",
+      "bear_crawl"
+    ]
+  },
+  {
+    "primary_id": "carioca",
+    "alternatives": [
+      "lateral_shuffle",
+      "bear_crawl"
+    ]
+  },
+  {
+    "primary_id": "sprint",
+    "alternatives": [
+      "sled_push"
     ]
   }
 ]
