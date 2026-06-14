@@ -26,13 +26,24 @@ _BLOCK_FOR_PATTERN = {
 }
 
 _BLOCK_PARAMS = {
-    "Power": {"sets": 3, "reps": "3", "rest": "2 min", "notes": "Max intent, full recovery"},
-    "Strength": {"sets": 4, "reps": "5", "rest": "2 min", "notes": "Leave 2 reps in reserve"},
-    "Accessory": {"sets": 3, "reps": "8-12", "rest": "90 sec", "notes": "Controlled tempo"},
-    "Core": {"sets": 3, "reps": "10", "rest": "60 sec", "notes": "Brace and breathe"},
+    "Power":     {"sets": 3, "reps": "3",    "rest": "2 min",  "load_guidance": "RPE 7 — max intent",       "notes": "Full recovery between sets; reset before each rep"},
+    "Strength":  {"sets": 4, "reps": "5",    "rest": "2 min",  "load_guidance": "70–75% 1RM (2–3 RIR)",    "notes": "Brace core; stop 2 reps short of failure"},
+    "Accessory": {"sets": 3, "reps": "8-12", "rest": "90 sec", "load_guidance": "RPE 6–7",                 "notes": "Controlled tempo; squeeze at peak contraction"},
+    "Core":      {"sets": 3, "reps": "10",   "rest": "60 sec", "load_guidance": "Bodyweight",              "notes": "Brace and breathe; maintain neutral spine"},
+    "Warmup":    {"sets": 2, "reps": "10",   "rest": "30 sec", "load_guidance": "Technique focus — no load", "notes": "Move through full range; do not rush"},
+    "Mobility":  {"sets": 2, "reps": "Hold 30s", "rest": "30 sec", "load_guidance": "Bodyweight",          "notes": "Breathe into the stretch; do not force range"},
 }
 
 _BLOCK_ORDER = ["Warmup", "Power", "Strength", "Accessory", "Core", "Mobility"]
+
+_BLOCK_INTENTS = {
+    "Warmup":    "Raise tissue temperature and activate primary movers before loading.",
+    "Power":     "Train the nervous system for maximal rate of force development.",
+    "Strength":  "Build absolute strength in foundational movement patterns.",
+    "Accessory": "Reinforce movement quality and address muscular balance.",
+    "Core":      "Develop anti-rotation stability and midline resilience.",
+    "Mobility":  "Restore joint range of motion and tissue extensibility.",
+}
 
 
 class MockProvider:
@@ -109,24 +120,75 @@ class MockProvider:
             entries = per_day[day]
             if not entries:
                 continue
-            blocks: dict[str, list] = {}
+
+            # Always include Warmup and Mobility blocks
+            blocks_map: dict[str, list] = {
+                "Warmup": [],
+                "Mobility": [],
+            }
+
             for e in entries:
                 block_type = _BLOCK_FOR_PATTERN.get(
                     e.pattern, "Strength" if e.cns == "High" else "Accessory"
                 )
                 params = _BLOCK_PARAMS[block_type]
-                blocks.setdefault(block_type, []).append({"name": e.name, **params})
-            ordered = [
-                {"type": bt, "exercises": blocks[bt]}
-                for bt in _BLOCK_ORDER
-                if bt in blocks
-            ]
-            sessions.append({"day": day, "blocks": ordered})
+                blocks_map.setdefault(block_type, []).append({"name": e.name, **params})
 
+            # Fill Warmup/Mobility with a carry/mobility entry if empty
+            if not blocks_map["Warmup"]:
+                warmup_entry = next(
+                    (e for e in library.exercises if e.pattern in ("carry", "locomotion")
+                     and e.id in set(plan.allowed_exercise_ids)), None
+                )
+                if warmup_entry:
+                    blocks_map["Warmup"].append({"name": warmup_entry.name, **_BLOCK_PARAMS["Warmup"]})
+                else:
+                    # fallback: reuse first entry
+                    if entries:
+                        blocks_map["Warmup"].append({"name": entries[0].name, **_BLOCK_PARAMS["Warmup"]})
+
+            if not blocks_map["Mobility"]:
+                mob_entry = next(
+                    (e for e in library.exercises if e.pattern in ("rotation", "hinge", "squat")
+                     and e.cns == "Low" and e.id in set(plan.allowed_exercise_ids)), None
+                )
+                if mob_entry:
+                    blocks_map["Mobility"].append({"name": mob_entry.name, **_BLOCK_PARAMS["Mobility"]})
+                else:
+                    if entries:
+                        blocks_map["Mobility"].append({"name": entries[0].name, **_BLOCK_PARAMS["Mobility"]})
+
+            ordered = [
+                {
+                    "type": bt,
+                    "block_intent": _BLOCK_INTENTS[bt],
+                    "exercises": blocks_map[bt],
+                }
+                for bt in _BLOCK_ORDER
+                if bt in blocks_map and blocks_map[bt]
+            ]
+            sessions.append({
+                "day": day,
+                "session_intent": f"Develop foundational movement quality and strength for {day}.",
+                "blocks": ordered,
+            })
+
+        split_days = [
+            {**d.model_dump(), "estimated_duration_min": 60}
+            for d in plan.days
+        ]
+
+        flag = plan.flag
         return {
-            "weekly_split": [d.model_dump() for d in plan.days],
+            "program_summary": {
+                "week_theme": f"Structured training week — {flag} phase",
+                "training_days": len(days),
+                "fatigue_state": "high" if flag == "deload" else ("moderate" if flag == "maintain" else "low"),
+                "progression_flag": flag,
+                "key_focuses": ["Reinforce movement patterns", "Manage fatigue and recovery"],
+            },
+            "weekly_split": split_days,
             "sessions": sessions,
             "conditioning": [],
-            "mobility": [],
-            "flags": [plan.flag],
+            "flags": [flag],
         }

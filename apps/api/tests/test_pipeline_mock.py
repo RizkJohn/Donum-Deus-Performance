@@ -14,7 +14,8 @@ async def test_pipeline_produces_valid_program(base_request, specs, library):
     assert result.program is not None
     assert result.attempts == 1
     out = result.output
-    assert set(out) == {"weekly_split", "sessions", "conditioning", "mobility", "flags"}
+    assert "program_summary" in out
+    assert set(out) >= {"program_summary", "weekly_split", "sessions", "conditioning", "flags"}
 
 
 @pytest.mark.asyncio

@@ -41,6 +41,7 @@ def validate(
         checks.check_pre_sport_low_cns(program, req),
         checks.check_movement_coverage(program, library),
         checks.check_block_order(program),
+        checks.check_required_blocks(program),
         checks.check_library_only(program, library),
         checks.check_volume(program),
         checks.check_intensity_safety(program),

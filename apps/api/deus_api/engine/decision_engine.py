@@ -17,8 +17,8 @@ from .library_loader import Library
 from .substitution import blocked_ids_for_injuries
 
 # Training days and base volume (exercises/session, <= 8) by training age.
-TARGET_DAYS = {"Beginner": 3, "Intermediate": 4, "Advanced": 5}
-BASE_VOLUME = {"Beginner": 5, "Intermediate": 6, "Advanced": 7}
+TARGET_DAYS = {"Beginner": 3, "Intermediate": 4, "Advanced": 5, "Elite": 6}
+BASE_VOLUME = {"Beginner": 5, "Intermediate": 6, "Advanced": 7, "Elite": 8}
 
 MIN_COVERAGE_EXERCISES = len(COVERAGE_GROUPS)  # 7
 

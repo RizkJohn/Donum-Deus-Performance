@@ -186,6 +186,20 @@ def check_plan_adherence(program: Program, plan: PrecomputedPlan) -> CheckResult
     return _ok("plan_adherence")
 
 
+def check_required_blocks(program: Program) -> CheckResult:
+    """Every training session must contain Warmup and Mobility blocks."""
+    reasons = []
+    for session in program.sessions:
+        types = {b.type for b in session.blocks}
+        if "Warmup" not in types:
+            reasons.append(f"{session.day}: missing required Warmup block")
+        if "Mobility" not in types:
+            reasons.append(f"{session.day}: missing required Mobility block")
+    if reasons:
+        return _fail("required_blocks", reasons, ["sessions"])
+    return _ok("required_blocks")
+
+
 def check_injury_blocks(program: Program, plan: PrecomputedPlan, library: Library) -> CheckResult:
     blocked_names = {
         library.by_id[i].name for i in plan.blocked_exercise_ids if i in library.by_id

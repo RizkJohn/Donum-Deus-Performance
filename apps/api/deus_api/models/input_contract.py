@@ -7,8 +7,12 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 Day = Literal[
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 ]
-TrainingAge = Literal["Beginner", "Intermediate", "Advanced"]
+TrainingAge = Literal["Beginner", "Intermediate", "Advanced", "Elite"]
 FatigueState = Literal["low", "moderate", "high"]
+GoalType = Literal[
+    "strength", "hypertrophy", "fat_loss", "athletic_performance",
+    "general_fitness", "endurance", "mobility", "rehabilitation",
+]
 
 DAY_ORDER: list[str] = [
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -18,8 +22,11 @@ DAY_ORDER: list[str] = [
 class ClientProfile(BaseModel):
     model_config = ConfigDict(extra="forbid")
     age: float = Field(gt=0, lt=120)
+    sex: Literal["male", "female", "other"] | None = None
     weight: float = Field(gt=0)
+    height_cm: float | None = Field(default=None, gt=0)
     training_age: TrainingAge
+    lifestyle: Literal["sedentary", "lightly_active", "active", "very_active"] = "active"
 
 
 class Goals(BaseModel):
@@ -67,9 +74,17 @@ class State(BaseModel):
         return self._fatigue_state
 
 
+class History(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    consecutive_training_weeks: int = Field(default=0, ge=0)
+    last_deload_week: str | None = None
+
+
 class GenerateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     client_profile: ClientProfile
     goals: Goals
     schedule: Schedule
     state: State
+    equipment: list[str] = Field(default_factory=list)
+    history: History = Field(default_factory=History)

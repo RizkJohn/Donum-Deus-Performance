@@ -42,9 +42,14 @@ class SpecLoader:
         return "\n\n---\n\n".join(parts)
 
     def output_json_schema(self) -> dict:
-        """The enforced JSON Schema embedded in output_schema.md."""
+        """The enforced JSON Schema embedded in output_schema.md.
+
+        Uses raw_decode so trailing prose after the closing brace is ignored.
+        """
         text = self._read("output_schema.md")
-        return json.loads(text[text.index("{"):])
+        start = text.index("{")
+        obj, _ = json.JSONDecoder().raw_decode(text, start)
+        return obj
 
 
 def sanitize_for_structured_output(schema: dict) -> dict:

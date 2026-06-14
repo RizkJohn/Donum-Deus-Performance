@@ -10,9 +10,12 @@
       "required": ["age", "weight", "training_age"],
       "additionalProperties": false,
       "properties": {
-        "age": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 120},
-        "weight": {"type": "number", "exclusiveMinimum": 0},
-        "training_age": {"type": "string", "enum": ["Beginner", "Intermediate", "Advanced"]}
+        "age":         {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 120},
+        "sex":         {"type": "string", "enum": ["male","female","other"]},
+        "weight":      {"type": "number", "exclusiveMinimum": 0},
+        "height_cm":   {"type": "number", "exclusiveMinimum": 0},
+        "training_age":{"type": "string", "enum": ["Beginner","Intermediate","Advanced","Elite"]},
+        "lifestyle":   {"type": "string", "enum": ["sedentary","lightly_active","active","very_active"]}
       }
     },
     "goals": {
@@ -20,8 +23,17 @@
       "required": ["primary", "secondary"],
       "additionalProperties": false,
       "properties": {
-        "primary": {"type": "string", "minLength": 1},
-        "secondary": {"type": "array", "items": {"type": "string"}}
+        "primary": {
+          "type": "string",
+          "enum": ["strength","hypertrophy","fat_loss","athletic_performance","general_fitness","endurance","mobility","rehabilitation"]
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["strength","hypertrophy","fat_loss","athletic_performance","general_fitness","endurance","mobility","rehabilitation"]
+          }
+        }
       }
     },
     "schedule": {
@@ -31,13 +43,13 @@
       "properties": {
         "available_days": {
           "type": "array",
-          "items": {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+          "items": {"type": "string", "enum": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]}
         },
         "sport_days": {
           "type": "object",
           "additionalProperties": {
             "type": "array",
-            "items": {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+            "items": {"type": "string", "enum": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]}
           }
         },
         "session_duration": {"type": "number", "exclusiveMinimum": 0}
@@ -45,12 +57,29 @@
     },
     "state": {
       "type": "object",
-      "required": ["fatigue_score", "fatigue_state", "injuries"],
+      "required": ["sleep", "soreness", "energy", "stress", "injuries"],
       "additionalProperties": false,
       "properties": {
-        "fatigue_score": {"type": "number", "minimum": 1, "maximum": 5},
-        "fatigue_state": {"type": "string", "enum": ["low", "moderate", "high"]},
+        "sleep":    {"type": "number", "minimum": 1, "maximum": 5},
+        "soreness": {"type": "number", "minimum": 1, "maximum": 5},
+        "energy":   {"type": "number", "minimum": 1, "maximum": 5},
+        "stress":   {"type": "number", "minimum": 1, "maximum": 5},
         "injuries": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["barbell","dumbbells","cables","machines","kettlebells","resistance_bands","pull_up_bar","sled","med_ball","bodyweight_only"]
+      }
+    },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "consecutive_training_weeks": {"type": "integer", "minimum": 0},
+        "last_deload_week": {"type": ["string","null"]}
       }
     }
   }
