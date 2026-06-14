@@ -1,0 +1,31 @@
+# Fly.io configuration — deploys the API service.
+# Deploy with: fly deploy --dockerfile apps/api/Dockerfile
+# Set secrets: fly secrets set ANTHROPIC_API_KEY=sk-ant-... LLM_PROVIDER=claude
+# Attach Postgres: fly postgres create && fly postgres attach <app-name>
+
+app = "deus-performance-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "apps/api/Dockerfile"
+
+[env]
+  LLM_PROVIDER = "claude"
+  ANTHROPIC_MODEL = "claude-opus-4-8"
+  CORS_ORIGINS = "https://deusperformance.com"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
