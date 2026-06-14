@@ -19,7 +19,12 @@ DAY_SETS = [
     ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 ]
 SPORT_SETS = [None, {"basketball": ["Tuesday"]}, {"soccer": ["Monday", "Saturday"]}]
-FATIGUE = [(1.5, "low"), (3.5, "moderate"), (4.5, "high")]
+# (sleep, soreness, energy, stress) → avg determines state
+FATIGUE = [
+    (1, 1, 2, 2),    # avg 1.5 → low
+    (3, 4, 3, 4),    # avg 3.5 → moderate
+    (4, 5, 4, 5),    # avg 4.5 → high
+]
 INJURIES = [(), ("knee",), ("shoulder", "lower back")]
 
 MATRIX = list(itertools.product(TRAINING_AGES, DAY_SETS, SPORT_SETS, FATIGUE, INJURIES))
@@ -28,13 +33,15 @@ MATRIX = list(itertools.product(TRAINING_AGES, DAY_SETS, SPORT_SETS, FATIGUE, IN
 @pytest.mark.asyncio
 @pytest.mark.parametrize("training_age,days,sports,fatigue,injuries", MATRIX)
 async def test_program_matrix(training_age, days, sports, fatigue, injuries, specs, library):
-    score, state = fatigue
+    sleep, soreness, energy, stress = fatigue
     req = make_request(
         training_age=training_age,
         available_days=days,
         sport_days=sports,
-        fatigue_score=score,
-        fatigue_state=state,
+        sleep=sleep,
+        soreness=soreness,
+        energy=energy,
+        stress=stress,
         injuries=injuries,
     )
     result = await generate_program(

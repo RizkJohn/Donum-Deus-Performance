@@ -6,6 +6,14 @@
 - Prefer simplest valid solution (minimize exercise count while meeting requirements).
 - No synonyms; use exact names from exercise_library.
 
+## OBJECTIVE HIERARCHY (NEVER REORDER)
+1. Joint Integrity
+2. Movement Quality
+3. Strength
+4. Work Capacity
+5. Hypertrophy
+6. Sport/Skill
+
 ## PRIORITY RESOLUTION
 If conflicts occur:
 1. CNS rules
@@ -14,15 +22,43 @@ If conflicts occur:
 4. Fatigue rules
 5. Volume targets
 
+## CNS MANAGEMENT
+- Max 2 High CNS days/week
+- No consecutive High CNS days
+- Pre-sport day = Low CNS
+- Post-high-output = Low CNS or Recovery
+
 ## EXERCISE SELECTION
 - Select from library by exact match.
 - If equipment/injury blocks a choice, use substitution_rules only.
 
+## PROGRAM RULES
+
+### STRENGTH
+- 3–5 sets, 3–6 reps, 1–3 RIR; never train to failure on primary lifts.
+
+### HYPERTROPHY
+- 3–4 sets, 6–12 reps; no failure.
+
+### POWER
+- Low volume; max intent per rep.
+
+### CONDITIONING
+- 10–25 min; must not impair primary strength work.
+
+### MOBILITY
+- Minimum 5–10 min per session.
+
+## FATIGUE MANAGEMENT
+If fatigue_state = high:
+1. Remove conditioning
+2. Reduce accessory volume
+3. Maintain intensity (do not reduce load)
+
 ## IDENTITY & ORDER
-- Maintain stable ordering:
-  weekly_split ordered Mon→Sun
-  sessions ordered Mon→Sun
-  blocks ordered: Warmup, Power, Strength, Accessory, Core, Mobility
+- weekly_split ordered Mon→Sun
+- sessions ordered Mon→Sun
+- blocks ordered: Warmup → Power → Strength → Accessory → Core → Mobility
 
 ## FAILURE MODE
 - If any rule violated → return error object (do not output partial plans).

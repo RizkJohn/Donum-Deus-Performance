@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProgramView from "@/components/program/ProgramView";
 import { getProgram } from "@/lib/api";
-import { isEngineError, type ProgramRecord } from "@/lib/types";
+import { fatigueStateFor, isEngineError, type ProgramRecord } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -105,7 +105,7 @@ export default async function ProgramPage({
                     {record.payload.schedule.session_duration} min sessions
                   </span>
                   <span className="border border-line bg-bg px-[11px] py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-ink3">
-                    Fatigue: {record.payload.state.fatigue_state}
+                    Fatigue: {fatigueStateFor((record.payload.state.sleep + record.payload.state.soreness + record.payload.state.energy + record.payload.state.stress) / 4)}
                   </span>
                   <span className="border border-line bg-bg px-[11px] py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-ink3">
                     Generated {new Date(record.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
