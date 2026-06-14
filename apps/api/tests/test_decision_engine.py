@@ -60,8 +60,8 @@ def test_single_day_beginner_unsatisfiable(library):
 
 
 def test_fatigue_reduces_volume_budget(library):
-    fresh = build_plan(make_request(fatigue_score=2.0), library)
-    tired = build_plan(make_request(fatigue_score=4.5, fatigue_state="high"), library)
+    fresh = build_plan(make_request(sleep=2, soreness=2, energy=2, stress=2), library)
+    tired = build_plan(make_request(sleep=5, soreness=4, energy=4, stress=5), library)
     assert isinstance(fresh, PrecomputedPlan) and isinstance(tired, PrecomputedPlan)
     assert tired.volume_budget < fresh.volume_budget
     assert tired.flag == "deload"

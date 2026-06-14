@@ -31,8 +31,10 @@ def make_request(
     training_age="Intermediate",
     available_days=("Monday", "Tuesday", "Thursday", "Friday", "Saturday"),
     sport_days=None,
-    fatigue_score=2.5,
-    fatigue_state="low",
+    sleep=2.0,
+    soreness=2.0,
+    energy=2.0,
+    stress=2.0,
     injuries=(),
 ) -> GenerateRequest:
     return GenerateRequest.model_validate({
@@ -44,8 +46,10 @@ def make_request(
             "session_duration": 60,
         },
         "state": {
-            "fatigue_score": fatigue_score,
-            "fatigue_state": fatigue_state,
+            "sleep": sleep,
+            "soreness": soreness,
+            "energy": energy,
+            "stress": stress,
             "injuries": list(injuries),
         },
     })

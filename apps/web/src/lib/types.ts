@@ -87,8 +87,13 @@ export interface AssessPayload {
     session_duration: number;
   };
   state: {
-    fatigue_score: number;
-    fatigue_state: FatigueState;
+    sleep: number;
+    soreness: number;
+    energy: number;
+    stress: number;
+    // computed by API — present in stored records, absent in submitted payload
+    fatigue_score?: number;
+    fatigue_state?: FatigueState;
     injuries: string[];
   };
 }

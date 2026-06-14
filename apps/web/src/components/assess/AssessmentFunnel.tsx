@@ -44,7 +44,38 @@ const INJURY_OPTIONS = [
   "None",
 ];
 
-const FATIGUE_SCORES = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+const FATIGUE_STEPS = [1, 2, 3, 4, 5] as const;
+
+const FATIGUE_FACTORS = [
+  {
+    key: "sleep" as const,
+    label: "Sleep",
+    hint: "How did you sleep last night?",
+    low: "Excellent",
+    high: "Terrible",
+  },
+  {
+    key: "soreness" as const,
+    label: "Soreness",
+    hint: "Current muscle soreness.",
+    low: "None",
+    high: "Severe",
+  },
+  {
+    key: "energy" as const,
+    label: "Energy",
+    hint: "Overall energy level right now.",
+    low: "High",
+    high: "Depleted",
+  },
+  {
+    key: "stress" as const,
+    label: "Stress",
+    hint: "Psychological / life stress load.",
+    low: "Calm",
+    high: "Severe",
+  },
+] as const;
 
 const STEPS = [
   { title: "Profile", sub: "Who is training" },
@@ -79,13 +110,20 @@ export default function AssessmentFunnel() {
   const [duration, setDuration] = useState(60);
 
   // Step 4 — state
-  const [fatigue, setFatigue] = useState(2.5);
+  const [sleepScore, setSleepScore] = useState(2);
+  const [sorenessScore, setSorenessScore] = useState(2);
+  const [energyScore, setEnergyScore] = useState(2);
+  const [stressScore, setStressScore] = useState(2);
   const [injuries, setInjuries] = useState<string[]>([]);
 
   // Step 5 — email
   const [email, setEmail] = useState("");
 
-  const fatigueState = useMemo(() => fatigueStateFor(fatigue), [fatigue]);
+  const fatigueScore = useMemo(
+    () => (sleepScore + sorenessScore + energyScore + stressScore) / 4,
+    [sleepScore, sorenessScore, energyScore, stressScore],
+  );
+  const fatigueState = useMemo(() => fatigueStateFor(fatigueScore), [fatigueScore]);
 
   function toggle<T>(list: T[], value: T, set: (v: T[]) => void) {
     set(
@@ -170,8 +208,10 @@ export default function AssessmentFunnel() {
           session_duration: duration,
         },
         state: {
-          fatigue_score: fatigue,
-          fatigue_state: fatigueState,
+          sleep: sleepScore,
+          soreness: sorenessScore,
+          energy: energyScore,
+          stress: stressScore,
           injuries: injuries.filter((i) => i !== "None"),
         },
       },
@@ -562,63 +602,89 @@ export default function AssessmentFunnel() {
           {step === 3 && (
             <fieldset className="border-0 p-0">
               <legend className="sr-only">Current state</legend>
-              <div className="mb-3">
-                <span className="field-label">
-                  Current fatigue (1 = fresh, 5 = exhausted)
-                </span>
-                <div
-                  className="grid grid-cols-9 gap-[5px]"
-                  role="radiogroup"
-                  aria-label="Fatigue score"
-                >
-                  {FATIGUE_SCORES.map((f) => {
-                    const sel = fatigue === f;
-                    const state = fatigueStateFor(f);
-                    const selClass =
-                      state === "low"
-                        ? "border-accent3 bg-accent2 text-accent"
-                        : state === "moderate"
-                          ? "border-[rgba(196,154,82,0.28)] bg-[rgba(196,154,82,0.1)] text-warm"
-                          : "border-[rgba(184,68,68,0.28)] bg-[rgba(184,68,68,0.1)] text-danger";
-                    return (
-                      <button
-                        key={f}
-                        type="button"
-                        role="radio"
-                        aria-checked={sel}
-                        aria-label={`Fatigue ${f}`}
-                        onClick={() => setFatigue(f)}
-                        className={`flex h-[46px] items-center justify-center border font-mono text-[12px] font-medium transition-colors ${
-                          sel
-                            ? selClass
-                            : "border-line bg-bg2 text-ink3 hover:border-line2"
-                        }`}
+              <div className="mb-3 flex flex-col gap-5">
+                {FATIGUE_FACTORS.map(({ key, label, hint, low, high }) => {
+                  const scoreMap = {
+                    sleep: sleepScore,
+                    soreness: sorenessScore,
+                    energy: energyScore,
+                    stress: stressScore,
+                  };
+                  const setMap = {
+                    sleep: setSleepScore,
+                    soreness: setSorenessScore,
+                    energy: setEnergyScore,
+                    stress: setStressScore,
+                  };
+                  const current = scoreMap[key];
+                  const set = setMap[key];
+                  return (
+                    <div key={key}>
+                      <div className="mb-[6px] flex items-baseline justify-between">
+                        <span className="field-label mb-0">{label}</span>
+                        <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-ink3">
+                          {hint}
+                        </span>
+                      </div>
+                      <div
+                        className="grid grid-cols-5 gap-[5px]"
+                        role="radiogroup"
+                        aria-label={label}
                       >
-                        {f}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-ink3">
-                  Fatigue state:{" "}
-                  <span
-                    className={
-                      fatigueState === "low"
-                        ? "text-accent"
-                        : fatigueState === "moderate"
-                          ? "text-warm"
-                          : "text-danger"
-                    }
-                  >
-                    {fatigueState}
-                  </span>
-                  {fatigueState === "high" && (
-                    <span className="ml-2 normal-case tracking-normal">
-                      — volume will be reduced ~30%, intensity preserved
-                    </span>
-                  )}
-                </p>
+                        {FATIGUE_STEPS.map((n) => {
+                          const sel = current === n;
+                          const selClass =
+                            n <= 2
+                              ? "border-accent3 bg-accent2 text-accent"
+                              : n === 3
+                                ? "border-[rgba(196,154,82,0.28)] bg-[rgba(196,154,82,0.1)] text-warm"
+                                : "border-[rgba(184,68,68,0.28)] bg-[rgba(184,68,68,0.1)] text-danger";
+                          return (
+                            <button
+                              key={n}
+                              type="button"
+                              role="radio"
+                              aria-checked={sel}
+                              aria-label={`${label} ${n}`}
+                              onClick={() => set(n)}
+                              className={`flex h-[42px] flex-col items-center justify-center border font-mono text-[11px] font-medium transition-colors ${
+                                sel
+                                  ? selClass
+                                  : "border-line bg-bg2 text-ink3 hover:border-line2"
+                              }`}
+                            >
+                              {n}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-[4px] flex justify-between font-mono text-[8px] text-ink3">
+                        <span>{low}</span>
+                        <span>{high}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+              <p className="mb-1 mt-2 font-mono text-[9px] uppercase tracking-[0.14em] text-ink3">
+                Derived fatigue state:{" "}
+                <span
+                  className={
+                    fatigueState === "low"
+                      ? "text-accent"
+                      : fatigueState === "moderate"
+                        ? "text-warm"
+                        : "text-danger"
+                  }
+                >
+                  {fatigueState} (avg {fatigueScore.toFixed(1)})
+                </span>
+                {fatigueState === "high" && (
+                  <span className="ml-2 normal-case tracking-normal">
+                    — volume will be reduced ~30%, intensity preserved
+                  </span>
+                )}
+              </p>
               <div className="mt-6">
                 <span className="field-label">Current injuries or pain</span>
                 <div
@@ -680,7 +746,7 @@ export default function AssessmentFunnel() {
                   ],
                   [
                     "State",
-                    `Fatigue ${summary.payload.state.fatigue_score} (${summary.payload.state.fatigue_state})${
+                    `Fatigue ${fatigueScore.toFixed(1)} (${fatigueState}) · Sleep ${sleepScore} · Soreness ${sorenessScore} · Energy ${energyScore} · Stress ${stressScore}${
                       summary.payload.state.injuries.length
                         ? ` · ${summary.payload.state.injuries.join(", ")}`
                         : " · No injuries"
