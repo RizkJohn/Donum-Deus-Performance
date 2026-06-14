@@ -1,21 +1,19 @@
 # Engine — System Files
 
-Lowercase `.md` files are the **canonical** versions.  
-Uppercase `.md` files are legacy reference copies (identical content).
+All files here are canonical. They are loaded directly as LLM prompts at runtime
+by `apps/api/deus_api/engine/spec_loader.py`.
 
 ## File Map
 
-| File | Purpose |
-|------|---------|
-| `engine_instructions.md` | Master system rules, CNS logic, session design ruleset |
-| `exercise_library.md` | Approved exercise pool with classifications |
-| `fatigue_model.md` | Fatigue accumulation, scoring, deload triggers |
-| `input_contract.md` | Client payload structure (JSON schema) |
-| `output_schema.md` | Program output structure (JSON schema) |
-| `progression_engine.md` | Load/volume/control progression rules |
-| `quality_control.md` | Pre-output QC gate — reject conditions |
-| `substitution_rules.md` | Equipment/injury/fatigue substitution logic |
-| `retry_policy.md` | Error handling and retry behavior |
-| `prompt_wrapper.md` | System prompt wrapper for API calls |
-| `ARCHITECTURE_SUMMARY.md` | High-level architecture overview |
-| `FINAL_STACK.md` | Technology stack decisions |
+| File | Role | Loaded by API |
+|------|------|:---:|
+| `engine_instructions.md` | Master rules: determinism, objective hierarchy, CNS, program rules, fatigue management | SYSTEM |
+| `output_schema.md` | Enforced JSON Schema for program output | DEVELOPER |
+| `exercise_library.md` | Approved exercise pool (id, name, pattern, cns, laterality) | DEVELOPER |
+| `substitution_rules.md` | Equipment/injury substitution map (pattern + CNS preserved) | DEVELOPER |
+| `progression_engine.md` | Load steps, progression states, deload triggers | DEVELOPER |
+| `fatigue_model.md` | Input scoring, thresholds, volume/intensity rules | DEVELOPER |
+| `quality_control.md` | Pre-output QC gate — all checks must pass or regenerate | DEVELOPER |
+| `input_contract.md` | Client payload JSON schema (passed as USER message) | USER |
+| `retry_policy.md` | Max 3 attempts, error escalation, simplification strategy | reference |
+| `prompt_wrapper.md` | SYSTEM / DEVELOPER / USER role assignments | reference |
