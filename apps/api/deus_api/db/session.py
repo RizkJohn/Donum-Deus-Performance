@@ -18,10 +18,13 @@ def get_engine():
 
 
 async def init_db() -> None:
+    """Dev-only helper: create all tables without Alembic.
+
+    Not called by the app — schema is managed by `alembic upgrade head`.
+    Kept for one-off local resets: `python -c "import asyncio; from deus_api.db.session import init_db; asyncio.run(init_db())"`.
+    """
     engine = get_engine()
     async with engine.begin() as conn:
-        # Milestone 1: create_all on startup. Alembic migrations come with
-        # the first schema change that needs data preservation.
         await conn.run_sync(Base.metadata.create_all)
 
 

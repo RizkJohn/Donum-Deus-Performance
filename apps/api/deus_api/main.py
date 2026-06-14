@@ -4,13 +4,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
-from .db.session import init_db
 from .routes import assess, generate, health
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+    # Schema is managed by Alembic (alembic upgrade head).
+    # Nothing to do on startup.
     yield
 
 

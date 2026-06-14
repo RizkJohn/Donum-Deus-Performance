@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /program/
+
+Sitemap: https://deusperformance.com/sitemap.xml

@@ -9,6 +9,9 @@ primary_region = "iad"
 [build]
   dockerfile = "apps/api/Dockerfile"
 
+[deploy]
+  release_command = "alembic upgrade head"
+
 [env]
   LLM_PROVIDER = "claude"
   ANTHROPIC_MODEL = "claude-opus-4-8"
