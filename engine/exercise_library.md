@@ -224,6 +224,36 @@
   pattern: anti_rotation
   cns: Low
   laterality: Bilateral
+- id: plank
+  name: Plank
+  pattern: anti_rotation
+  cns: Low
+  laterality: Bilateral
+- id: bird_dog
+  name: Bird Dog
+  pattern: anti_rotation
+  cns: Low
+  laterality: Bilateral
+- id: copenhagen_plank
+  name: Copenhagen Plank
+  pattern: anti_rotation
+  cns: Low
+  laterality: Unilateral
+- id: hollow_body_hold
+  name: Hollow Body Hold
+  pattern: anti_rotation
+  cns: Low
+  laterality: Bilateral
+- id: half_kneeling_cable_chop
+  name: Half Kneeling Cable Chop
+  pattern: rotation
+  cns: Low
+  laterality: Unilateral
+- id: half_kneeling_cable_lift
+  name: Half Kneeling Cable Lift
+  pattern: rotation
+  cns: Low
+  laterality: Unilateral
 
 ### CONDITIONING
 - id: farmer_carry
@@ -301,6 +331,41 @@
 - id: deep_squat_hold
   name: Deep Squat Hold
   pattern: squat
+  cns: Low
+  laterality: Bilateral
+- id: worlds_greatest_stretch
+  name: World's Greatest Stretch
+  pattern: squat
+  cns: Low
+  laterality: Bilateral
+- id: thoracic_rotation
+  name: Thoracic Rotation
+  pattern: rotation
+  cns: Low
+  laterality: Bilateral
+- id: hip_flexor_stretch
+  name: Hip Flexor Stretch
+  pattern: hinge
+  cns: Low
+  laterality: Unilateral
+- id: couch_stretch
+  name: Couch Stretch
+  pattern: squat
+  cns: Low
+  laterality: Unilateral
+- id: wall_ankle_mob
+  name: Wall Ankle Mobilisation
+  pattern: squat
+  cns: Low
+  laterality: Bilateral
+- id: lat_stretch
+  name: Lat Stretch
+  pattern: pull_v
+  cns: Low
+  laterality: Unilateral
+- id: cat_cow
+  name: Cat Cow
+  pattern: hinge
   cns: Low
   laterality: Bilateral
 
