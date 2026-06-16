@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     data_dir: Path = _API_ROOT / "data"
     cors_origins: str = "http://localhost:3000"
     max_attempts: int = 3
+    n8n_webhook_url: str = ""  # base URL, e.g. http://n8n:5678 — empty disables notifications
 
 
 @lru_cache

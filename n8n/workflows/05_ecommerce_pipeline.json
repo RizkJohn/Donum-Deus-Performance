@@ -1,0 +1,258 @@
+{
+  "name": "05 – E-Commerce Product Pipeline",
+  "nodes": [
+    {
+      "id": "wh-product",
+      "name": "Webhook – New Product",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-product",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "extract-product",
+      "name": "Extract Product Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "title",       "value": "={{ $json.body.title }}",       "type": "string" },
+            { "id": "2", "name": "description", "value": "={{ $json.body.description }}", "type": "string" },
+            { "id": "3", "name": "price",       "value": "={{ $json.body.price }}",       "type": "number" },
+            { "id": "4", "name": "category",    "value": "={{ $json.body.category }}",    "type": "string" },
+            { "id": "5", "name": "sku",         "value": "={{ $json.body.sku }}",         "type": "string" },
+            { "id": "6", "name": "imageUrl",    "value": "={{ $json.body.image_url }}",   "type": "string" }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      }
+    },
+    {
+      "id": "create-shopify",
+      "name": "Shopify – Create Product Listing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{ $env.SHOPIFY_SHOP_URL }}/admin/api/2024-01/products.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",                  "value": "application/json" },
+            { "name": "X-Shopify-Access-Token",        "value": "={{ $env.SHOPIFY_ACCESS_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ product: { title: $json.title, body_html: $json.description, vendor: 'Donum Deus Holdings', product_type: $json.category, status: 'draft', variants: [{ sku: $json.sku, price: String($json.price), inventory_management: 'shopify' }], images: $json.imageUrl ? [{ src: $json.imageUrl }] : [] } }) }}",
+        "options": { "timeout": 15000 }
+      }
+    },
+    {
+      "id": "check-shopify",
+      "name": "Shopify Created?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [900, 200],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.product?.id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "build-social-prompt",
+      "name": "Build Social Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const product = $('Extract Product Data').item.json;\nconst shopifyProduct = $json.product;\n\nconst prompt = `You are the content voice for Donum Deus Holdings — a wellness and lifestyle e-commerce brand.\nBrand tone: premium, disciplined, purposeful. Not hype. Not aggressive.\n\nWrite 3 social posts to launch this product:\n\nProduct: ${product.title}\nCategory: ${product.category}\nDescription: ${product.description}\nPrice: $${product.price}\n\nWrite one post for:\n1. Instagram (caption ≤220 chars + 5 hashtags)\n2. TikTok (hook ≤150 chars)\n3. Pinterest (keyword-rich description ≤500 chars)\n\nReturn as JSON: { \"instagram\": \"...\", \"tiktok\": \"...\", \"pinterest\": \"...\" }`;\n\nreturn [{ json: { ...product, shopifyProductId: shopifyProduct?.id, prompt } }];"
+      }
+    },
+    {
+      "id": "gen-social-posts",
+      "name": "Claude – Generate Social Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "Content-Type",       "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, messages: [{ role: 'user', content: $json.prompt }] }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "anthropic-api", "name": "Anthropic API" }
+      }
+    },
+    {
+      "id": "parse-social",
+      "name": "Parse Social Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 200],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const responseText = $json.content?.[0]?.text || '{}';\nlet posts = {};\ntry { posts = JSON.parse(responseText); } catch(e) { posts = { instagram: responseText, tiktok: '', pinterest: '' }; }\nconst product = $('Build Social Prompt').item.json;\nreturn [{ json: { ...product, posts } }];"
+      }
+    },
+    {
+      "id": "save-content-calendar",
+      "name": "Notion – Save to Content Calendar",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [1780, 200],
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": {
+          "__rl": true,
+          "value": "={{ $env.NOTION_CONTENT_DATABASE_ID }}",
+          "mode": "id"
+        },
+        "title": "=Product Launch: {{ $json.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Platform|select",   "selectValue": "Instagram" },
+            { "key": "Type|select",       "selectValue": "Product Launch" },
+            { "key": "Status|select",     "selectValue": "Ready" },
+            { "key": "Content|rich_text", "textValue": "={{ $json.posts.instagram }}" },
+            { "key": "TikTok|rich_text",  "textValue": "={{ $json.posts.tiktok }}" }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": { "id": "notion-api", "name": "Notion" }
+      }
+    },
+    {
+      "id": "slack-product",
+      "name": "Slack – Product Launch Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1780, 400],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": {
+          "__rl": true,
+          "value": "#deus-ecommerce",
+          "mode": "name"
+        },
+        "text": "=:shopping_bags: *New product in pipeline*\n*{{ $json.title }}* — ${{ $json.price }}\nShopify draft ID: {{ $json.shopifyProductId }}\nSocial posts saved to Notion content calendar.",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "deus-slack", "name": "Deus Slack" }
+      }
+    },
+    {
+      "id": "shopify-error",
+      "name": "Slack – Shopify Error",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [900, 420],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": {
+          "__rl": true,
+          "value": "#deus-ecommerce",
+          "mode": "name"
+        },
+        "text": "=:warning: *Shopify listing failed*\nProduct: {{ $('Extract Product Data').item.json.title }}\nResponse: {{ JSON.stringify($json).substring(0, 300) }}",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "deus-slack", "name": "Deus Slack" }
+      }
+    },
+    {
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2000, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\" }",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook – New Product": {
+      "main": [[{ "node": "Extract Product Data", "type": "main", "index": 0 }]]
+    },
+    "Extract Product Data": {
+      "main": [[{ "node": "Shopify – Create Product Listing", "type": "main", "index": 0 }]]
+    },
+    "Shopify – Create Product Listing": {
+      "main": [[{ "node": "Shopify Created?", "type": "main", "index": 0 }]]
+    },
+    "Shopify Created?": {
+      "main": [
+        [{ "node": "Build Social Prompt", "type": "main", "index": 0 }],
+        [{ "node": "Slack – Shopify Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Social Prompt": {
+      "main": [[{ "node": "Claude – Generate Social Posts", "type": "main", "index": 0 }]]
+    },
+    "Claude – Generate Social Posts": {
+      "main": [[{ "node": "Parse Social Posts", "type": "main", "index": 0 }]]
+    },
+    "Parse Social Posts": {
+      "main": [
+        [
+          { "node": "Notion – Save to Content Calendar", "type": "main", "index": 0 },
+          { "node": "Slack – Product Launch Alert", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Notion – Save to Content Calendar": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Slack – Product Launch Alert": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "ecommerce" }, { "name": "holdings" }]
+}

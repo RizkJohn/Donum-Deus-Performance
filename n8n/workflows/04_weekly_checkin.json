@@ -1,0 +1,169 @@
+{
+  "name": "04 – Weekly Athlete Check-In",
+  "nodes": [
+    {
+      "id": "cron-monday",
+      "name": "Schedule – Monday 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 200],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }]
+        }
+      }
+    },
+    {
+      "id": "query-leads",
+      "name": "Postgres – Query Active Leads",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [460, 200],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT l.email, l.run_id, pr.created_at FROM leads l JOIN program_runs pr ON pr.id = l.run_id WHERE pr.created_at > NOW() - INTERVAL '30 days' ORDER BY pr.created_at DESC",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": { "id": "deus-postgres", "name": "Deus Postgres" }
+      }
+    },
+    {
+      "id": "split-leads",
+      "name": "Split Leads",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 200],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "send-checkin",
+      "name": "Email – Weekly Check-In Survey",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 200],
+      "parameters": {
+        "fromEmail": "Deus Performance <hello@deusperformance.com>",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Your weekly check-in — update your program",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html><html><body style=\"font-family:'Helvetica Neue',Arial,sans-serif;background:#0b0f0c;color:#d4ddd6;max-width:600px;margin:0 auto;padding:32px\"><h2 style=\"color:#7caf58\">Weekly Check-In</h2><p>Your program adapts to your current state. Take 60 seconds to update your inputs and get a fresh program for next week.</p><a href=\"https://deusperformance.com/assess\" style=\"display:inline-block;background:#7caf58;color:#0b0f0c;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:700;margin:16px 0\">Update & Generate Week {{ Math.ceil((new Date() - new Date($json.created_at)) / (7*24*60*60*1000)) + 1 }} Program</a><p style=\"font-size:13px;color:#a0a8a2\">Last program generated: {{ new Date($json.created_at).toLocaleDateString() }}</p><p style=\"color:#6b7a6e;font-size:12px\">Deus Performance · Riz Management LLC</p></body></html>",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": { "id": "deus-smtp", "name": "Deus SMTP" }
+      }
+    },
+    {
+      "id": "loop-back-leads",
+      "name": "Continue Loop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1120, 200],
+      "parameters": {}
+    },
+    {
+      "id": "wh-checkin-response",
+      "name": "Webhook – Check-In Response",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 500],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "checkin-response",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "extract-checkin",
+      "name": "Extract Check-In Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 500],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "email",   "value": "={{ $json.body.email }}",                   "type": "string" },
+            { "id": "2", "name": "payload", "value": "={{ $json.body.payload }}",                 "type": "object" }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      }
+    },
+    {
+      "id": "call-assess",
+      "name": "Deus API – Generate Updated Program",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 500],
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/v1/assess",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $json.email, payload: $json.payload }) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
+        },
+        "options": { "timeout": 60000 }
+      }
+    },
+    {
+      "id": "send-updated-program",
+      "name": "Email – Updated Program Ready",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 500],
+      "parameters": {
+        "fromEmail": "Deus Performance <hello@deusperformance.com>",
+        "toEmail": "={{ $('Extract Check-In Data').item.json.email }}",
+        "subject": "Your updated Deus Performance program is ready",
+        "emailFormat": "html",
+        "html": "=<!DOCTYPE html><html><body style=\"font-family:'Helvetica Neue',Arial,sans-serif;background:#0b0f0c;color:#d4ddd6;max-width:600px;margin:0 auto;padding:32px\"><h2 style=\"color:#7caf58\">Your program has been updated.</h2><p>Based on your check-in inputs, your training program for the coming week has been regenerated.</p><a href=\"https://deusperformance.com/program/{{ $json.id }}\" style=\"display:inline-block;background:#7caf58;color:#0b0f0c;padding:12px 24px;border-radius:4px;text-decoration:none;font-weight:700;margin:16px 0\">View Updated Program</a><p style=\"color:#6b7a6e;font-size:12px\">Deus Performance · Riz Management LLC</p></body></html>",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": { "id": "deus-smtp", "name": "Deus SMTP" }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule – Monday 9 AM": {
+      "main": [[{ "node": "Postgres – Query Active Leads", "type": "main", "index": 0 }]]
+    },
+    "Postgres – Query Active Leads": {
+      "main": [[{ "node": "Split Leads", "type": "main", "index": 0 }]]
+    },
+    "Split Leads": {
+      "main": [
+        [{ "node": "Email – Weekly Check-In Survey", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Email – Weekly Check-In Survey": {
+      "main": [[{ "node": "Continue Loop", "type": "main", "index": 0 }]]
+    },
+    "Continue Loop": {
+      "main": [[{ "node": "Split Leads", "type": "main", "index": 1 }]]
+    },
+    "Webhook – Check-In Response": {
+      "main": [[{ "node": "Extract Check-In Data", "type": "main", "index": 0 }]]
+    },
+    "Extract Check-In Data": {
+      "main": [[{ "node": "Deus API – Generate Updated Program", "type": "main", "index": 0 }]]
+    },
+    "Deus API – Generate Updated Program": {
+      "main": [[{ "node": "Email – Updated Program Ready", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "coaching" }, { "name": "retention" }]
+}

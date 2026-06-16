@@ -1,0 +1,156 @@
+{
+  "name": "01 – Program Delivery",
+  "nodes": [
+    {
+      "id": "wh-trigger",
+      "name": "Webhook – Program Ready",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "program-ready",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "extract-data",
+      "name": "Extract Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "run_id",  "value": "={{ $json.body.run_id }}",  "type": "string" },
+            { "id": "2", "name": "email",   "value": "={{ $json.body.email }}",   "type": "string" },
+            { "id": "3", "name": "program", "value": "={{ $json.body.program }}", "type": "object" },
+            { "id": "4", "name": "profile", "value": "={{ $json.body.payload.profile }}", "type": "object" }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      }
+    },
+    {
+      "id": "format-email",
+      "name": "Format Program Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const item = $input.first().json;\nconst prog = item.program;\nconst flags = (prog.flags || []).join(', ') || 'none';\n\nlet sessionRows = '';\nfor (const session of (prog.sessions || [])) {\n  sessionRows += `<h3 style=\"color:#7caf58;margin-top:24px\">${session.day}</h3>`;\n  for (const block of (session.blocks || [])) {\n    sessionRows += `<p style=\"font-weight:600;text-transform:uppercase;font-size:12px;letter-spacing:1px;color:#a0a8a2\">${block.type}</p>`;\n    sessionRows += '<ul style=\"margin:0 0 12px 20px;padding:0\">';\n    for (const ex of (block.exercises || [])) {\n      sessionRows += `<li style=\"margin-bottom:4px\">${ex.name} — ${ex.sets}×${ex.reps} @ ${ex.load || 'bodyweight'}</li>`;\n    }\n    sessionRows += '</ul>';\n  }\n}\n\nconst html = `\n<!DOCTYPE html><html><body style=\"font-family:'Helvetica Neue',Arial,sans-serif;background:#0b0f0c;color:#d4ddd6;max-width:600px;margin:0 auto;padding:32px\">\n<h1 style=\"color:#7caf58;font-size:28px;margin-bottom:4px\">Deus Performance</h1>\n<p style=\"color:#a0a8a2;font-size:13px;margin-top:0\">The body is a gift. Train it accordingly.</p>\n<hr style=\"border:none;border-top:1px solid #1e2820;margin:24px 0\">\n<h2 style=\"color:#d4ddd6\">Your Weekly Program</h2>\n<p><strong>Progression flag:</strong> <span style=\"color:#7caf58\">${flags}</span></p>\n${sessionRows}\n<hr style=\"border:none;border-top:1px solid #1e2820;margin:32px 0\">\n<p style=\"font-size:12px;color:#6b7a6e\">View your program online: <a href=\"https://deusperformance.com/program/${item.run_id}\" style=\"color:#7caf58\">deusperformance.com/program/${item.run_id}</a></p>\n<p style=\"font-size:12px;color:#6b7a6e\">Deus Performance · Riz Management LLC</p>\n</body></html>`;\n\nreturn [{ json: { ...item, emailHtml: html } }];"
+      }
+    },
+    {
+      "id": "send-email",
+      "name": "Send Program Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300],
+      "parameters": {
+        "fromEmail": "Deus Performance <hello@deusperformance.com>",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Your Deus Performance Program is Ready",
+        "emailFormat": "html",
+        "html": "={{ $json.emailHtml }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": { "id": "deus-smtp", "name": "Deus SMTP" }
+      }
+    },
+    {
+      "id": "notion-crm",
+      "name": "Notion – Add to CRM",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [1120, 200],
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": {
+          "__rl": true,
+          "value": "={{ $env.NOTION_CRM_DATABASE_ID }}",
+          "mode": "id"
+        },
+        "title": "={{ $json.email }}",
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Email|email",    "emailValue": "={{ $json.email }}" },
+            { "key": "Run ID|rich_text", "textValue": "={{ $json.run_id }}" },
+            { "key": "Status|select",  "selectValue": "Active" },
+            { "key": "Flags|rich_text", "textValue": "={{ ($json.program.flags || []).join(', ') }}" }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": { "id": "notion-api", "name": "Notion" }
+      }
+    },
+    {
+      "id": "slack-notify",
+      "name": "Slack – Team Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1120, 400],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": {
+          "__rl": true,
+          "value": "#deus-notifications",
+          "mode": "name"
+        },
+        "text": "=:muscle: *New Deus program generated*\n*Lead:* {{ $json.email }}\n*Run ID:* {{ $json.run_id }}\n*Flags:* {{ ($json.program.flags || []).join(', ') || 'none' }}\n<https://deusperformance.com/program/{{ $json.run_id }}|View Program>",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "deus-slack", "name": "Deus Slack" }
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\" }",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook – Program Ready": {
+      "main": [[{ "node": "Extract Fields", "type": "main", "index": 0 }]]
+    },
+    "Extract Fields": {
+      "main": [[{ "node": "Format Program Email", "type": "main", "index": 0 }]]
+    },
+    "Format Program Email": {
+      "main": [[{ "node": "Send Program Email", "type": "main", "index": 0 }]]
+    },
+    "Send Program Email": {
+      "main": [
+        [
+          { "node": "Notion – Add to CRM", "type": "main", "index": 0 },
+          { "node": "Slack – Team Alert", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Notion – Add to CRM": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    },
+    "Slack – Team Alert": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "coaching" }, { "name": "delivery" }]
+}

@@ -9,6 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./n8n/init-db.sh:/docker-entrypoint-initdb.d/init-n8n-db.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U deus"]
       interval: 5s
@@ -23,7 +24,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://deus:deus@postgres:5432/deus
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}      # no API key needed by default
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      CORS_ORIGINS: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5678
+      N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL:-}    # set to http://n8n:5678 to enable n8n notifications
     ports:
       - "8000:8000"
     depends_on:
@@ -40,7 +42,40 @@ services:
     depends_on:
       - api
 
+  # n8n workflow engine — self-hosted automation for all business processes.
+  # UI: http://localhost:5678  (create owner account on first launch)
+  # Import workflows: docker compose exec n8n n8n import:workflow --separate --input=/workflows
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-change-me-in-production-32ch}
+      - N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_USER_MANAGEMENT_JWT_SECRET:-change-me-jwt-secret}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=deus
+      - DB_POSTGRESDB_PASSWORD=deus
+      - GENERIC_TIMEZONE=${TIMEZONE:-America/New_York}
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_TEMPLATES_ENABLED=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro   # mount workflows for CLI import
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   # Content bot — generates Deus Performance social posts on a schedule.
+  # Superseded by the n8n content-generation workflow but kept for standalone use.
   # Start with: docker compose --profile bot up content-bot
   content-bot:
     profiles: ["bot"]
@@ -59,3 +94,4 @@ services:
 
 volumes:
   pgdata:
+  n8n_data:

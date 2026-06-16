@@ -1,0 +1,158 @@
+{
+  "name": "06 – Weekly KPI Report",
+  "nodes": [
+    {
+      "id": "schedule-sunday",
+      "name": "Schedule – Sunday 6 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 18 * * 0" }]
+        }
+      }
+    },
+    {
+      "id": "query-programs",
+      "name": "Postgres – Program Stats",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [460, 200],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS programs_this_week,\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '14 days' AND created_at <= NOW() - INTERVAL '7 days') AS programs_last_week,\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND program->>'error' IS NULL) AS successful_this_week,\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND program->>'error' IS NOT NULL) AS failed_this_week,\n  AVG(attempts) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS avg_attempts,\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND attempts > 1) AS retried_this_week,\n  COUNT(DISTINCT provider) AS providers_used\nFROM program_runs",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": { "id": "deus-postgres", "name": "Deus Postgres" }
+      }
+    },
+    {
+      "id": "query-leads",
+      "name": "Postgres – Lead Stats",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [460, 400],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS leads_this_week,\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '14 days' AND created_at <= NOW() - INTERVAL '7 days') AS leads_last_week,\n  COUNT(*) AS total_leads\nFROM leads",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": { "id": "deus-postgres", "name": "Deus Postgres" }
+      }
+    },
+    {
+      "id": "query-qc",
+      "name": "Postgres – QC Pass Rate",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [460, 600],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS total_runs,\n  ROUND(100.0 * COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND attempts = 1) / NULLIF(COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days'), 0), 1) AS first_pass_pct,\n  ROUND(100.0 * COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND program->>'error' IS NULL) / NULLIF(COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days'), 0), 1) AS success_pct\nFROM program_runs",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": { "id": "deus-postgres", "name": "Deus Postgres" }
+      }
+    },
+    {
+      "id": "merge-stats",
+      "name": "Merge Stats",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [720, 400],
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      }
+    },
+    {
+      "id": "build-report",
+      "name": "Build KPI Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 400],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst p = items[0]?.json || {};\nconst l = items[1]?.json || {};\nconst q = items[2]?.json || {};\n\nconst week = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });\nconst pctChange = (a, b) => b > 0 ? ((a - b) / b * 100).toFixed(0) + '%' : 'N/A';\nconst arrow = (a, b) => a >= b ? '▲' : '▼';\n\nconst progWoW = pctChange(p.programs_this_week, p.programs_last_week);\nconst leadWoW = pctChange(l.leads_this_week, l.leads_last_week);\n\nconst html = `<!DOCTYPE html><html><body style=\"font-family:'Helvetica Neue',Arial,sans-serif;background:#0b0f0c;color:#d4ddd6;max-width:680px;margin:0 auto;padding:32px\">\n<h1 style=\"color:#7caf58\">Deus Performance</h1>\n<h2 style=\"color:#d4ddd6;margin-top:0\">Weekly KPI Report — ${week}</h2>\n<hr style=\"border:none;border-top:1px solid #1e2820\">\n\n<h3 style=\"color:#7caf58\">Coaching Engine</h3>\n<table style=\"width:100%;border-collapse:collapse\">\n  <tr><td style=\"padding:8px 0;border-bottom:1px solid #1e2820\">Programs generated (this week)</td><td style=\"text-align:right;font-weight:700\">${p.programs_this_week || 0} <span style=\"color:#a0a8a2;font-size:12px\">${arrow(p.programs_this_week, p.programs_last_week)} ${progWoW} WoW</span></td></tr>\n  <tr><td style=\"padding:8px 0;border-bottom:1px solid #1e2820\">Success rate</td><td style=\"text-align:right;font-weight:700;color:#7caf58\">${q.success_pct || 0}%</td></tr>\n  <tr><td style=\"padding:8px 0;border-bottom:1px solid #1e2820\">First-pass QC rate</td><td style=\"text-align:right\">${q.first_pass_pct || 0}%</td></tr>\n  <tr><td style=\"padding:8px 0;border-bottom:1px solid #1e2820\">Avg LLM attempts</td><td style=\"text-align:right\">${parseFloat(p.avg_attempts || 1).toFixed(2)}</td></tr>\n  <tr><td style=\"padding:8px 0\">Retried generations</td><td style=\"text-align:right\">${p.retried_this_week || 0}</td></tr>\n</table>\n\n<h3 style=\"color:#7caf58;margin-top:24px\">Leads & Growth</h3>\n<table style=\"width:100%;border-collapse:collapse\">\n  <tr><td style=\"padding:8px 0;border-bottom:1px solid #1e2820\">New leads (this week)</td><td style=\"text-align:right;font-weight:700\">${l.leads_this_week || 0} <span style=\"color:#a0a8a2;font-size:12px\">${arrow(l.leads_this_week, l.leads_last_week)} ${leadWoW} WoW</span></td></tr>\n  <tr><td style=\"padding:8px 0\">Total leads (all-time)</td><td style=\"text-align:right\">${l.total_leads || 0}</td></tr>\n</table>\n\n<hr style=\"border:none;border-top:1px solid #1e2820;margin-top:32px\">\n<p style=\"font-size:12px;color:#6b7a6e\">Generated automatically by Deus Performance n8n · Riz Management LLC</p>\n</body></html>`;\n\nconst slackText = `*Deus Performance — Weekly KPIs (${week})*\\n>Programs: ${p.programs_this_week || 0} (${arrow(p.programs_this_week, p.programs_last_week)} ${progWoW})\\n>Success rate: ${q.success_pct || 0}%  |  First-pass QC: ${q.first_pass_pct || 0}%\\n>New leads: ${l.leads_this_week || 0} (${arrow(l.leads_this_week, l.leads_last_week)} ${leadWoW})  |  Total: ${l.total_leads || 0}`;\n\nreturn [{ json: { html, slackText, week } }];"
+      }
+    },
+    {
+      "id": "send-report-email",
+      "name": "Email – KPI Report to Team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1200, 300],
+      "parameters": {
+        "fromEmail": "Deus Performance <hello@deusperformance.com>",
+        "toEmail": "={{ $env.TEAM_EMAIL || 'team@deusperformance.com' }}",
+        "subject": "=Weekly KPI Report — {{ $json.week }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": { "id": "deus-smtp", "name": "Deus SMTP" }
+      }
+    },
+    {
+      "id": "slack-report",
+      "name": "Slack – KPI Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1200, 500],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": {
+          "__rl": true,
+          "value": "#deus-reports",
+          "mode": "name"
+        },
+        "text": "={{ $json.slackText }}",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "deus-slack", "name": "Deus Slack" }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule – Sunday 6 PM": {
+      "main": [
+        [
+          { "node": "Postgres – Program Stats", "type": "main", "index": 0 },
+          { "node": "Postgres – Lead Stats",    "type": "main", "index": 0 },
+          { "node": "Postgres – QC Pass Rate",  "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Postgres – Program Stats": {
+      "main": [[{ "node": "Merge Stats", "type": "main", "index": 0 }]]
+    },
+    "Postgres – Lead Stats": {
+      "main": [[{ "node": "Merge Stats", "type": "main", "index": 1 }]]
+    },
+    "Postgres – QC Pass Rate": {
+      "main": [[{ "node": "Merge Stats", "type": "main", "index": 2 }]]
+    },
+    "Merge Stats": {
+      "main": [[{ "node": "Build KPI Report", "type": "main", "index": 0 }]]
+    },
+    "Build KPI Report": {
+      "main": [
+        [
+          { "node": "Email – KPI Report to Team", "type": "main", "index": 0 },
+          { "node": "Slack – KPI Summary",        "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "analytics" }, { "name": "reporting" }]
+}
