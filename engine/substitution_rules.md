@@ -2,15 +2,27 @@
 primary_id -> [alt_id_1, alt_id_2]
 
 ## RULES
-- Keep same pattern and cns
-- Prefer same laterality
-- If no valid substitute exists → return UNSATISFIABLE_CONSTRAINTS
+1. Keep same pattern — substitution must not change exercise.pattern
+2. Keep same CNS classification
+3. Prefer same laterality
+4. Preserve plane coverage — if the substituted exercise was satisfying a CHECK_3
+   plane requirement (e.g., pull_v satisfying vertical pull), the substitute must
+   also carry the same pattern. Do not silently change pull_v -> pull_h.
+5. Preserve push:pull ratio contribution — if removing a pull exercise,
+   replacement must also be a pull pattern.
+6. If no valid substitute exists -> return UNSATISFIABLE_CONSTRAINTS with:
+   {"offending_id": "...", "reason": "no substitute preserves pattern + plane + CNS"}
+
+## LATERAL PATTERN SUBSTITUTION
+If primary exercise has pattern = "lateral":
+  Substitute must also carry pattern = "lateral"
+  Do not fall back to pattern = "squat" (Unilateral) — that is a QC proxy, not a substitute
 
 ## SUBSTITUTIONS (CANONICAL)
 
 ### LOWER BODY
-trap_bar_deadlift -> [barbell_deadlift]
-barbell_deadlift -> [trap_bar_deadlift]
+trap_bar_deadlift -> [barbell_deadlift, db_rdl]
+barbell_deadlift -> [trap_bar_deadlift, db_rdl]
 front_squat -> [back_squat]
 back_squat -> [front_squat]
 bulgarian_split_squat -> [atg_split_squat]
@@ -28,7 +40,7 @@ incline_db_press -> [arnold_press]
 single_arm_db_overhead_press -> [landmine_press, arnold_press, incline_db_press]
 landmine_press -> [single_arm_db_overhead_press, arnold_press]
 arnold_press -> [incline_db_press]
-pullups -> [lat_pulldown]
+pullups -> [lat_pulldown, inverted_row]
 lat_pulldown -> [pullups, cable_pullover]
 single_arm_lat_pulldown -> [cable_pullover, lat_pulldown, pullups]
 cable_pullover -> [lat_pulldown, pullups]
@@ -45,8 +57,8 @@ lateral_bound -> [single_leg_hop]
 single_leg_hop -> [lateral_bound]
 med_ball_slam -> [med_ball_rotational_throw]
 med_ball_rotational_throw -> [med_ball_slam]
-cable_woodchop -> [landmine_rotation, ninety_ninety_hips]
-landmine_rotation -> [cable_woodchop, ninety_ninety_hips]
+cable_woodchop -> [landmine_rotation]
+landmine_rotation -> [cable_woodchop]
 
 ### CORE
 hanging_leg_raise -> [dead_bug, ab_wheel_rollout]
@@ -54,6 +66,13 @@ dead_bug -> [pallof_press_alternative, hanging_leg_raise]
 pallof_press_alternative -> [side_plank, dead_bug]
 side_plank -> [pallof_press_alternative, dead_bug]
 ab_wheel_rollout -> [dead_bug, hanging_leg_raise]
+
+### FRONTAL PLANE (LATERAL)
+lateral_squat -> [lateral_lunge, copenhagen_plank]
+lateral_lunge -> [lateral_squat, lateral_band_walk]
+copenhagen_plank -> [lateral_squat, side_plank]
+lateral_band_walk -> [lateral_squat, lateral_lunge]
+lateral_sled_drag -> [lateral_band_walk, lateral_lunge]
 
 ### CONDITIONING
 farmer_carry -> [overhead_carry, suitcase_carry]
@@ -66,3 +85,7 @@ sled_push -> [sprint]
 lateral_shuffle -> [carioca, bear_crawl]
 carioca -> [lateral_shuffle, bear_crawl]
 sprint -> [sled_push]
+
+## INVOCATION
+Only called when exercise_library exact match fails or injury/equipment flag blocks primary.
+Never called pre-emptively.
