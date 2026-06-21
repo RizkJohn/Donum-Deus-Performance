@@ -294,6 +294,41 @@
     "laterality": "Bilateral"
   },
   {
+    "id": "lateral_squat",
+    "name": "Lateral Squat",
+    "pattern": "lateral",
+    "cns": "Low",
+    "laterality": "Unilateral"
+  },
+  {
+    "id": "lateral_lunge",
+    "name": "Lateral Lunge",
+    "pattern": "lateral",
+    "cns": "Low",
+    "laterality": "Unilateral"
+  },
+  {
+    "id": "copenhagen_plank",
+    "name": "Copenhagen Plank",
+    "pattern": "lateral",
+    "cns": "Low",
+    "laterality": "Unilateral"
+  },
+  {
+    "id": "lateral_band_walk",
+    "name": "Lateral Band Walk",
+    "pattern": "lateral",
+    "cns": "Low",
+    "laterality": "Bilateral"
+  },
+  {
+    "id": "lateral_sled_drag",
+    "name": "Lateral Sled Drag",
+    "pattern": "lateral",
+    "cns": "Low",
+    "laterality": "Bilateral"
+  },
+  {
     "id": "farmer_carry",
     "name": "Farmer Carry",
     "pattern": "carry",
