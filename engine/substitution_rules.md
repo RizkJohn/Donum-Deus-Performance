@@ -21,8 +21,8 @@ If primary exercise has pattern = "lateral":
 ## SUBSTITUTIONS (CANONICAL)
 
 ### LOWER BODY
-trap_bar_deadlift -> [barbell_deadlift, db_rdl]
-barbell_deadlift -> [trap_bar_deadlift, db_rdl]
+trap_bar_deadlift -> [barbell_deadlift]
+barbell_deadlift -> [trap_bar_deadlift]
 front_squat -> [back_squat]
 back_squat -> [front_squat]
 bulgarian_split_squat -> [atg_split_squat]
@@ -40,7 +40,7 @@ incline_db_press -> [arnold_press]
 single_arm_db_overhead_press -> [landmine_press, arnold_press, incline_db_press]
 landmine_press -> [single_arm_db_overhead_press, arnold_press]
 arnold_press -> [incline_db_press]
-pullups -> [lat_pulldown, inverted_row]
+pullups -> [lat_pulldown]
 lat_pulldown -> [pullups, cable_pullover]
 single_arm_lat_pulldown -> [cable_pullover, lat_pulldown, pullups]
 cable_pullover -> [lat_pulldown, pullups]
@@ -70,7 +70,7 @@ ab_wheel_rollout -> [dead_bug, hanging_leg_raise]
 ### FRONTAL PLANE (LATERAL)
 lateral_squat -> [lateral_lunge, copenhagen_plank]
 lateral_lunge -> [lateral_squat, lateral_band_walk]
-copenhagen_plank -> [lateral_squat, side_plank]
+copenhagen_plank -> [lateral_squat, lateral_lunge]
 lateral_band_walk -> [lateral_squat, lateral_lunge]
 lateral_sled_drag -> [lateral_band_walk, lateral_lunge]
 

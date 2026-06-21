@@ -2,15 +2,13 @@
   {
     "primary_id": "trap_bar_deadlift",
     "alternatives": [
-      "barbell_deadlift",
-      "db_rdl"
+      "barbell_deadlift"
     ]
   },
   {
     "primary_id": "barbell_deadlift",
     "alternatives": [
-      "trap_bar_deadlift",
-      "db_rdl"
+      "trap_bar_deadlift"
     ]
   },
   {
@@ -114,8 +112,7 @@
   {
     "primary_id": "pullups",
     "alternatives": [
-      "lat_pulldown",
-      "inverted_row"
+      "lat_pulldown"
     ]
   },
   {
@@ -279,7 +276,7 @@
     "primary_id": "copenhagen_plank",
     "alternatives": [
       "lateral_squat",
-      "side_plank"
+      "lateral_lunge"
     ]
   },
   {
