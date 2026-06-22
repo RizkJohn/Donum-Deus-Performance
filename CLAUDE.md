@@ -7,22 +7,31 @@ Guidance for AI assistants working in this repository.
 **Deus Performance (DP)** — by Riz Management LLC — is a
 **constraint-driven adaptive training engine**. The repo contains:
 
-1. **`engine/`** — the "brain": markdown spec files defining how an LLM
+1. **`packages/engine/`** — the "brain": markdown spec files defining how an LLM
    generates weekly training programs from a structured client payload. They
    are **loaded as prompts at runtime** by the API (see
-   `engine/prompt_wrapper.md` and `apps/api/deus_api/engine/spec_loader.py`),
+   `packages/engine/prompt_wrapper.md` and `apps/api/deus_api/engine/spec_loader.py`),
    not compiled, and remain the **source of truth** for all training logic.
 2. **`apps/api/`** — FastAPI engine pipeline service (Python 3.11, Pydantic,
    SQLAlchemy). Provider-agnostic LLM layer: `LLM_PROVIDER=mock` (default;
    deterministic, offline, no API key) or `claude` (Anthropic SDK). Pipeline:
    input validation → deterministic decision engine → LLM exercise-fill →
    QC gate → retry (≤3) → program or `UNSATISFIABLE_CONSTRAINTS`.
+   Being superseded by `api/` (Vercel Edge Functions) per the 90-day MVP plan.
 3. **`apps/web/`** — Next.js 15 + Tailwind marketing site + assessment funnel
    (the live frontend; dark sage design ported from `frontend/deus_v2.html`).
-4. **`packages/schemas/`** — shared JSON Schemas derived from `engine/*.md`.
-5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
-6. **`business/` + `docs/`** — strategy and reference material;
-   `docs/ARCHITECTURE.md` is the system design for the live product.
+4. **`api/`** — Vercel Edge Function stubs: `generate.ts`, `intake.ts`,
+   `apply.ts`, `newsletter.ts`. These proxy Anthropic calls server-side so the
+   API key is never in the browser. Implementation target: Month 1 Week 3.
+5. **`packages/schemas/`** — shared JSON Schemas derived from `packages/engine/*.md`.
+6. **`packages/content-gen/`** — social content generator (Python bot + future
+   TSX admin tool at `/admin/content`).
+7. **`frontend/`** — legacy standalone HTML mockups (design reference only;
+   `deus_v2.html` is the source for the Next.js port).
+8. **`scripts/seed.sql`** — Supabase schema (practitioners, intake_profiles,
+   programmes, applications, subscribers).
+9. **`docs/architecture/`** — system design and reference guides.
+10. **`docs/deprecated/`** — archived documents no longer operationally relevant.
 
 **Derived-data discipline:** `apps/api/data/*.json` is generated from the
 engine markdown by `make seed-library` — never hand-edit the JSON;
@@ -32,18 +41,30 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 
 ```
 .
-├── engine/        # Training-system spec files — SOURCE OF TRUTH
-├── apps/
-│   ├── api/       # FastAPI engine pipeline (deus_api/, data/, scripts/, tests/)
-│   └── web/       # Next.js marketing site + assessment funnel
 ├── packages/
-│   └── schemas/   # Shared JSON Schemas (derived)
-├── frontend/      # Legacy static HTML mockups (design reference)
-├── business/      # Business plan / strategy
-├── docs/          # ARCHITECTURE.md + reference guides
-├── docker-compose.yml   # postgres + api (:8000) + web (:3000)
-├── Makefile             # make dev / test / seed-library / api / web
-└── README.md      # Top-level overview
+│   ├── engine/        # Training-system spec files — SOURCE OF TRUTH
+│   ├── content-gen/   # Social content generator (Python bot)
+│   └── schemas/       # Shared JSON Schemas (derived from engine/)
+├── apps/
+│   ├── api/           # FastAPI engine pipeline (deus_api/, data/, scripts/, tests/)
+│   └── web/           # Next.js marketing site + assessment funnel
+│       └── src/
+│           ├── app/
+│           │   ├── (marketing)/  # /, /doctrine, /about, /apply
+│           │   ├── journal/      # Blog (MDX)
+│           │   ├── engine/       # Auth-gated programme tool (T1+)
+│           │   └── dashboard/    # Practitioner portal (auth-gated)
+│           └── content/          # MDX blog articles
+├── api/               # Vercel Edge Functions (generate, intake, apply, newsletter)
+├── scripts/
+│   └── seed.sql       # Supabase schema seed
+├── frontend/          # Legacy static HTML mockups (design reference)
+├── docs/
+│   ├── architecture/  # ARCHITECTURE.md + reference guides
+│   └── deprecated/    # Archived documents
+├── docker-compose.yml # postgres + api (:8000) + web (:3000)
+├── Makefile           # make dev / test / seed-library / api / web
+└── README.md          # Top-level overview
 ```
 
 ## Running & testing
@@ -52,10 +73,10 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 - `make test` — pytest suite in `apps/api/tests/` (offline; includes a 400+
   case program contract test). Run after any engine or API change.
 - `make seed-library` — regenerate `apps/api/data/*.json` after editing
-  `engine/exercise_library.md` or `engine/substitution_rules.md`.
+  `packages/engine/exercise_library.md` or `packages/engine/substitution_rules.md`.
 - Web: `cd apps/web && npm install && npm run dev` (or `npm run build`).
 
-## The engine (`engine/`)
+## The engine (`packages/engine/`)
 
 The engine is a pipeline of constraints. An LLM receives a structured client
 payload and must return a complete weekly program as **JSON only — no prose.**
@@ -73,7 +94,7 @@ Each engine concept exists as **two files**:
 - **UPPERCASE** (e.g. `ENGINE_INSTRUCTIONS_CORE.md`, `OUTPUT_SCHEMA.md`) — a
   longer, **narrative/explanatory** companion version.
 
-> Note: `engine/README.md` describes the uppercase files as "legacy reference
+> Note: `packages/engine/README.md` describes the uppercase files as "legacy reference
 > copies (identical content)." This is **not accurate** — the two versions
 > differ in length and content (the uppercase ones are generally more verbose
 > and prose-like). Treat the **lowercase files as the source of truth** for
@@ -132,6 +153,18 @@ When changing a schema enum, value range, or exercise name, **propagate the
 change** to every file that references it (e.g. a new pattern must appear in
 `exercise_library`, `quality_control` coverage list, and `engine_instructions`).
 
+## Web routes (`apps/web/src/app/`)
+
+| Route | File | Status |
+|-------|------|--------|
+| `/` | `(marketing)/page.tsx` | Live |
+| `/apply` | `(marketing)/apply/page.tsx` | Live (was `/assess`) |
+| `/doctrine` | `(marketing)/doctrine/page.tsx` | Stub — needs content |
+| `/about` | `(marketing)/about/page.tsx` | Stub — needs content |
+| `/journal` | `journal/page.tsx` | Stub — needs MDX pipeline |
+| `/engine/[id]` | `engine/[id]/page.tsx` | Live (was `/program/[id]`) |
+| `/dashboard` | `dashboard/page.tsx` | Stub — needs Supabase auth |
+
 ## Frontend (`frontend/`)
 
 Three standalone HTML files, each self-contained (inline `<style>`, Google
@@ -149,7 +182,8 @@ within a single file and preserve the existing token system.
 ## Conventions
 
 - **Commits:** Conventional Commits with a scope, e.g.
-  `feat(engine): ...`, `feat(frontend): ...`, `docs: ...`, `chore: ...`.
+  `feat(engine): ...`, `feat(web): ...`, `feat(api): ...`,
+  `feat(content-gen): ...`, `docs: ...`, `chore: ...`.
 - **Branch:** develop on the active feature branch; never push to `main`
   without explicit permission. Push with `git push -u origin <branch>`.
 - **Do not create pull requests** unless the user explicitly asks.

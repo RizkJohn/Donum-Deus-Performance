@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate derived JSON artifacts from the canonical engine markdown specs.
 
-The markdown in engine/ is the SOURCE OF TRUTH (lowercase files, per
+The markdown in packages/engine/ is the SOURCE OF TRUTH (lowercase files, per
 CLAUDE.md). This script ports the structured data — exercise library and
 substitution rules — to JSON that deterministic code consumes. Never
 hand-edit the JSON; re-run `make seed-library` after editing the markdown.
@@ -19,7 +19,7 @@ from pathlib import Path
 
 API_ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = API_ROOT.parent.parent
-ENGINE_DIR = REPO_ROOT / "engine"
+ENGINE_DIR = REPO_ROOT / "packages" / "engine"
 DATA_DIR = API_ROOT / "data"
 
 ENTRY_RE = re.compile(

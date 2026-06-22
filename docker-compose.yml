@@ -45,7 +45,7 @@ services:
   content-bot:
     profiles: ["bot"]
     build:
-      context: apps/content_bot
+      context: packages/content-gen
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       NOTION_API_KEY: ${NOTION_API_KEY:-}
