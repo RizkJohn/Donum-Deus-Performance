@@ -7,25 +7,25 @@ Guidance for AI assistants working in this repository.
 **Deus Performance (DP)** — by Riz Management LLC — is a
 **constraint-driven adaptive training engine**. The repo contains:
 
-1. **`packages/engine/`** — the "brain": markdown spec files defining how an LLM
-   generates weekly training programs from a structured client payload. They
-   are **loaded as prompts at runtime** by the API (see
-   `packages/engine/prompt_wrapper.md` and `apps/api/deus_api/engine/spec_loader.py`),
-   not compiled, and remain the **source of truth** for all training logic.
-2. **`apps/api/`** — FastAPI engine pipeline service (Python 3.11, Pydantic,
+1. **`packages/engine/`** — the "brain": lowercase markdown spec files defining
+   how an LLM generates weekly training programs from a structured client payload.
+   Loaded as prompts at runtime; never compiled. **Source of truth** for all
+   training logic.
+2. **`apps/api/`** — FastAPI engine pipeline service (Python 3.11, Pydantic v2,
    SQLAlchemy). Provider-agnostic LLM layer: `LLM_PROVIDER=mock` (default;
-   deterministic, offline, no API key) or `claude` (Anthropic SDK). Pipeline:
-   input validation → deterministic decision engine → LLM exercise-fill →
-   QC gate → retry (≤3) → program or `UNSATISFIABLE_CONSTRAINTS`.
-   Being superseded by `api/` (Vercel Edge Functions) per the 90-day MVP plan.
-3. **`apps/web/`** — Next.js 15 + Tailwind marketing site + assessment funnel
-   (the live frontend; dark sage design ported from `frontend/deus_v2.html`).
-4. **`api/`** — Vercel Edge Function stubs: `generate.ts`, `intake.ts`,
-   `apply.ts`, `newsletter.ts`. These proxy Anthropic calls server-side so the
-   API key is never in the browser. Implementation target: Month 1 Week 3.
+   deterministic, offline, no API key) or `claude` (Anthropic SDK,
+   `claude-opus-4-8`). Pipeline: input validation → deterministic decision engine
+   → LLM exercise-fill → QC gate → retry (≤3) → program or
+   `UNSATISFIABLE_CONSTRAINTS`.
+3. **`apps/web/`** — Next.js 16 + Tailwind marketing site + assessment funnel
+   (live frontend; dark sage design ported from `frontend/deus_v2.html`).
+   Includes a server-side Anthropic proxy at `src/app/api/generate/route.ts`
+   (`claude-sonnet-4-6`; API key never leaves the server).
+4. **`api/`** — Vercel Edge Function stubs at repo root: `generate.ts`,
+   `intake.ts`, `apply.ts`, `newsletter.ts`. Architecture reference stubs;
+   real programme generation is served by `apps/web/src/app/api/generate/`.
 5. **`packages/schemas/`** — shared JSON Schemas derived from `packages/engine/*.md`.
-6. **`packages/content-gen/`** — social content generator (Python bot + future
-   TSX admin tool at `/admin/content`).
+6. **`packages/content-gen/`** — social content generator (Python bot).
 7. **`frontend/`** — legacy standalone HTML mockups (design reference only;
    `deus_v2.html` is the source for the Next.js port).
 8. **`scripts/seed.sql`** — Supabase schema (practitioners, intake_profiles,
@@ -42,20 +42,22 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 ```
 .
 ├── packages/
-│   ├── engine/        # Training-system spec files — SOURCE OF TRUTH
+│   ├── engine/        # Training-system spec files — SOURCE OF TRUTH (lowercase only)
 │   ├── content-gen/   # Social content generator (Python bot)
 │   └── schemas/       # Shared JSON Schemas (derived from engine/)
 ├── apps/
 │   ├── api/           # FastAPI engine pipeline (deus_api/, data/, scripts/, tests/)
-│   └── web/           # Next.js marketing site + assessment funnel
+│   └── web/           # Next.js 16 marketing site + assessment funnel
 │       └── src/
 │           ├── app/
 │           │   ├── (marketing)/  # /, /doctrine, /about, /apply
 │           │   ├── journal/      # Blog (MDX)
 │           │   ├── engine/       # Auth-gated programme tool (T1+)
-│           │   └── dashboard/    # Practitioner portal (auth-gated)
+│           │   ├── dashboard/    # Practitioner portal (auth-gated)
+│           │   └── api/generate/ # Server-side Anthropic proxy (Node.js runtime)
+│           ├── components/       # Shared UI components
 │           └── content/          # MDX blog articles
-├── api/               # Vercel Edge Functions (generate, intake, apply, newsletter)
+├── api/               # Vercel Edge Function stubs (architecture reference)
 ├── scripts/
 │   └── seed.sql       # Supabase schema seed
 ├── frontend/          # Legacy static HTML mockups (design reference)
@@ -74,7 +76,9 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
   case program contract test). Run after any engine or API change.
 - `make seed-library` — regenerate `apps/api/data/*.json` after editing
   `packages/engine/exercise_library.md` or `packages/engine/substitution_rules.md`.
-- Web: `cd apps/web && npm install && npm run dev` (or `npm run build`).
+- Web: `cd apps/web && npm install && npm run dev` (starts on `:3000`).
+- For `/api/generate` to work locally, set `ANTHROPIC_API_KEY` in
+  `apps/web/.env.local` (see `apps/web/.env.local.example`).
 
 ## The engine (`packages/engine/`)
 
@@ -85,60 +89,35 @@ Flow: `input_contract` → `engine_instructions` + `fatigue_model` +
 `progression_engine` → `quality_control` gate → `output_schema`, with
 `substitution_rules` applied for equipment/injury constraints.
 
-### Dual-file naming convention — IMPORTANT
-
-Each engine concept exists as **two files**:
-
-- **lowercase** (e.g. `engine_instructions.md`, `output_schema.md`) — the
-  **canonical, terse, machine-spec** version: JSON schemas, enums, rule lists.
-- **UPPERCASE** (e.g. `ENGINE_INSTRUCTIONS_CORE.md`, `OUTPUT_SCHEMA.md`) — a
-  longer, **narrative/explanatory** companion version.
-
-> Note: `packages/engine/README.md` describes the uppercase files as "legacy reference
-> copies (identical content)." This is **not accurate** — the two versions
-> differ in length and content (the uppercase ones are generally more verbose
-> and prose-like). Treat the **lowercase files as the source of truth** for
-> precise schemas and rules. When you change a rule, check whether the
-> corresponding uppercase file also needs updating to stay consistent, and
-> mention the discrepancy if it matters.
-
-Uppercase↔lowercase pairs:
-`engine_instructions` ↔ `ENGINE_INSTRUCTIONS_CORE`,
-`exercise_library` ↔ `EXERCISE_LIBRARY`,
-`fatigue_model` ↔ `FATIGUE_MODEL`,
-`input_contract` ↔ `INPUT_CONTRACT`,
-`output_schema` ↔ `OUTPUT_SCHEMA`,
-`progression_engine` ↔ `PROGRESSION_ENGINE`,
-`quality_control` ↔ `QUALITY_CONTROL_CHECK`,
-`substitution_rules` ↔ `SUBSTITUTION_RULES`.
-`ARCHITECTURE_SUMMARY.md` and `FINAL_STACK.md` exist only in uppercase.
+Only **lowercase** spec files exist in `packages/engine/`. These are the
+canonical, terse, machine-spec versions — JSON schemas, enums, rule lists.
+There are no uppercase companion files.
 
 ### Engine file map
 
-| File | Purpose |
-|------|---------|
-| `engine_instructions.md` | Master rules: determinism, priority resolution, exercise selection, ordering, failure mode |
-| `exercise_library.md` | Approved exercise pool + entry format (`id`, `name`, `pattern`, `cns`, `laterality`) |
-| `fatigue_model.md` | Fatigue scoring (0–5) and `low/moderate/high` thresholds |
-| `input_contract.md` | Client payload JSON schema (profile, goals, schedule, state) |
-| `output_schema.md` | Enforced program output JSON schema |
-| `progression_engine.md` | Load steps (+2.5% / +5%) and `progress/maintain/deload` flags |
-| `quality_control.md` | Pre-output QC gate; all checks must pass or regenerate |
-| `substitution_rules.md` | `primary_id -> [alt_ids]`; preserve pattern + cns |
-| `retry_policy.md` | Max 3 attempts, constrain offending fields, simplify on repeat failure |
-| `prompt_wrapper.md` | Which files go in SYSTEM / DEVELOPER / USER roles |
-| `ARCHITECTURE_SUMMARY.md` | High-level runtime architecture (n8n → Claude → workers → Postgres → UI) |
-| `FINAL_STACK.md` | One-line role of each spec file |
+| File | Role | Prompt slot |
+|------|------|-------------|
+| `engine_instructions.md` | Master rules: determinism, priority, selection, ordering, failure | SYSTEM |
+| `output_schema.md` | Enforced programme output JSON schema | DEVELOPER |
+| `exercise_library.md` | Approved exercise pool (`id`, `name`, `pattern`, `cns`, `laterality`) | DEVELOPER |
+| `substitution_rules.md` | `primary_id → [alt_ids]`; preserve pattern + cns | DEVELOPER |
+| `progression_engine.md` | Load steps (+2.5% / +5%) and `progress/maintain/deload` flags | DEVELOPER |
+| `fatigue_model.md` | Fatigue scoring (0–5) and `low/moderate/high` thresholds | DEVELOPER |
+| `quality_control.md` | Pre-output QC gate; all checks must pass or regenerate | DEVELOPER |
+| `input_contract.md` | Client payload JSON schema (passed as USER message) | USER |
+| `retry_policy.md` | Max 3 attempts, constrain offending fields, simplify on repeat | reference |
+| `prompt_wrapper.md` | SYSTEM / DEVELOPER / USER role assignments | reference |
 
 ### Hard engine rules (do not violate when editing specs)
 
 These constraints are load-bearing — keep them internally consistent across
-files if you touch them:
+all files if you touch them:
 
 - **Output is JSON only.** No prose. On unsatisfiable input, return
   `{"error":"UNSATISFIABLE_CONSTRAINTS","reasons":[...]}`.
-- **CNS:** max 2 High-CNS days/week; no consecutive High-CNS days; pre-sport day
-  is Low CNS.
+- **CNS budget is dynamic:** fatigue_score ≥ 4.0 ("high") → max **1** High-CNS
+  day; moderate/low → max **2** High-CNS days. No consecutive High days.
+  Pre-sport day is always Low CNS.
 - **Weekly movement coverage required:** squat, hinge, push (h/v), pull (h/v),
   rotation/anti-rotation, carry/locomotion, jump.
 - **Block order is fixed:** Warmup → Power → Strength → Accessory → Core →
@@ -164,6 +143,7 @@ change** to every file that references it (e.g. a new pattern must appear in
 | `/journal` | `journal/page.tsx` | Stub — needs MDX pipeline |
 | `/engine/[id]` | `engine/[id]/page.tsx` | Live (was `/program/[id]`) |
 | `/dashboard` | `dashboard/page.tsx` | Stub — needs Supabase auth |
+| `POST /api/generate` | `api/generate/route.ts` | Live — server-side Anthropic proxy |
 
 ## Frontend (`frontend/`)
 
