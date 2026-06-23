@@ -168,11 +168,17 @@ content (A).
 
 ## Definition of done
 
-- [ ] `/doctrine` renders with full content, matches dark sage design
-- [ ] `/about` renders with full content
-- [ ] `/journal` lists articles; `/journal/[slug]` renders MDX
-- [ ] `packages/content-gen/` pillars updated to DP brand positioning
-- [ ] Programmes saved to Supabase after generation; `/engine/[id]` loads from DB
-- [ ] Email captured to `subscribers` table at assessment completion
-- [ ] `/dashboard` auth-gated; shows recent programmes for signed-in practitioner
+- [x] `/doctrine` renders with full content, matches dark sage design
+- [x] `/about` renders with full content
+- [x] `/journal` lists articles; `/journal/[slug]` renders MDX
+- [x] `packages/content-gen/` pillars updated to DP brand positioning (32 DP-brand pillars across 6 categories)
+- [x] `engine.ts` shared logic extracted; `/api/assess` route (generate + persist + email capture)
+- [x] `supabase.ts` server client; `/engine/[id]` queries Supabase directly
+- [x] Journal article 1: "Why CNS Fatigue Is the Constraint Most Coaches Ignore" (`cns-fatigue-constraint`)
+- [x] Journal article 2: "Seven Patterns. One Week. The Movement Hierarchy Explained." (`movement-hierarchy`)
+- [x] Journal article 3: "What 1–3 RIR Actually Means on a Primary Lift" (`rir-primary-lifts`)
+- [ ] Supabase project credentials connected; `scripts/seed.sql` run against project
+- [ ] Programmes saved to Supabase after generation; `/engine/[id]` loads from DB (needs credentials)
+- [ ] Email captured to `subscribers` table at assessment completion (needs credentials)
+- [ ] `/dashboard` auth-gated; shows recent programmes for signed-in practitioner (B4 — deferred)
 - [ ] All CI checks passing (pytest + tsc + Next.js build)
