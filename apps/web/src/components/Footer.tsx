@@ -35,7 +35,7 @@ export default function Footer() {
             FAQ
           </Link>
           <Link
-            href="/assess"
+            href="/apply"
             className="font-mono text-[10px] uppercase tracking-[0.1em] text-accent transition-opacity hover:opacity-80"
           >
             Free Assessment

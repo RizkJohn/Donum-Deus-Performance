@@ -1,8 +1,5 @@
 import type { AssessRequest, AssessResponse, ProgramRecord } from "./types";
 
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -12,38 +9,22 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
+/** POST /api/assess — submit the assessment funnel payload. Called from browser. */
+export async function submitAssessment(body: AssessRequest): Promise<AssessResponse> {
+  const res = await fetch("/api/assess", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     let detail = res.statusText;
     try {
-      const body = await res.json();
-      if (body?.detail) detail = JSON.stringify(body.detail);
+      const err = await res.json();
+      if (err?.message) detail = err.message;
     } catch {
-      // non-JSON error body; keep statusText
+      // non-JSON body
     }
     throw new ApiError(res.status, detail);
   }
-  return (await res.json()) as T;
-}
-
-/** POST /v1/assess — submit the assessment funnel payload. */
-export function submitAssessment(body: AssessRequest): Promise<AssessResponse> {
-  return request<AssessResponse>("/v1/assess", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-}
-
-/** GET /v1/programs/:id — fetch a stored program run (server-side). */
-export function getProgram(id: string): Promise<ProgramRecord> {
-  return request<ProgramRecord>(`/v1/programs/${encodeURIComponent(id)}`, {
-    cache: "no-store",
-  });
+  return res.json() as Promise<AssessResponse>;
 }

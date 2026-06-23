@@ -9,45 +9,58 @@ from anthropic import Anthropic
 log = logging.getLogger(__name__)
 
 # Each pillar is a specific enough seed that Claude will produce concrete, varied angles.
+# Pillars reflect the Deus Performance brand positioning: constraint-driven training,
+# CNS management, movement patterns, objective hierarchy, recovery, and mindset.
 CONTENT_PILLARS = [
-    "swimming — freestyle catch phase, early vertical forearm, and elbow position",
-    "swimming — underwater dolphin kick efficiency, depth, and breakout timing",
-    "swimming — flip turn mechanics, push-off angle, and streamline lock",
-    "swimming — breathing rhythm under race pressure and CO2 tolerance training",
-    "swimming — backstroke rotation, catch, and hip-driven power transfer",
-    "swimming — breaststroke pullout sequence, glide timing, and undulation",
-    "swimming — pacing strategy and negative splits in distance events",
-    "swimming — open water sighting technique and draft positioning",
-    "athletic performance — explosive starting strength and rate of force development",
-    "athletic performance — sprint mechanics, drive phase, and maximum velocity",
-    "athletic performance — posterior chain power for swimming and field sports",
-    "athletic performance — deceleration, change of direction, and knee-joint loading",
-    "recovery — sleep architecture, deep sleep quality, and performance adaptation",
-    "recovery — HRV interpretation, readiness scores, and training load management",
-    "recovery — cold exposure protocols and neuromuscular recovery windows",
-    "recovery — active recovery protocols vs rest days: when and why",
-    "high-performance mindset — identity-based training and internal standards over outcomes",
-    "high-performance mindset — adversity response and performing under competitive pressure",
-    "high-performance mindset — discipline architecture and environment design",
-    "high-performance mindset — visualization, pre-performance routines, and arousal control",
-    "high-performance mindset — the dichotomy of control: what you own vs what you release",
-    "training science — progressive overload, periodization phases, and peak timing",
-    "training science — taper strategy and competition-day physiological readiness",
-    "training science — specificity principle and sport-transfer training design",
-    "training science — CNS fatigue, intensity management, and session sequencing",
-    "nutrition — pre-training fueling, carbohydrate timing, and glycogen loading",
-    "nutrition — hydration strategy and electrolyte balance for pool athletes",
-    "nutrition — post-session recovery nutrition and protein synthesis windows",
-    "biomechanics — joint stacking, posture under fatigue, and technique preservation",
-    "biomechanics — shoulder health, internal rotation limits, and injury prevention for swimmers",
+    # Constraint-driven training — the DP method
+    "constraint-training — why a fixed objective hierarchy produces better outcomes than flexible programming",
+    "constraint-training — the CNS budget: why you cannot train heavy twice in a row and expect full output",
+    "constraint-training — the difference between volume fatigue and neural fatigue, and why it matters",
+    "constraint-training — why 1–3 RIR on primary lifts is not conservative — it is correct",
+    "constraint-training — deload timing: when the data says back off, backing off is the training",
+    "constraint-training — why the engine returns an error rather than a degraded programme",
+    "constraint-training — fatigue-adaptive volume: cutting reps, not weight, when recovery is low",
+    # CNS management
+    "cns-management — what high-CNS training actually means and how to identify it in your week",
+    "cns-management — the 48–72 hour neural recovery window and what compromises it",
+    "cns-management — why two hard sessions back-to-back compound fatigue instead of doubling stimulus",
+    "cns-management — HRV as a readiness signal: how to read it without overthinking it",
+    "cns-management — the pre-competition Low CNS rule and why it exists",
+    # Movement patterns
+    "movement-patterns — why squat, hinge, push, pull, rotation, carry, and jump cover everything",
+    "movement-patterns — the hinge pattern: posterior chain development and why most people do it wrong",
+    "movement-patterns — horizontal vs vertical pulling: why both are required every week",
+    "movement-patterns — rotation and anti-rotation: the core as a force-transfer mechanism, not an aesthetic feature",
+    "movement-patterns — carry and locomotion: the underrated pattern that builds structural resilience",
+    "movement-patterns — why a muscle-group split is an organisational convenience, not a physiological principle",
+    # Objective hierarchy
+    "objective-hierarchy — joint integrity first: why building on a damaged joint produces a damaged athlete",
+    "objective-hierarchy — movement quality before load: the squat performed poorly under weight builds a stronger fault",
+    "objective-hierarchy — why strength is third, not first, in the hierarchy",
+    "objective-hierarchy — work capacity as the engine beneath everything else",
+    "objective-hierarchy — hypertrophy as a consequence of well-structured training, not a primary objective",
+    # Recovery science
+    "recovery-science — sleep architecture and the deep sleep window where training adaptations are consolidated",
+    "recovery-science — why post-session nutrition timing matters for the 48-hour adaptation window",
+    "recovery-science — active recovery vs rest days: the case for deliberate low-intensity movement",
+    "recovery-science — progressive overload requires progressive recovery — why one without the other stalls",
+    # Athlete mindset
+    "athlete-mindset — identity-based training: performing to an internal standard, not an external comparison",
+    "athlete-mindset — discipline architecture: building an environment where the right action is the easy action",
+    "athlete-mindset — process over outcome: why the athlete who controls inputs outperforms the one who chases results",
+    "athlete-mindset — adversity response: the difference between fatigue that requires rest and discomfort that requires resilience",
+    "athlete-mindset — why removing optionality from your training produces more consistency than willpower",
 ]
 
 SYSTEM_PROMPT = """\
-You are the content engine for "Deus Performance" — a faceless elite online coaching brand \
-for athletic performance, swimming technique, and high-performance mindset.
+You are the content engine for "Deus Performance" — a faceless elite coaching brand \
+built on constraint-driven adaptive training. The brand positioning: movement-based, \
+CNS-managed, fatigue-adaptive programming governed by hard physiological rules.
 
-Brand voice: Bold. Direct. No fluff. Authoritative. Aspirational. Short punchy sentences. \
-The brand has no face — all content works as text overlays, voiceover on B-roll, or motion graphics.
+Brand voice: Precise. Disciplined. No hype. Authoritative. Short, declarative sentences. \
+No motivational clichés. Every claim should be grounded in a physiological principle. \
+The brand has no face — all content works as text overlays, voiceover on B-roll, or motion graphics. \
+Tagline: "The body is a gift. Train it accordingly."
 
 Respond ONLY with a valid JSON object. No markdown fences, no preamble, no extra text:
 {
