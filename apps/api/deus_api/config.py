@@ -1,6 +1,6 @@
 """Application settings.
 
-ENGINE_SPEC_DIR points at the canonical `engine/` markdown specs (lowercase
+ENGINE_SPEC_DIR points at the canonical `packages/engine/` markdown specs (lowercase
 files are the source of truth per CLAUDE.md). DATA_DIR holds the derived
 JSON artifacts generated from those specs by scripts/port_library.py.
 """
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     llm_provider: str = "mock"  # mock | claude
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-4-8"
-    engine_spec_dir: Path = _REPO_ROOT / "engine"
+    engine_spec_dir: Path = _REPO_ROOT / "packages" / "engine"
     data_dir: Path = _API_ROOT / "data"
     cors_origins: str = "http://localhost:3000"
     max_attempts: int = 3

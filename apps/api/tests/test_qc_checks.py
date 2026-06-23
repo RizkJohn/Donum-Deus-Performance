@@ -87,3 +87,27 @@ def test_split_deviation_rejected(good, library):
     program["weekly_split"] = program["weekly_split"][:-1]
     report = validate(program, req, plan, library)
     assert "plan_adherence" in _failed_names(report)
+
+
+def test_high_fatigue_limits_cns_to_one(library):
+    """When fatigue_score >= 4.0 the dynamic budget drops to max 1 High CNS day."""
+    req = make_request(sleep=5.0, soreness=5.0, energy=5.0, stress=5.0)
+    plan = build_plan(req, library)
+    high_days = [d for d in plan.days if d.cns == "High"]
+    assert len(high_days) <= 1, f"Expected ≤1 High CNS day under high fatigue; got {len(high_days)}"
+
+
+def test_two_high_days_rejected_under_high_fatigue(library):
+    """Forcing two High CNS days must fail QC when fatigue_score >= 4.0."""
+    req = make_request(sleep=5.0, soreness=5.0, energy=5.0, stress=5.0)
+    plan = build_plan(req, library)
+    program = MockProvider()._build_program(plan, library)
+    high_count = 0
+    for d in program["weekly_split"]:
+        if high_count < 2:
+            d["cns"] = "High"
+            high_count += 1
+    if high_count < 2:
+        pytest.skip("not enough training days in fixture to force 2 High")
+    report = validate(program, req, plan, library)
+    assert "cns_limits" in _failed_names(report)

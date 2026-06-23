@@ -3,8 +3,24 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProgramView from "@/components/program/ProgramView";
-import { getProgram } from "@/lib/api";
-import { fatigueStateFor, isEngineError, type ProgramRecord } from "@/lib/types";
+import { fatigueStateFor, isEngineError, type ProgramRecord, type AssessPayload, type ProgramOrError } from "@/lib/types";
+
+async function getProgramRecord(id: string): Promise<ProgramRecord | null> {
+  try {
+    const { getSupabaseServer } = await import("@/lib/supabase");
+    const supabase = getSupabaseServer();
+    const { data, error } = await supabase
+      .from("programmes")
+      .select("id, output, created_at")
+      .eq("id", id)
+      .single();
+    if (error || !data) return null;
+    const { programme, payload } = data.output as { programme: ProgramOrError; payload: AssessPayload };
+    return { id: data.id, program: programme, payload, created_at: data.created_at };
+  } catch {
+    return null;
+  }
+}
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +63,7 @@ function FailureNotice({
           ))}
         </ul>
       )}
-      <Link href="/assess" className="btn-primary">
+      <Link href="/apply" className="btn-primary">
         Start a new assessment →
       </Link>
     </div>
@@ -61,13 +77,8 @@ export default async function ProgramPage({
 }) {
   const { id } = await params;
 
-  let record: ProgramRecord | null = null;
-  let failed = false;
-  try {
-    record = await getProgram(id);
-  } catch {
-    failed = true;
-  }
+  const record = await getProgramRecord(id);
+  const failed = record === null;
 
   return (
     <>

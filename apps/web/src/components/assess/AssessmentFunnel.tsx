@@ -233,7 +233,7 @@ export default function AssessmentFunnel() {
         setPhase("engine_error");
         return;
       }
-      router.push(`/program/${res.id}`);
+      router.push(`/engine/${res.id}`);
     } catch {
       setPhase("network_error");
     }

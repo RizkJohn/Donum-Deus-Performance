@@ -107,7 +107,6 @@ export interface AssessResponse {
 
 export interface ProgramRecord {
   id: string;
-  email: string;
   payload: AssessPayload;
   program: ProgramOrError;
   created_at: string;

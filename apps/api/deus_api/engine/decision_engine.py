@@ -72,13 +72,14 @@ def build_plan(req: GenerateRequest, library: Library) -> PrecomputedPlan | Engi
             f"{MIN_COVERAGE_EXERCISES} required weekly movement patterns"
         ])
 
-    # --- CNS assignment: <= 2 High, no consecutive (calendar), pre-sport Low
+    # --- CNS assignment: dynamic High cap (fatigue-aware), no consecutive, pre-sport Low
+    max_high_cns = 1 if req.state.fatigue_score >= 4.0 else 2
     pre_sport = {
         DAY_ORDER[(_calendar_index(d) - 1) % 7] for d in sport_day_set
     }
     high_days: set[str] = set()
     for day in chosen:
-        if len(high_days) >= 2:
+        if len(high_days) >= max_high_cns:
             break
         if day in pre_sport:
             continue

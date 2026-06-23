@@ -24,7 +24,7 @@ export default function Hero() {
           the waitlist.
         </p>
         <div className="mb-10 flex flex-wrap items-center gap-[14px]">
-          <Link href="/assess" className="btn-primary">
+          <Link href="/apply" className="btn-primary">
             Start your free assessment →
           </Link>
           <Link href="/#method" className="btn-ghost">

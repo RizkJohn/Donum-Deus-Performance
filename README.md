@@ -1,56 +1,39 @@
 # Deus Performance
 *by Riz Management LLC*
 
-> *Deus — the body is a gift. Train it accordingly.*
+> *The body is a gift. Train it accordingly.*
 
 ---
 
-## Repository Structure
-
-```
-deus-performance/
-├── apps/
-│   ├── api/             # FastAPI engine pipeline service (Python)
-│   │   ├── deus_api/               # models, engine (decision/QC/retry), llm providers, routes
-│   │   ├── data/                   # derived JSON (exercise library, substitutions)
-│   │   ├── scripts/port_library.py # markdown → JSON generator
-│   │   └── tests/                  # pytest suite incl. 400+ program contract test
-│   └── web/             # Next.js marketing site + assessment funnel (TypeScript)
-│
-├── packages/schemas/    # Shared JSON Schemas (derived from engine/*.md)
-│
-├── engine/              # Core training system brain (SOURCE OF TRUTH)
-│   ├── engine_instructions.md      # System rules & CNS management
-│   ├── exercise_library.md         # Approved exercise pool
-│   ├── fatigue_model.md            # Fatigue scoring & accumulation rules
-│   ├── input_contract.md           # Client payload schema
-│   ├── output_schema.md            # Program output format
-│   ├── progression_engine.md       # Load/volume progression logic
-│   ├── quality_control.md          # QC checklist (pre-output gate)
-│   ├── substitution_rules.md       # Exercise substitution logic
-│   ├── retry_policy.md             # Error handling & retry behavior
-│   ├── prompt_wrapper.md           # API prompt wrapping instructions
-│   └── ARCHITECTURE_SUMMARY.md    # High-level system architecture
-│
-├── frontend/            # Legacy static mockups (design reference)
-│   ├── deus_v1.html                # Initial landing page / engine interface
-│   └── deus_v2.html                # Redesigned DP site (basis for apps/web)
-│
-├── business/            # Business strategy & planning
-│   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
-│
-├── docs/                # Reference documentation
-│   ├── RedesignGuide.md            # Frontend redesign specifications
-│   └── io-vs-com-org-guide.md      # Domain strategy guide
-│
-└── README.md
-```
+Deus Performance is a **constraint-driven adaptive training engine** — a system that takes a structured client intake and returns a complete weekly training programme generated under hard physiological rules. No improvisation. No muscle-group splits. No training to failure.
 
 ---
 
-## System Overview
+## How it works
 
-Deus Performance (DP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
+```
+Client intake (profile · goals · schedule · fatigue state · injuries)
+        │
+        ▼
+Deterministic engine  ──  fatigue score → CNS plan → volume budget → allowed exercises
+        │
+        ▼
+claude-sonnet-4-6  ──  fills exercise slots only (never decides structure)
+        │
+        ▼
+QC gate  ──  12 hard-rule checks; reject + retry if any fail (≤ 3 attempts)
+        │
+        ▼
+Weekly training programme  ──  sessions · blocks · sets · reps · rest · notes
+```
+
+The LLM never decides CNS distribution, volume, fatigue response, or progression flags. The deterministic engine pre-computes those constraints; the model only selects exercises within the permitted pool. The QC gate re-validates every rule regardless of what the model returns.
+
+---
+
+## Objective hierarchy
+
+The engine enforces a fixed priority order — never reordered:
 
 1. Joint Integrity
 2. Movement Quality
@@ -59,62 +42,112 @@ Deus Performance (DP) is a **constraint-driven adaptive training engine** operat
 5. Hypertrophy
 6. Sport / Skill Performance
 
-The engine takes a structured client payload and returns a complete weekly training program conforming to CNS management rules, movement pattern coverage requirements, and fatigue accumulation constraints.
+---
+
+## Tech stack
+
+| Layer | Technology |
+|-------|-----------|
+| Engine specs | Markdown (`packages/engine/`) — source of truth |
+| Backend API | Python 3.11, FastAPI, Pydantic v2, SQLAlchemy 2.0 |
+| LLM (API) | Anthropic SDK — `claude-opus-4-8` (mock provider for dev/tests) |
+| LLM (web proxy) | Anthropic SDK — `claude-sonnet-4-6` |
+| Frontend | Next.js 16, React 19, Tailwind CSS 3, TypeScript |
+| Database | PostgreSQL (Supabase) |
+| Infra | Docker Compose (local), Vercel (web), Railway/Fly (API) |
 
 ---
 
-## Engine Architecture
+## Repository layout
 
-**Input** → `input_contract.md`  
-Client profile, goals, schedule, fatigue state, injuries
-
-**Processing** → `engine_instructions.md` + `fatigue_model.md` + `progression_engine.md`  
-CNS classification, session design, movement pattern validation, QC gate
-
-**Output** → `output_schema.md`  
-Structured weekly program: sessions, blocks, exercises, sets, reps, rest, notes
-
-**Substitution** → `substitution_rules.md`  
-Equipment constraints, injury flags, fatigue-adjusted alternatives
-
----
-
-## Operating Principles
-
-- No improvisation. System operates within defined constraints.
-- Movement-based design, not muscle-group splits.
-- Full-body exposure across the training week.
-- Maximum 2 High CNS sessions per week. No consecutive High CNS days.
-- Never train to failure on primary lifts (1–3 RIR maintained).
-- Deload every 6–8 weeks or on performance drop.
-
----
-
-## Running the product
-
-See `docs/ARCHITECTURE.md` for the full system design.
-
-```bash
-docker compose up --build   # postgres + api (:8000) + web (:3000) — no API key needed
-make test                   # engine test suite (offline, mock provider)
-make seed-library           # regenerate derived JSON after editing engine/*.md
+```
+.
+├── packages/
+│   ├── engine/         # Markdown spec files — SOURCE OF TRUTH (lowercase only)
+│   ├── content-gen/    # Social content generator (Python bot)
+│   └── schemas/        # JSON Schemas derived from engine/
+├── apps/
+│   ├── api/            # FastAPI engine pipeline (Python)
+│   │   ├── deus_api/   # models, engine, llm providers, routes, qc
+│   │   ├── data/       # derived JSON (exercise library, substitutions)
+│   │   └── tests/      # pytest suite — 442 tests, offline
+│   └── web/            # Next.js 16 marketing site + assessment funnel
+│       └── src/app/
+│           ├── (marketing)/    # /, /apply, /doctrine, /about
+│           ├── journal/        # Blog (MDX)
+│           ├── engine/[id]/    # Programme result view
+│           ├── dashboard/      # Practitioner portal
+│           └── api/generate/   # Server-side Anthropic proxy
+├── api/                # Vercel Edge Function stubs (architecture reference)
+├── scripts/seed.sql    # Supabase schema
+├── frontend/           # Legacy static mockups (design reference)
+├── docs/architecture/  # System design and reference guides
+└── docker-compose.yml  # postgres + api (:8000) + web (:3000)
 ```
 
-The API defaults to `LLM_PROVIDER=mock` (deterministic, offline). For real
-generation set `LLM_PROVIDER=claude` and `ANTHROPIC_API_KEY`. The pipeline:
-input validation → deterministic decision engine (CNS split, volume, coverage,
-fatigue) → LLM exercise-fill → QC gate (one check per hard rule) → retry (≤3)
-→ program or `UNSATISFIABLE_CONSTRAINTS`.
+---
+
+## Quick start
+
+```bash
+# Full stack — no API key needed (mock LLM provider)
+docker compose up --build
+
+# Engine test suite (offline, 442 tests)
+make test
+
+# Regenerate derived JSON after editing engine/*.md
+make seed-library
+
+# Web only
+cd apps/web && npm install && npm run dev
+
+# API only
+cd apps/api && pip install -e ".[dev]" && uvicorn deus_api.main:app --reload
+```
+
+For the live `/api/generate` route, copy `apps/web/.env.local.example` →
+`apps/web/.env.local` and set `ANTHROPIC_API_KEY`.
+
+---
+
+## Engine rules (non-negotiable)
+
+- **CNS budget:** fatigue_score ≥ 4.0 → max 1 High-CNS day; otherwise max 2. No consecutive High days. Pre-sport day is always Low CNS.
+- **Block order:** Warmup → Power → Strength → Accessory → Core → Mobility.
+- **Movement coverage:** squat, hinge, push (horizontal + vertical), pull (horizontal + vertical), rotation/anti-rotation, carry/locomotion, jump — every week.
+- **Volume:** ≤ 8 exercises per session.
+- **Intensity:** 1–3 RIR on primary lifts. Never to failure.
+- **Exercise source:** library only. No synonyms. No invented exercises.
+
+---
+
+## Web routes
+
+| Route | Status |
+|-------|--------|
+| `/` | Live |
+| `/apply` | Live — 4-step assessment funnel |
+| `/engine/[id]` | Live — programme result view |
+| `POST /api/generate` | Live — server-side Anthropic proxy |
+| `/doctrine` | Stub |
+| `/about` | Stub |
+| `/journal` | Stub |
+| `/dashboard` | Stub — needs Supabase auth |
 
 ---
 
 ## Brand
 
-- **Institution**: Deus Performance
-- **Operating entity**: Riz Management LLC
-- **Tagline**: *Deus. The body is a gift. Train it accordingly.*
-- **Service model**: Fulfillment-as-a-service coaching practice
+- **Institution:** Deus Performance
+- **Operating entity:** Riz Management LLC
+- **Tagline:** *Deus. The body is a gift. Train it accordingly.*
+- **Tone:** Precise, disciplined, no hype. Movement-based, constraint-driven.
 
 ---
 
-*End.*
+## Development reference
+
+See [`instructions.md`](instructions.md) for setup guide and change workflows.
+See [`skills.md`](skills.md) for make targets and command reference.
+See [`CLAUDE.md`](CLAUDE.md) for AI assistant guidance.

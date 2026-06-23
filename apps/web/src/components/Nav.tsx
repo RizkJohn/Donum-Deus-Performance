@@ -31,7 +31,7 @@ export default function Nav() {
           FAQ
         </Link>
         <Link
-          href="/assess"
+          href="/apply"
           className="bg-accent px-[22px] py-[9px] font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#0b0f0c] transition-opacity hover:opacity-85"
         >
           Free Assessment
