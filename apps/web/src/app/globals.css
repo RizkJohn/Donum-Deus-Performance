@@ -25,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -136,6 +137,13 @@ body {
   background-image: linear-gradient(rgba(31, 58, 95, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(31, 58, 95, 0.045) 1px, transparent 1px);
   background-size: 80px 80px;
+}
+
+@media (max-width: 640px) {
+  .btn-primary {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
 }
 
 select.field-input {
