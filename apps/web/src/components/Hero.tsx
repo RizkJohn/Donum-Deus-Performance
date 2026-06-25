@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="mx-auto max-w-[1300px] grid grid-cols-1 gap-[30px] items-center px-5 pt-[44px] pb-9 md:grid-cols-[1.1fr_1fr] md:gap-[72px] md:px-[52px] md:pt-[60px] md:pb-[52px]">
+    <section className="mx-auto max-w-[1300px] grid grid-cols-1 gap-[28px] items-center px-5 pt-[72px] pb-9 md:grid-cols-[1.1fr_1fr] md:gap-[72px] md:px-[52px] md:pt-[68px] md:pb-[52px]">
       {/* Left */}
       <div>
         <div className="flex items-center gap-[10px] font-mono text-[8px] tracking-[0.3em] uppercase text-ink3 mb-[14px]">
@@ -11,7 +11,7 @@ export default function Hero() {
         </div>
         <h1
           className="font-play font-normal leading-[1.0] tracking-[-0.02em] mb-[20px] text-ink"
-          style={{ fontSize: "clamp(46px, 5.8vw, 80px)" }}
+          style={{ fontSize: "clamp(36px, 8vw, 80px)" }}
         >
           The body is not
           <br />a project.
