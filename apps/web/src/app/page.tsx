@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import HowItWorks from "@/components/HowItWorks";
-import Method from "@/components/Method";
-import FieldReports from "@/components/FieldReports";
-import Pricing from "@/components/Pricing";
-import Faq from "@/components/Faq";
+import DoctrineQuote from "@/components/DoctrineQuote";
+import Principles from "@/components/Principles";
+import Inscription from "@/components/Inscription";
+import OrderSection from "@/components/OrderSection";
 import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Deus Performance — Adaptive Training Engine",
+  title: "Deus Performance — A Practice of Physical Stewardship",
   description:
-    "A two-minute assessment becomes a complete, CNS-managed weekly training program. Constraint-driven, movement-based, fatigue-adaptive. Free assessment — no card required.",
+    "A philosophy-driven training practice grounded in joint integrity, movement quality, and the long-term development of human capacity. The body is a gift. Train it accordingly.",
 };
 
 export default function LandingPage() {
@@ -21,11 +20,11 @@ export default function LandingPage() {
       <Nav />
       <main>
         <Hero />
-        <HowItWorks />
-        <Method />
-        <FieldReports />
-        <Pricing />
-        <Faq />
+        <DoctrineQuote />
+        <Principles />
+        <hr className="h-px border-0 bg-line mx-[52px] max-md:mx-5" />
+        <Inscription />
+        <OrderSection />
         <FinalCta />
       </main>
       <Footer />

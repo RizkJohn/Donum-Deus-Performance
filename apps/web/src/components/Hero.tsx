@@ -1,93 +1,93 @@
 import Link from "next/link";
 
-const STATS = [
-  "2 min assessment",
-  "Personalized weekly program",
-  "No credit card",
-];
-
 export default function Hero() {
   return (
-    <header className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-6 pb-24 pt-[110px] md:px-12 lg:grid-cols-2 lg:gap-20">
+    <section className="mx-auto max-w-[1300px] grid grid-cols-1 gap-[30px] items-center px-5 pt-[44px] pb-9 md:grid-cols-[1.1fr_1fr] md:gap-[72px] md:px-[52px] md:pt-[60px] md:pb-[52px]">
+      {/* Left */}
       <div>
-        <p className="kicker mb-7">Adaptive Training Engine</p>
-        <h1 className="mb-8 font-play text-[clamp(48px,6.5vw,88px)] font-black leading-[0.94] tracking-[-0.02em] text-ink">
-          Train with precision.{" "}
-          <em className="font-normal italic text-accent">
-            Live without limit.
-          </em>
+        <div className="flex items-center gap-[10px] font-mono text-[8px] tracking-[0.3em] uppercase text-ink3 mb-[14px]">
+          <span className="w-[18px] h-px bg-line2 flex-shrink-0" aria-hidden="true" />
+          Train the mind. The body follows.
+        </div>
+        <h1
+          className="font-play font-normal leading-[1.0] tracking-[-0.02em] mb-[20px] text-ink"
+          style={{ fontSize: "clamp(46px, 5.8vw, 80px)" }}
+        >
+          The body is not
+          <br />a project.
+          <br />
+          It is a <em className="text-accent">practice.</em>
         </h1>
-        <p className="mb-10 max-w-[420px] border-l-2 border-line2 pl-5 font-bask text-[17px] leading-[1.85] text-ink2">
-          A constraint-driven engine builds your week the way a serious coach
-          would — complete movement coverage, managed nervous-system load,
-          volume that adapts to your fatigue. Human-grade programming, without
-          the waitlist.
+        <p className="font-bask text-[16px] text-ink2 leading-[1.9] max-w-[430px] mb-[24px] pl-[16px] border-l border-line2">
+          Deus Performance is a philosophy-driven practice that bridges ancient
+          wisdom and modern athletic discipline. Every plateau is a philosophical
+          problem before it becomes a physical one — the Stoics, the
+          existentialists, and the Eastern masters resolved the questions every
+          serious athlete eventually meets. We build the mind that builds the
+          body.
         </p>
-        <div className="mb-10 flex flex-wrap items-center gap-[14px]">
+        <div className="flex gap-[14px] items-center flex-wrap">
           <Link href="/assess" className="btn-primary">
-            Start your free assessment →
+            Begin the Assessment
           </Link>
-          <Link href="/#method" className="btn-ghost">
-            See the method
+          <Link href="/dispatches" className="btn-ghost">
+            Read the Dispatches →
           </Link>
         </div>
-        <ul className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-5">
-          {STATS.map((s) => (
-            <li
-              key={s}
-              className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink3"
-            >
-              <span aria-hidden="true" className="text-accent">
-                —
-              </span>
-              {s}
-            </li>
-          ))}
-        </ul>
       </div>
 
-      <div className="hidden lg:block">
-        <div className="border border-line bg-bg1 p-10">
-          <p
-            aria-hidden="true"
-            className="mb-5 font-play text-[clamp(68px,8vw,112px)] font-black italic leading-[0.9] tracking-[-0.02em] text-line2"
-          >
-            Deus.
-          </p>
-          <div className="mb-5 h-px bg-line" />
-          <div className="flex flex-col gap-px bg-line">
-            {[
-              {
-                latin: "Donum",
-                word: "The gift",
-                def: "The body is given once. Stewardship is not optional.",
-              },
-              {
-                latin: "Disciplina",
-                word: "The discipline",
-                def: "Order of effort: joint integrity before load, quality before volume.",
-              },
-              {
-                latin: "Mensura",
-                word: "The measure",
-                def: "Every session governed by hard rules — never by enthusiasm.",
-              },
-            ].map((r) => (
-              <div key={r.latin} className="flex items-stretch bg-bg">
-                <span className="flex min-w-[120px] items-center border-r border-line px-[18px] py-[14px] font-play text-[20px] italic text-warm">
-                  {r.latin}
-                </span>
-                <span className="flex flex-col justify-center gap-[2px] px-[18px] py-[14px] text-[10px] tracking-[0.06em] text-ink3">
-                  <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-ink">
-                    {r.word}
-                  </span>
-                  {r.def}
-                </span>
-              </div>
-            ))}
+      {/* Right: etymology panel */}
+      <div className="border border-line bg-bg1">
+        <div className="px-[17px] py-[9px] border-b border-line font-mono text-[7px] tracking-[0.22em] uppercase text-ink3 bg-bg2">
+          Etymology · Derivation of the institutional name
+        </div>
+
+        <div className="flex items-stretch border-b border-line">
+          <div className="px-[17px] py-[13px] font-play italic text-[18px] text-warm min-w-[110px] border-r border-line flex items-center flex-shrink-0 max-[480px]:min-w-0 max-[480px]:w-full max-[480px]:border-r-0 max-[480px]:border-b max-[480px]:flex-none">
+            corpus
+          </div>
+          <div className="px-[17px] py-[13px]">
+            <div className="font-mono text-[7px] tracking-[0.2em] uppercase text-ink3 mb-[3px]">
+              Latin noun · neuter · third declension
+            </div>
+            <div className="font-mono font-medium text-[11px] text-ink mb-[3px]">
+              The body; something given freely
+            </div>
+            <div className="text-[9px] text-ink3 leading-[1.55]">
+              The body is not earned — it is received. That receiving carries
+              weight. It is a gift, and a gift obligates the one who holds it.
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-stretch border-b border-line">
+          <div className="px-[17px] py-[13px] font-play italic text-[18px] text-warm min-w-[110px] border-r border-line flex items-center flex-shrink-0 max-[480px]:min-w-0 max-[480px]:w-full max-[480px]:border-r-0 max-[480px]:border-b max-[480px]:flex-none">
+            deus
+          </div>
+          <div className="px-[17px] py-[13px]">
+            <div className="font-mono text-[7px] tracking-[0.2em] uppercase text-ink3 mb-[3px]">
+              Latin noun · masculine · second declension
+            </div>
+            <div className="font-mono font-medium text-[11px] text-ink mb-[3px]">
+              God; the divine source
+            </div>
+            <div className="text-[9px] text-ink3 leading-[1.55]">
+              Root of English: deity, divine. The source exceeds the recipient.
+              The origin of the gift is greater than the gift itself.
+            </div>
+          </div>
+        </div>
+
+        <div className="px-[17px] py-[14px] bg-bg2">
+          <div className="font-play italic text-[16px] text-accent mb-[4px]">
+            deus dedit
+          </div>
+          <div className="font-bask italic text-[12px] text-ink2 leading-[1.65]">
+            God has given. A statement of origin and obligation in two words.
+            The institution&apos;s name is its doctrine.
           </div>
         </div>
       </div>
-    </header>
+    </section>
   );
 }
