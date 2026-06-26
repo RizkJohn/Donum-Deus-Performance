@@ -1,9 +1,24 @@
 ## FORMAT (MANDATORY)
 - id: snake_case_unique
 - name: exact_display_name
-- pattern: [squat|hinge|push_h|push_v|pull_h|pull_v|rotation|anti_rotation|carry|locomotion|jump]
+- pattern: [squat|hinge|push_h|push_v|pull_h|pull_v|rotation|anti_rotation|carry|locomotion|jump|lateral]
 - cns: [High|Low]
 - laterality: [Unilateral|Bilateral]
+
+## PATTERN — PLANE MAPPING
+Engines and QC use this mapping to validate plane diversity.
+
+  Sagittal:   squat, hinge, push_h, push_v, pull_h, pull_v, jump
+  Transverse: rotation, anti_rotation
+  Frontal:    lateral
+  Gait:       carry, locomotion
+
+## PATTERN NOTES
+- push_h and push_v are distinct patterns. Do not collapse into a single "push" field.
+- pull_h and pull_v are distinct patterns. Do not collapse into a single "pull" field.
+- lateral: frontal-plane dominant movements (lateral squat, lateral lunge, Copenhagen plank,
+  lateral band walk, lateral sled drag). Exercises must be explicitly tagged; unilateral squat
+  is a proxy (quality_control.md CHECK_3 path b), not a lateral pattern.
 
 ## LIBRARY (CANONICAL — exact name match required)
 
@@ -225,6 +240,33 @@
   cns: Low
   laterality: Bilateral
 
+### FRONTAL PLANE (LATERAL)
+- id: lateral_squat
+  name: Lateral Squat
+  pattern: lateral
+  cns: Low
+  laterality: Unilateral
+- id: lateral_lunge
+  name: Lateral Lunge
+  pattern: lateral
+  cns: Low
+  laterality: Unilateral
+- id: copenhagen_plank
+  name: Copenhagen Plank
+  pattern: lateral
+  cns: Low
+  laterality: Unilateral
+- id: lateral_band_walk
+  name: Lateral Band Walk
+  pattern: lateral
+  cns: Low
+  laterality: Bilateral
+- id: lateral_sled_drag
+  name: Lateral Sled Drag
+  pattern: lateral
+  cns: Low
+  laterality: Bilateral
+
 ### CONDITIONING
 - id: farmer_carry
   name: Farmer Carry
@@ -306,5 +348,9 @@
 
 ## RULES
 - Only use listed exercises (exact name match, no synonyms).
-- Preserve movement intent.
-- Prefer unilateral where possible.
+- If equipment or injury blocks a choice, use substitution_rules.md only.
+- Substitutions must preserve: pattern, CNS classification, laterality, and plane coverage.
+
+## LIBRARY STATUS — FRONTAL PLANE
+lateral pattern exercises are populated (CHECK_3 path a active).
+lateral_library_ready = true when all five lateral entries above are available in runtime data.

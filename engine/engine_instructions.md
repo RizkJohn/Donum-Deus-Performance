@@ -5,60 +5,79 @@
   {"error":"UNSATISFIABLE_CONSTRAINTS","reasons":[...]}
 - Prefer simplest valid solution (minimize exercise count while meeting requirements).
 - No synonyms; use exact names from exercise_library.
-
-## OBJECTIVE HIERARCHY (NEVER REORDER)
-1. Joint Integrity
-2. Movement Quality
-3. Strength
-4. Work Capacity
-5. Hypertrophy
-6. Sport/Skill
+- Enumerate ALL violations before returning error — do not short-circuit on first failure.
 
 ## PRIORITY RESOLUTION
-If conflicts occur:
-1. CNS rules
-2. Schedule constraints
-3. Movement coverage
-4. Fatigue rules
-5. Volume targets
+If conflicts occur, resolve in this order:
+1. CNS budget (profile-gated — resolve from quality_control.md SECTION 1 before construction)
+2. Schedule constraints (sport days, session density)
+3. Movement coverage — all planes (sagittal, transverse, frontal, gait)
+4. Fatigue-volume alignment (consume fatigue_model.volume_ceiling before setting volume)
+5. Push:pull ratio + laterality balance
+6. Variability rules (7a–7d)
+7. Volume targets
 
-## CNS MANAGEMENT
-- Max 2 High CNS days/week
-- No consecutive High CNS days
-- Pre-sport day = Low CNS
-- Post-high-output = Low CNS or Recovery
+## CNS BUDGET (PROFILE-GATED)
+Resolve before any session is constructed. Source: client_profile.training_age.
+  Beginner:     max_high_cns = 2
+  Intermediate: max_high_cns = 3
+  Advanced:     max_high_cns = 4
+No consecutive High CNS days.
+Pre-sport day = Low CNS.
+Post-High day = Low CNS or unscheduled.
+
+## MOVEMENT REQUIREMENTS (WEEKLY — ALL REQUIRED)
+Sagittal:   squat, hinge, push_h, push_v, pull_h, pull_v, jump
+Transverse: rotation, anti_rotation
+Frontal:    lateral (resolve via quality_control.md CHECK_3 priority paths a→b→c)
+Gait:       carry, locomotion
+
+CRITICAL: push_h and push_v are independent requirements. Satisfying one does not satisfy the other.
+CRITICAL: pull_h and pull_v are independent requirements. Satisfying one does not satisfy the other.
+
+## SESSION PLANE DIVERSITY
+High CNS session: patterns must span >= 3 distinct planes
+Low CNS session:  patterns must span >= 2 distinct planes
+Plane map:
+  Sagittal:   squat, hinge, push_h, push_v, pull_h, pull_v, jump
+  Transverse: rotation, anti_rotation
+  Frontal:    lateral, carry (unilateral loaded), locomotion (lateral)
+
+## PUSH:PULL RATIO
+  push_total = count(push_h) + count(push_v) across all sessions
+  pull_total = count(pull_h) + count(pull_v) across all sessions
+Enforce: pull_total >= push_total
+Ideal:   pull_total / push_total >= 1.2
+
+## LATERALITY (ACCESSORY BLOCK)
+  unilateral_ratio = unilateral_count / total_accessory_exercises
+  Beginner:             >= 0.30
+  Intermediate/Advanced: >= 0.40
+
+## VARIABILITY RULES
+7a: No exercise.name repeated in consecutive training sessions
+7b: No pattern in > floor(training_days/2)+1 sessions
+7c: No exercise.name in > 2 sessions/week
+7d: push_h count across week <= total_training_days
+
+## VOLUME BOUNDS
+Per session: exercises 5-8, sets <= 22
+Weekly (Strength + Accessory only):
+  Beginner:     <= 60 sets
+  Intermediate: <= 80 sets
+  Advanced:     <= 100 sets
 
 ## EXERCISE SELECTION
-- Select from library by exact match.
-- If equipment/injury blocks a choice, use substitution_rules only.
-
-## PROGRAM RULES
-
-### STRENGTH
-- 3–5 sets, 3–6 reps, 1–3 RIR; never train to failure on primary lifts.
-
-### HYPERTROPHY
-- 3–4 sets, 6–12 reps; no failure.
-
-### POWER
-- Low volume; max intent per rep.
-
-### CONDITIONING
-- 10–25 min; must not impair primary strength work.
-
-### MOBILITY
-- Minimum 5–10 min per session.
-
-## FATIGUE MANAGEMENT
-If fatigue_state = high:
-1. Remove conditioning
-2. Reduce accessory volume
-3. Maintain intensity (do not reduce load)
+- Select from library by exact match only.
+- If equipment or injury blocks a choice, use substitution_rules.md only.
+- Substitutions must preserve: pattern, CNS classification, laterality, and plane coverage.
 
 ## IDENTITY & ORDER
-- weekly_split ordered Mon→Sun
-- sessions ordered Mon→Sun
-- blocks ordered: Warmup → Power → Strength → Accessory → Core → Mobility
+Stable ordering required:
+  weekly_split: Mon -> Sun
+  sessions:     Mon -> Sun
+  blocks:       Warmup, Power, Strength, Accessory, Core, Mobility
 
 ## FAILURE MODE
-- If any rule violated → return error object (do not output partial plans).
+- Any rule violated -> return error object. Do not output partial plans.
+- Return ALL violations in reasons[] before returning. Do not short-circuit.

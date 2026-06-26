@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 Pattern = Literal[
     "squat", "hinge", "push_h", "push_v", "pull_h", "pull_v",
-    "rotation", "anti_rotation", "carry", "locomotion", "jump",
+    "rotation", "anti_rotation", "carry", "locomotion", "jump", "lateral",
 ]
 Laterality = Literal["Unilateral", "Bilateral"]
 

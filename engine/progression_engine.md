@@ -1,5 +1,5 @@
 ## LOAD_STEP
-- small: +2.5%
+- small:  +2.5%
 - medium: +5%
 
 ## STATES
@@ -7,27 +7,23 @@
 - maintain
 - deload
 
-## RULES BY MODALITY
-
-### STRENGTH
-- Increase load 2.5–5% on successful completion.
-- Two consecutive failures → reduce load 5%.
-
-### HYPERTROPHY
-- Increase reps before increasing load.
-- No training to failure.
-
-### POWER
-- Do not increase volume.
-- Increase intent and speed per rep.
-
-### DELOAD
-- Schedule every 6–8 weeks OR when fatigue_state = high.
-- Early triggers: performance drop, RPE spike, inconsistent output.
-- Reduce volume; maintain load.
-
-## MEASURABILITY
-Progress must track at least one: load, reps, or movement quality.
-
 ## OUTPUT HOOK
-Return flag in "flags": ["progress" | "maintain" | "deload"]
+Return flag in "flags": ["progress","maintain","deload"]
+
+## DELOAD TRIGGER
+- Every 6-8 weeks (scheduled)
+- Or when performance drops across 2+ consecutive sessions on same lift
+
+## EXERCISE ROTATION (VARIABILITY AT MACRO LEVEL)
+After each 6-8 week block, rotate primary lift selection within the same pattern.
+  Example: barbell_back_squat (Weeks 1-8) -> front_squat or safety_bar_squat (Weeks 9-16)
+This preserves pattern coverage (squat) while preventing neural accommodation and
+satisfying long-term variability intent from quality_control.md CHECK_7.
+
+Do not rotate pattern — only rotate exercise within the same pattern family.
+
+## PROGRESSION SEQUENCE
+1. Resolve fatigue_state from fatigue_model (consume volume_ceiling first)
+2. Apply load step if state = "progress"
+3. Hold load if state = "maintain"
+4. Reduce load -10% if state = "deload"; reduce volume, maintain frequency

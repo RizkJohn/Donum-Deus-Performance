@@ -214,15 +214,13 @@
   {
     "primary_id": "cable_woodchop",
     "alternatives": [
-      "landmine_rotation",
-      "ninety_ninety_hips"
+      "landmine_rotation"
     ]
   },
   {
     "primary_id": "landmine_rotation",
     "alternatives": [
-      "cable_woodchop",
-      "ninety_ninety_hips"
+      "cable_woodchop"
     ]
   },
   {
@@ -258,6 +256,41 @@
     "alternatives": [
       "dead_bug",
       "hanging_leg_raise"
+    ]
+  },
+  {
+    "primary_id": "lateral_squat",
+    "alternatives": [
+      "lateral_lunge",
+      "copenhagen_plank"
+    ]
+  },
+  {
+    "primary_id": "lateral_lunge",
+    "alternatives": [
+      "lateral_squat",
+      "lateral_band_walk"
+    ]
+  },
+  {
+    "primary_id": "copenhagen_plank",
+    "alternatives": [
+      "lateral_squat",
+      "lateral_lunge"
+    ]
+  },
+  {
+    "primary_id": "lateral_band_walk",
+    "alternatives": [
+      "lateral_squat",
+      "lateral_lunge"
+    ]
+  },
+  {
+    "primary_id": "lateral_sled_drag",
+    "alternatives": [
+      "lateral_band_walk",
+      "lateral_lunge"
     ]
   },
   {
