@@ -9,6 +9,11 @@ const FOOTER_LINKS = [
   "Correspondence",
 ];
 
+const LEGAL_LINKS = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-line px-[52px] py-[22px] max-md:px-5">
@@ -34,12 +39,29 @@ export default function Footer() {
           </Link>
         </nav>
       </div>
-      <div className="mx-auto max-w-[1300px] mt-[10px] pt-[10px] border-t border-line font-mono text-[8px] text-ink3 tracking-[0.04em] leading-[1.7]">
-        © {new Date().getFullYear()} Riz Management LLC. All rights reserved.
-        &nbsp;·&nbsp; Deus Performance is a practice of performance education.
-        It does not constitute medical, rehabilitation, or clinical advice of
-        any kind. Consult a licensed clinician before beginning any new training
-        programme.
+      <div className="mx-auto max-w-[1300px] mt-[10px] pt-[10px] border-t border-line">
+        <div className="flex items-center justify-between flex-wrap gap-[10px] mb-[8px]">
+          <p className="font-mono text-[8px] text-ink3 tracking-[0.04em] leading-[1.7]">
+            © {new Date().getFullYear()} Riz Management LLC. All rights reserved.
+          </p>
+          <nav aria-label="Legal links" className="flex gap-4">
+            {LEGAL_LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="font-mono text-[8px] tracking-[0.14em] uppercase text-ink3 hover:text-ink transition-colors"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <p className="font-mono text-[8px] text-ink3 tracking-[0.04em] leading-[1.7]">
+          Deus Performance is a practice of performance education. It does not
+          constitute medical, rehabilitation, or clinical advice of any kind.
+          Consult a licensed clinician before beginning any new training
+          programme.
+        </p>
       </div>
     </footer>
   );
