@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .db.session import init_db
+from .middleware import RateLimitMiddleware
 from .routes import assess, generate, health
 
 
@@ -27,6 +28,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(RateLimitMiddleware)
     app.include_router(health.router)
     app.include_router(generate.router)
     app.include_router(assess.router)

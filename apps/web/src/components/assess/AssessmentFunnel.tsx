@@ -116,8 +116,9 @@ export default function AssessmentFunnel() {
   const [stressScore, setStressScore] = useState(2);
   const [injuries, setInjuries] = useState<string[]>([]);
 
-  // Step 5 — email
+  // Step 5 — email + consent
   const [email, setEmail] = useState("");
+  const [consented, setConsented] = useState(false);
 
   const fatigueScore = useMemo(
     () => (sleepScore + sorenessScore + energyScore + stressScore) / 4,
@@ -166,6 +167,8 @@ export default function AssessmentFunnel() {
     if (s === 4) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
         return "Enter a valid email address.";
+      if (!consented)
+        return "Confirm that you have read and agree to the Privacy Policy and Terms of Service.";
     }
     return null;
   }
@@ -778,6 +781,37 @@ export default function AssessmentFunnel() {
               <p className="mt-2 text-[9px] italic text-ink3">
                 No card required. No spam — the program and nothing else.
               </p>
+
+              {/* Consent */}
+              <label className="mt-5 flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  checked={consented}
+                  onChange={(e) => setConsented(e.target.checked)}
+                  className="mt-[2px] h-[14px] w-[14px] shrink-0 cursor-pointer accent-[var(--accent)]"
+                />
+                <span className="text-[10px] leading-[1.7] text-ink3 group-hover:text-ink2 transition-colors">
+                  I have read and agree to the{" "}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="text-accent underline underline-offset-2 hover:text-ink transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="text-accent underline underline-offset-2 hover:text-ink transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
+                  . I understand that Deus Performance is not a medical provider
+                  and this programme does not constitute clinical advice.
+                </span>
+              </label>
             </div>
           )}
         </div>
