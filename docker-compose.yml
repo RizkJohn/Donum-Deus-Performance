@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: deus
-      POSTGRES_PASSWORD: deus
-      POSTGRES_DB: deus
+      POSTGRES_USER: ${POSTGRES_USER:-deus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-deus}
+      POSTGRES_DB: ${POSTGRES_DB:-deus}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U deus"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-deus}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -20,10 +20,15 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://deus:deus@postgres:5432/deus
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-deus}:${POSTGRES_PASSWORD:-deus}@postgres:5432/${POSTGRES_DB:-deus}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}      # no API key needed by default
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      CORS_ORIGINS: http://localhost:3000
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      # Set API_KEY to a strong random secret in production.
+      # When set, all API endpoints require the X-API-Key header.
+      API_KEY: ${API_KEY:-}
+      # Set DISABLE_DOCS=true to suppress /docs and /redoc in production.
+      DISABLE_DOCS: ${DISABLE_DOCS:-false}
     ports:
       - "8000:8000"
     depends_on:
@@ -34,7 +39,10 @@ services:
     build:
       context: apps/web
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      # Server-side URL used by Next.js API routes and server components.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://api:8000}
+      # Must match API_KEY above — kept server-side (not NEXT_PUBLIC_).
+      INTERNAL_API_KEY: ${API_KEY:-}
     ports:
       - "3000:3000"
     depends_on:
@@ -49,7 +57,7 @@ services:
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       NOTION_API_KEY: ${NOTION_API_KEY:-}
-      NOTION_DATABASE_ID: ${NOTION_DATABASE_ID:-88bf899d-a0aa-4c8a-9d24-c243a87008f3}
+      NOTION_DATABASE_ID: ${NOTION_DATABASE_ID:-}
       PLATFORMS: ${PLATFORMS:-Instagram,TikTok,Threads}
       CONTENT_TYPES: ${CONTENT_TYPES:-Motivational,Educational}
       POSTS_PER_RUN: ${POSTS_PER_RUN:-6}

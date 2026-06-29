@@ -1,8 +1,11 @@
 """Pydantic mirror of engine/input_contract.md (REQUIRED, STRICT)."""
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, StringConstraints, model_validator
+
+# Bounded string used for free-text list items (injury labels, secondary goals).
+BoundedStr = Annotated[str, StringConstraints(max_length=100)]
 
 Day = Literal[
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -24,8 +27,8 @@ class ClientProfile(BaseModel):
 
 class Goals(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    primary: str = Field(min_length=1)
-    secondary: list[str]
+    primary: str = Field(min_length=1, max_length=100)
+    secondary: list[BoundedStr] = Field(max_length=10)  # max 10 items
 
 
 class Schedule(BaseModel):
@@ -41,7 +44,7 @@ class State(BaseModel):
     soreness: float = Field(ge=1, le=5)   # 1 = none, 5 = severe
     energy: float = Field(ge=1, le=5)     # 1 = high, 5 = depleted
     stress: float = Field(ge=1, le=5)     # 1 = calm, 5 = severe
-    injuries: list[str]
+    injuries: list[BoundedStr] = Field(max_length=20)  # max 20 items
 
     _fatigue_score: float = PrivateAttr()
     _fatigue_state: FatigueState = PrivateAttr()
