@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     data_dir: Path = _API_ROOT / "data"
     cors_origins: str = "http://localhost:3000"
     max_attempts: int = 3
+    # Security: set API_KEY in production to require X-API-Key on all endpoints
+    api_key: str = ""
+    # Set DISABLE_DOCS=true in production to suppress /docs and /redoc
+    disable_docs: bool = False
+    # Maximum request body size in bytes (default 64 KB)
+    max_request_bytes: int = 65_536
 
 
 @lru_cache
