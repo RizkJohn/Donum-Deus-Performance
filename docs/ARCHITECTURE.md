@@ -10,7 +10,7 @@
 |---|---|---|
 | First milestone | Engine pipeline + revamped landing | Highest-value foundation; no auth/payments yet |
 | Backend | Python 3.11, FastAPI, PostgreSQL | Pydantic maps 1:1 to the engine JSON contracts |
-| LLM layer | Provider-agnostic interface | Claude (Anthropic) default; mock provider for key-free dev/tests; Qwen3/DeepSeek/OpenAI swappable |
+| LLM layer | Provider-agnostic + tiered models | Claude (Anthropic) default; mock provider for key-free dev/tests. Tiered per stage: Opus 4.8 reasons over the assessment, Sonnet 4.6 generates sessions, Haiku 4.5 powers chat — assessment is deterministic by default so Opus only bills on demand |
 | Frontend | Next.js + React + Tailwind | SEO, analytics, funnel A/B testing — parity with top coaching platforms |
 | Repo shape | Monorepo (`apps/`, `packages/`) | One contract, two consumers (API + web) |
 
@@ -27,27 +27,36 @@
                                        │                  └──────┬───────┘   │
                                        └─────────────────────────┼───────────┘
                                                                  │
-        ┌────────────────────────────────────────────────────────┤
+        ┌────────────────────────────────────────────────────────┐
+        │ 0. Athlete state        (load/init by email; exposure, │
+        │    fatigue index, compliance fold forward each cycle)  │
         │ 1. Input validation     (Pydantic ← input_contract.md) │
-        │ 2. Decision engine      (deterministic: CNS split,     │
-        │    volume budget, movement coverage, fatigue rules)    │
-        │ 3. Prompt assembly      (prompt_wrapper.md roles:      │
-        │    SYSTEM=engine_instructions, DEVELOPER=specs+plan)   │
-        │ 4. LLM provider         (claude | mock | …) fills      │
+        │ 2. Assessment Layer     (DETERMINISTIC abstractions:   │
+        │    readiness, training state, stimulus, priorities,    │
+        │    novelty target, intensity, exclusions — not workouts)│
+        │ 3. Variation engine     (novelty scoring vs exposure;  │
+        │    reorder allowed pool, prioritise under-trained)     │
+        │ 4. Decision engine      (deterministic: CNS split,     │
+        │    volume budget, coverage, fatigue; consumes 2 & 3)   │
+        │ 5. Prompt assembly      (prompt_wrapper.md roles +     │
+        │    compressed programming directives)                  │
+        │ 6. LLM provider         (Sonnet generation tier) fills │
         │    exercise slots only — never safety logic            │
-        │ 5. QC gate              (one check per hard rule)      │
-        │ 6. Retry orchestrator   (≤3 attempts, constrain        │
-        │    offending fields, simplify on repeat failure)       │
-        │ 7. Persist + return     (program_runs table)           │
+        │ 7. QC gate              (one check per hard rule)      │
+        │ 8. Retry orchestrator   (≤3 attempts, constrain fields)│
+        │ 9. Persist + return     (program_runs + athlete_states;│
+        │    program + coach's read + state summary)             │
         └────────────────────────────────────────────────────────┘
+   Reinforcement: POST /v1/feedback (completion/RPE/soreness) ──▶ athlete_states
 ```
 
-**The determinism boundary is the safety case.** The LLM never decides CNS
-distribution, volume, coverage, fatigue response, or progression flags — the
-decision engine pre-computes a `PrecomputedPlan` (weekly split, CNS per day,
-per-session slot budget, required movement patterns, allowed exercise pool)
-and the LLM only fills exercise slots within it. The QC gate re-validates
-every hard rule regardless of what the model returns.
+**The determinism boundary is the safety case.** Both the Assessment Layer and
+the decision engine are deterministic. The LLM never decides CNS distribution,
+volume, coverage, fatigue response, progression flags, readiness, or stimulus —
+the decision engine pre-computes a `PrecomputedPlan` (weekly split, CNS per day,
+per-session slot budget, required movement patterns, allowed exercise pool) and
+the LLM only fills exercise slots within it. The QC gate re-validates every hard
+rule regardless of what the model returns.
 
 ## Repository layout
 
@@ -86,6 +95,10 @@ every hard rule regardless of what the model returns.
 | `quality_control.md` | One Python check function per rule + DEVELOPER prompt | QC gate |
 | `retry_policy.md` | Retry orchestrator behavior | `retry.py` |
 | `prompt_wrapper.md` | Role assignment for prompt assembly | `prompt_builder` |
+| `assessment_layer.md` | Deterministic `assess()` → `TrainingAssessment` | `engine/assessment.py` |
+| `athlete_state.md` | Persistent state lifecycle (load/exposure/feedback) | `engine/athlete_state.py`, `db/models.py` |
+| `variation_engine.md` | Novelty scoring + pool prioritisation | `engine/variation.py` |
+| `reinforcement_signals.md` | Feedback fold-in | `routes/feedback.py`, `engine/athlete_state.py` |
 
 **Markdown stays canonical.** Structured data (library, substitutions) is
 ported to JSON by `scripts/port_library.py`; a sync test fails CI if the
@@ -136,11 +149,14 @@ class LLMProvider(Protocol):
   Baskerville via `next/font`), restructured for conversion: hero with single
   CTA → free AI assessment, social proof, method, three-tier pricing
   (Self-Service / Hybrid / Premium per business blueprint), FAQ, final CTA.
-- **Funnel (`/assess`)** — multi-step quiz mapping 1:1 to `input_contract.md`
-  (profile → goals → schedule → state → email/review), POSTs to
-  `/v1/assess`, routes to result.
-- **Result (`/program/[id]`)** — renders weekly split (CNS badges), session
-  cards, block tables.
+- **Funnel (`/assess`)** — multi-step quiz mapping to `input_contract.md`
+  (profile → goals → schedule → state → practice/preferences → email/review),
+  POSTs to `/v1/assess`, routes to result.
+- **Result (`/program/[id]`)** — the **Coach's Read** (the `TrainingAssessment`
+  abstraction: readiness, training state, stimulus, priorities, intensity),
+  weekly split (CNS badges), session cards, block tables, a **downloadable
+  branded program PDF** (`@react-pdf/renderer`, client-side — zero server cost),
+  and a **check-in form** posting reinforcement signals to `/v1/feedback`.
 - SEO: per-route metadata, sitemap, robots, OpenGraph, JSON-LD.
 
 ## Local development
@@ -151,11 +167,17 @@ make test                # pytest: unit + 100-program contract test (mock provid
 LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
 ```
 
+## Shipped in this milestone
+
+- Persistent athlete state (`athlete_states`), two-layer Assessment→Programming
+  split, variation/novelty engine, reinforcement signals (`/v1/feedback`),
+  tiered models, and a client-rendered program PDF.
+
 ## Deferred (documented stubs)
 
-- Fatigue sub-scores (sleep/soreness/energy/stress) in the input contract —
-  payload currently carries a single `fatigue_score`; averaging helper exists.
-- Deload-every-6–8-weeks needs training-history persistence (program_runs is
-  the seed for this).
-- Auth, payments, dashboard, check-ins, chat coach, Redis/Qdrant — later
-  milestones per the business roadmap.
+- Auth, payments, and gating the PDF/ongoing adaptation behind a subscription.
+- Haiku chat-coach surface (model tier configured; UI not built).
+- Long-horizon mesocycle planning beyond per-cycle exposure/compliance
+  (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
+- Email delivery of the PDF; Redis/Qdrant; Alembic migrations (currently
+  `create_all` on fresh DBs).
