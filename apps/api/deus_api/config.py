@@ -20,7 +20,14 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./deus.db"
     llm_provider: str = "mock"  # mock | claude
     anthropic_api_key: str = ""
-    anthropic_model: str = "claude-opus-4-8"
+    # Tiered models (docs/RedesignGuide.md): Opus reasons over the assessment,
+    # Sonnet does high-volume session generation, Haiku powers the chat layer.
+    # The Assessment Layer is deterministic by default, so these only bill when
+    # LLM_PROVIDER=claude. `anthropic_model` kept as a back-compat alias.
+    assessment_model: str = "claude-opus-4-8"
+    generation_model: str = "claude-sonnet-4-6"
+    chat_model: str = "claude-haiku-4-5-20251001"
+    anthropic_model: str = "claude-sonnet-4-6"
     engine_spec_dir: Path = _REPO_ROOT / "engine"
     data_dir: Path = _API_ROOT / "data"
     cors_origins: str = "http://localhost:3000"

@@ -1,29 +1,8 @@
 import pytest
-from httpx import ASGITransport, AsyncClient
 
 from conftest import make_request
-from deus_api.main import create_app
 
-
-@pytest.fixture
-async def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path}/test.db")
-    # reset cached settings/engine so the test DB URL takes effect
-    from deus_api import config
-    from deus_api.db import session as db_session
-    config.get_settings.cache_clear()
-    db_session._engine = None
-    db_session._sessionmaker = None
-
-    app = create_app()
-    await db_session.init_db()
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as c:
-        yield c
-
-    config.get_settings.cache_clear()
-    db_session._engine = None
-    db_session._sessionmaker = None
+# `client` fixture lives in conftest.py (shared across route test modules).
 
 
 @pytest.mark.asyncio
@@ -56,11 +35,89 @@ async def test_assess_and_fetch_roundtrip(client):
     body = r.json()
     assert body["id"] and "weekly_split" in body["program"]
 
+    # the revamp surfaces the coach's read + persistent state on assess
+    assert body["assessment"] is not None
+    assert "training_state" in body["assessment"]
+    assert body["assessment"]["summary"]
+    assert body["state_summary"]["cycle_count"] == 1
+
     r2 = await client.get(f"/v1/programs/{body['id']}")
     assert r2.status_code == 200
     fetched = r2.json()
     assert fetched["email"] == "athlete@example.com"
     assert fetched["program"] == body["program"]
+    assert fetched["assessment"]["training_state"] == body["assessment"]["training_state"]
+    assert fetched["state_summary"]["cycle_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_assess_accepts_preferences(client):
+    payload = make_request().model_dump()
+    payload["preferences"] = {
+        "training_environment": "home",
+        "preferred_modalities": ["dumbbells"],
+        "exercise_aversions": ["barbell"],
+        "novelty_tolerance": "high",
+    }
+    r = await client.post("/v1/assess", json={"email": "prefs@example.com", "payload": payload})
+    assert r.status_code == 200
+    assert r.json()["assessment"]["novelty_target"] >= 0.5
+
+
+@pytest.mark.asyncio
+async def test_persistent_state_accumulates_across_cycles(client):
+    email = "returning@example.com"
+    body = {"email": email, "payload": make_request().model_dump()}
+
+    r1 = await client.post("/v1/assess", json=body)
+    assert r1.json()["state_summary"]["cycle_count"] == 1
+
+    r2 = await client.post("/v1/assess", json=body)
+    second = r2.json()
+    # state is persistent and folds forward, not reset each time
+    assert second["state_summary"]["cycle_count"] == 2
+    assert sum(second["state_summary"]["recent_movement_patterns"].values()) > 0
+
+
+@pytest.mark.asyncio
+async def test_feedback_folds_into_state(client):
+    email = "feedback@example.com"
+    r = await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
+    run_id = r.json()["id"]
+
+    fb = await client.post("/v1/feedback", json={
+        "email": email,
+        "run_id": run_id,
+        "completion_pct": 0.3,
+        "soreness": 5,
+        "rpe_drift": 2.5,
+    })
+    assert fb.status_code == 200
+    summary = fb.json()["state_summary"]
+    assert summary["compliance_score"] < 1.0  # low completion drags compliance down
+
+
+@pytest.mark.asyncio
+async def test_feedback_unknown_run_404(client):
+    r = await client.post("/v1/feedback", json={
+        "email": "x@example.com", "run_id": "nope", "completion_pct": 1.0,
+    })
+    assert r.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_erasure_removes_state_and_feedback(client):
+    email = "erase@example.com"
+    r = await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
+    run_id = r.json()["id"]
+    await client.post("/v1/feedback", json={"email": email, "run_id": run_id, "completion_pct": 0.5})
+
+    d = await client.request("DELETE", "/v1/data", json={"email": email})
+    assert d.status_code == 200
+    body = d.json()
+    assert body["deleted_programmes"] >= 1
+    assert body["deleted_feedback"] >= 1
+    assert body["deleted_athlete_state"] == 1
 
 
 @pytest.mark.asyncio

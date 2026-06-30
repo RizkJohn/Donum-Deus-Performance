@@ -49,6 +49,7 @@ class MockProvider:
         user: str,
         json_schema: dict,
         context: dict[str, Any] | None = None,
+        model: str | None = None,  # tier hint ignored offline
     ) -> GenerationResult:
         if context is None or "plan" not in context or "library" not in context:
             raise RuntimeError("MockProvider requires context={'plan', 'library'}")
@@ -63,13 +64,16 @@ class MockProvider:
         return GenerationResult(parsed=program, raw_text="", stop_reason="end_turn")
 
     def _pick_for_group(self, group: str, plan: PrecomputedPlan, library: Library):
-        """First allowed exercise covering the group; prefer Low CNS so picks
-        sit safely on Low-CNS days (jump has only High options — placed on a
-        High day when one exists)."""
-        allowed = set(plan.allowed_exercise_ids)
+        """First allowed exercise covering the group, honouring the engine's
+        variation-priority order (`allowed_exercise_ids` is pre-sorted novel →
+        stale, aversions last). Prefer Low CNS so picks sit safely on Low-CNS
+        days (jump has only High options — placed on a High day when one exists).
+        """
         patterns = COVERAGE_GROUPS[group]
         candidates = [
-            e for e in library.exercises if e.id in allowed and e.pattern in patterns
+            library.by_id[i]
+            for i in plan.allowed_exercise_ids
+            if library.by_id[i].pattern in patterns
         ]
         low = [e for e in candidates if e.cns == "Low"]
         pool = low or candidates

@@ -58,3 +58,28 @@ def make_request(
 @pytest.fixture
 def base_request():
     return make_request()
+
+
+@pytest.fixture
+async def client(tmp_path, monkeypatch):
+    """Async HTTP client against a throwaway sqlite DB (shared by route tests)."""
+    from httpx import ASGITransport, AsyncClient
+
+    monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path}/test.db")
+    from deus_api import config
+    from deus_api.db import session as db_session
+    from deus_api.main import create_app
+
+    config.get_settings.cache_clear()
+    db_session._engine = None
+    db_session._sessionmaker = None
+
+    app = create_app()
+    await db_session.init_db()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+
+    config.get_settings.cache_clear()
+    db_session._engine = None
+    db_session._sessionmaker = None

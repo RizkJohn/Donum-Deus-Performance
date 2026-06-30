@@ -32,4 +32,5 @@ class LLMProvider(Protocol):
         user: str,
         json_schema: dict,
         context: dict[str, Any] | None = None,
+        model: str | None = None,
     ) -> GenerationResult: ...

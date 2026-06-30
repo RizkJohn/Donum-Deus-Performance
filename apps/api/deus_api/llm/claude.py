@@ -30,9 +30,11 @@ class ClaudeProvider:
         user: str,
         json_schema: dict,
         context: dict[str, Any] | None = None,
+        model: str | None = None,
     ) -> GenerationResult:
+        active_model = model or self._model
         response = await self._client.messages.create(
-            model=self._model,
+            model=active_model,
             max_tokens=16000,
             thinking={"type": "adaptive"},
             system=[
@@ -65,7 +67,7 @@ class ClaudeProvider:
             parsed=parsed,
             stop_reason=response.stop_reason,
             meta={
-                "model": self._model,
+                "model": active_model,
                 "input_tokens": response.usage.input_tokens,
                 "output_tokens": response.usage.output_tokens,
             },

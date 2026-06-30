@@ -13,7 +13,9 @@ def build_provider(settings: Settings) -> LLMProvider:
     if settings.llm_provider == "mock":
         return MockProvider()
     if settings.llm_provider == "claude":
+        # Default model is the generation tier (Sonnet); the pipeline passes an
+        # explicit per-call model so each stage uses its tier.
         return ClaudeProvider(
-            api_key=settings.anthropic_api_key, model=settings.anthropic_model
+            api_key=settings.anthropic_api_key, model=settings.generation_model
         )
     raise ValueError(f"unknown LLM_PROVIDER: {settings.llm_provider!r}")
