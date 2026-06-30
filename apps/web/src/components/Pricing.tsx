@@ -3,19 +3,19 @@ import Link from "next/link";
 const TIERS = [
   {
     name: "Engine",
-    price: 49,
+    price: 30,
     desc: "The full adaptive engine, self-directed.",
     featured: false,
     features: [
-      "AI-generated weekly programs",
-      "Fatigue check-ins that adjust volume",
-      "Equipment & injury substitutions",
-      "Complete movement coverage, every week",
+      "Adaptive weekly programs that learn from your history",
+      "Your coach's read — readiness, stimulus, priorities — every week",
+      "A downloadable, branded program PDF each cycle",
+      "Fatigue check-ins, variation, and injury/equipment substitutions",
     ],
   },
   {
     name: "Hybrid",
-    price: 199,
+    price: 90,
     desc: "The engine, reviewed by a human coach.",
     featured: true,
     features: [
@@ -27,7 +27,7 @@ const TIERS = [
   },
   {
     name: "Premium",
-    price: 750,
+    price: 250,
     desc: "A dedicated coach, engine-assisted.",
     featured: false,
     features: [
@@ -47,8 +47,9 @@ export default function Pricing() {
         Choose your <em className="font-normal italic text-warm">measure.</em>
       </h2>
       <p className="max-w-[560px] font-bask text-[16px] leading-[1.8] text-ink2">
-        Start with the free assessment — no card required. See your first
-        program before you decide anything.
+        Start with the free assessment — no card required. Your first week is
+        yours to keep, as a branded program PDF with the coach&apos;s read.
+        Subscribe when you want the engine to keep adapting to you.
       </p>
 
       <div className="mt-11 grid grid-cols-1 gap-px border border-line bg-line md:grid-cols-3">
@@ -111,7 +112,7 @@ export default function Pricing() {
         ))}
       </div>
       <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.1em] text-ink3">
-        Start with the free assessment — no card required.
+        Free assessment · first program PDF included · no card required.
       </p>
     </section>
   );

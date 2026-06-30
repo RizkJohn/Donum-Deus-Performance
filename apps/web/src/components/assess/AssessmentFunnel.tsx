@@ -10,7 +10,9 @@ import {
   type AssessRequest,
   type Day,
   type Goal,
+  type NoveltyTolerance,
   type TrainingAge,
+  type TrainingEnvironment,
 } from "@/lib/types";
 
 const DAYS: Day[] = [
@@ -77,11 +79,43 @@ const FATIGUE_FACTORS = [
   },
 ] as const;
 
+const ENVIRONMENTS: { value: TrainingEnvironment; label: string }[] = [
+  { value: "full_gym", label: "Full gym" },
+  { value: "home", label: "Home" },
+  { value: "minimal", label: "Minimal" },
+];
+
+const MODALITIES = [
+  "Barbell",
+  "Dumbbell",
+  "Kettlebell",
+  "Machines",
+  "Bands",
+  "Bodyweight",
+  "Sled",
+];
+
+const AVERSIONS = [
+  "Burpees",
+  "Running",
+  "Barbell",
+  "Kettlebell",
+  "Jumping",
+  "Lunges",
+];
+
+const NOVELTY: { value: NoveltyTolerance; label: string; hint: string }[] = [
+  { value: "low", label: "Familiar", hint: "Repeat what works" },
+  { value: "medium", label: "Balanced", hint: "Steady rotation" },
+  { value: "high", label: "Varied", hint: "Fresh stimulus often" },
+];
+
 const STEPS = [
   { title: "Profile", sub: "Who is training" },
   { title: "Goals", sub: "What it is for" },
   { title: "Schedule", sub: "When you can train" },
   { title: "State", sub: "Fatigue & injuries" },
+  { title: "Practice", sub: "Environment & preference" },
   { title: "Review", sub: "Confirm & generate" },
 ];
 
@@ -116,7 +150,15 @@ export default function AssessmentFunnel() {
   const [stressScore, setStressScore] = useState(2);
   const [injuries, setInjuries] = useState<string[]>([]);
 
-  // Step 5 — email + consent
+  // Step 5 — practice / preferences
+  const [trainingEnvironment, setTrainingEnvironment] =
+    useState<TrainingEnvironment>("full_gym");
+  const [preferredModalities, setPreferredModalities] = useState<string[]>([]);
+  const [exerciseAversions, setExerciseAversions] = useState<string[]>([]);
+  const [noveltyTolerance, setNoveltyTolerance] =
+    useState<NoveltyTolerance>("medium");
+
+  // Step 6 — email + consent
   const [email, setEmail] = useState("");
   const [consented, setConsented] = useState(false);
 
@@ -164,7 +206,7 @@ export default function AssessmentFunnel() {
       if (!sportName.trim() && sportDays.length > 0)
         return "Name your sport, or clear the selected sport days.";
     }
-    if (s === 4) {
+    if (s === 5) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
         return "Enter a valid email address.";
       if (!consented)
@@ -217,12 +259,18 @@ export default function AssessmentFunnel() {
           stress: stressScore,
           injuries: injuries.filter((i) => i !== "None"),
         },
+        preferences: {
+          training_environment: trainingEnvironment,
+          preferred_modalities: preferredModalities,
+          exercise_aversions: exerciseAversions,
+          novelty_tolerance: noveltyTolerance,
+        },
       },
     };
   }
 
   async function submit() {
-    const v = validateStep(4);
+    const v = validateStep(5);
     if (v) {
       setValidation(v);
       return;
@@ -717,7 +765,108 @@ export default function AssessmentFunnel() {
             </fieldset>
           )}
 
-          {step === 4 && summary && (
+          {step === 4 && (
+            <fieldset className="border-0 p-0">
+              <legend className="sr-only">Practice & preferences</legend>
+              <div className="mb-6">
+                <span className="field-label">Training environment</span>
+                <div
+                  className="grid grid-cols-3 gap-2"
+                  role="radiogroup"
+                  aria-label="Training environment"
+                >
+                  {ENVIRONMENTS.map((e) => (
+                    <button
+                      key={e.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={trainingEnvironment === e.value}
+                      onClick={() => setTrainingEnvironment(e.value)}
+                      className={`chip-btn ${trainingEnvironment === e.value ? "chip-btn-sel" : ""}`}
+                    >
+                      {e.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-6">
+                <span className="field-label">Preferred implements (optional)</span>
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Preferred implements"
+                >
+                  {MODALITIES.map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      aria-pressed={preferredModalities.includes(m)}
+                      onClick={() => toggle(preferredModalities, m, setPreferredModalities)}
+                      className={`chip-btn ${preferredModalities.includes(m) ? "chip-btn-sel" : ""}`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-6">
+                <span className="field-label">Movements to avoid (optional)</span>
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Movements to avoid"
+                >
+                  {AVERSIONS.map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      aria-pressed={exerciseAversions.includes(a)}
+                      onClick={() => toggle(exerciseAversions, a, setExerciseAversions)}
+                      className={`chip-btn ${exerciseAversions.includes(a) ? "chip-btn-sel" : ""}`}
+                    >
+                      {a}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  A preference, not a hard block — coverage is preserved; the
+                  engine simply selects around them where it can.
+                </p>
+              </div>
+              <div>
+                <span className="field-label">Variation</span>
+                <div
+                  className="grid grid-cols-3 gap-2"
+                  role="radiogroup"
+                  aria-label="Variation"
+                >
+                  {NOVELTY.map((n) => (
+                    <button
+                      key={n.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={noveltyTolerance === n.value}
+                      onClick={() => setNoveltyTolerance(n.value)}
+                      className={`flex flex-col items-center gap-[2px] px-2 py-[10px] ${
+                        noveltyTolerance === n.value ? "chip-btn-sel" : "chip-btn"
+                      }`}
+                    >
+                      <span className="text-[11px] font-medium">{n.label}</span>
+                      <span className="font-mono text-[7px] uppercase tracking-[0.1em] text-ink3">
+                        {n.hint}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[9px] italic text-ink3">
+                  The variation engine tracks what you have trained and rotates
+                  stimulus to keep adaptation alive — this sets how aggressively.
+                </p>
+              </div>
+            </fieldset>
+          )}
+
+          {step === 5 && summary && (
             <div>
               <dl className="mb-6 flex flex-col gap-px border border-line bg-line">
                 {[
@@ -754,6 +903,12 @@ export default function AssessmentFunnel() {
                         ? ` · ${summary.payload.state.injuries.join(", ")}`
                         : " · No injuries"
                     }`,
+                  ],
+                  [
+                    "Practice",
+                    `${ENVIRONMENTS.find((e) => e.value === trainingEnvironment)?.label} · Variation: ${noveltyTolerance}${
+                      preferredModalities.length ? ` · Prefers ${preferredModalities.join(", ")}` : ""
+                    }${exerciseAversions.length ? ` · Avoids ${exerciseAversions.join(", ")}` : ""}`,
                   ],
                 ].map(([k, v]) => (
                   <div key={k} className="flex bg-bg1 px-5 py-3">

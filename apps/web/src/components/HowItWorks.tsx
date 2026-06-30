@@ -2,17 +2,17 @@ const STEPS = [
   {
     num: "I.",
     title: "Assessment",
-    body: "Five questions, two minutes. Profile, goals, schedule, current fatigue, injury constraints. No guesswork enters the system.",
+    body: "A short, deliberate intake: profile, goals, schedule, current fatigue, injuries, and how you prefer to train. No guesswork enters the system.",
   },
   {
     num: "II.",
-    title: "The engine generates your week",
-    body: "A complete weekly program — CNS-managed, movement-complete, ordered. Every output passes a quality-control gate before you see it.",
+    title: "The engine reads you, then builds",
+    body: "First a deterministic read — readiness, training state, stimulus, movement priority. Then a complete, QC-validated week, delivered as a branded PDF that is yours to keep.",
   },
   {
     num: "III.",
-    title: "Train & adapt",
-    body: "Weekly check-ins feed back into the engine. Load and volume adjust to your fatigue; progress, maintain, or deload — decided by rule, not mood.",
+    title: "Train, check in, adapt",
+    body: "Weekly check-ins feed your persistent athlete state. Load, variation, and progression adjust to your fatigue and adherence — decided by rule, not mood.",
   },
 ];
 

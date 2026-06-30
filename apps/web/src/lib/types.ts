@@ -71,6 +71,18 @@ export type Goal =
 
 export type FatigueState = "low" | "moderate" | "high";
 
+export type TrainingEnvironment = "full_gym" | "home" | "minimal";
+export type NoveltyTolerance = "low" | "medium" | "high";
+export type RecoveryCapacity = "low" | "moderate" | "high";
+
+export interface Preferences {
+  training_environment: TrainingEnvironment;
+  preferred_modalities: string[];
+  exercise_aversions: string[];
+  novelty_tolerance: NoveltyTolerance;
+  recovery_capacity?: RecoveryCapacity | null;
+}
+
 export interface AssessPayload {
   client_profile: {
     age: number;
@@ -93,6 +105,59 @@ export interface AssessPayload {
     stress: number;
     injuries: string[];
   };
+  preferences?: Preferences;
+}
+
+// ---- Assessment Layer output (mirrors models/assessment.py) ----
+
+export type TrainingState =
+  | "primed"
+  | "balanced"
+  | "functional_overreach"
+  | "depleted";
+
+export type Stimulus =
+  | "progressive_overload"
+  | "volume_maintenance"
+  | "volume_reduction"
+  | "technical_deload";
+
+export type IntensityTarget = "low" | "moderate" | "moderate-high" | "high";
+
+export interface TrainingAssessment {
+  readiness_score: number;
+  training_state: TrainingState;
+  recovery_classification: RecoveryCapacity;
+  overload_tolerance: number;
+  recommended_stimulus: Stimulus;
+  progression_path: "progress" | "maintain" | "deload";
+  movement_priority: string[];
+  novelty_target: number;
+  intensity_target: IntensityTarget;
+  intensity_range: string;
+  exclusions: string[];
+  summary: string;
+}
+
+export interface AthleteStateSummary {
+  cycle_count: number;
+  fatigue_index: number;
+  compliance_score: number;
+  recovery_capacity: RecoveryCapacity;
+  novelty_tolerance: NoveltyTolerance;
+  recent_movement_patterns: Record<string, number>;
+}
+
+export interface Feedback {
+  email: string;
+  run_id: string;
+  completion_pct: number;
+  rpe_drift?: number;
+  soreness?: number;
+  skipped_exercises?: string[];
+  substitutions?: string[];
+  enjoyment?: number;
+  performance_note?: string;
 }
 
 export interface AssessRequest {
@@ -103,6 +168,8 @@ export interface AssessRequest {
 export interface AssessResponse {
   id: string;
   program: ProgramOrError;
+  assessment: TrainingAssessment | null;
+  state_summary: AthleteStateSummary | null;
 }
 
 export interface ProgramRecord {
@@ -110,6 +177,8 @@ export interface ProgramRecord {
   email: string;
   payload: AssessPayload;
   program: ProgramOrError;
+  assessment: TrainingAssessment | null;
+  state_summary: AthleteStateSummary | null;
   created_at: string;
 }
 

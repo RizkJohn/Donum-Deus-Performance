@@ -3,6 +3,9 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProgramView from "@/components/program/ProgramView";
+import CoachsRead from "@/components/program/CoachsRead";
+import CheckInForm from "@/components/program/CheckInForm";
+import DownloadPdfButton from "@/components/program/DownloadPdfButton";
 import { getProgram } from "@/lib/api";
 import { fatigueStateFor, isEngineError, type ProgramRecord } from "@/lib/types";
 
@@ -113,14 +116,33 @@ export default async function ProgramPage({
                 </div>
               </div>
             </header>
+            <div className="mx-auto max-w-[1180px] px-6 pt-10 md:px-12">
+              <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-line pb-6">
+                <p className="max-w-[440px] font-bask text-[14px] italic leading-[1.7] text-ink2">
+                  Your complete week, validated and ready. Keep the document —
+                  it is yours.
+                </p>
+                <DownloadPdfButton record={record} />
+              </div>
+              {record.assessment && (
+                <CoachsRead
+                  assessment={record.assessment}
+                  state={record.state_summary}
+                />
+              )}
+            </div>
             <ProgramView program={record.program} />
+            <div className="mx-auto max-w-[1180px] px-6 md:px-12">
+              <CheckInForm runId={record.id} email={record.email} />
+            </div>
             <section className="border-t border-line px-6 py-16 text-center md:px-12">
               <p className="mb-2 font-play text-[15px] italic text-warm">
                 Donum Dei.
               </p>
               <p className="mx-auto mb-8 max-w-[420px] font-bask text-[15px] leading-[1.8] text-ink2">
                 This is week one. Keep the engine adapting to you — fatigue
-                check-ins, progression, substitutions — from $49/month.
+                check-ins, progression, variation, substitutions — from
+                $30/month.
               </p>
               <Link href="/#pricing" className="btn-primary">
                 See plans

@@ -1,4 +1,4 @@
-import type { AssessRequest, AssessResponse, ProgramRecord } from "./types";
+import type { AssessRequest, AssessResponse, Feedback, ProgramRecord } from "./types";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -45,5 +45,15 @@ export function submitAssessment(body: AssessRequest): Promise<AssessResponse> {
 export function getProgram(id: string): Promise<ProgramRecord> {
   return request<ProgramRecord>(`/v1/programs/${encodeURIComponent(id)}`, {
     cache: "no-store",
+  });
+}
+
+/** POST /v1/feedback — submit reinforcement signals after a training cycle. */
+export function submitFeedback(
+  body: Feedback,
+): Promise<{ ok: boolean; state_summary: unknown }> {
+  return request("/v1/feedback", {
+    method: "POST",
+    body: JSON.stringify(body),
   });
 }
