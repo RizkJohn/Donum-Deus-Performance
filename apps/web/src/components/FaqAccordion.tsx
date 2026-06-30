@@ -10,39 +10,39 @@ type FaqItem = {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: "What does philosophy have to do with training?",
-    a: "Everything that a training plan alone cannot reach. The mechanical problems of programming — load, volume, recovery — are solved. The problems that actually stall athletes are not mechanical: governing what you cannot control, sustaining effort without motivation, performing without forcing, holding a standard no one is watching. The Stoics, existentialists, and Eastern traditions worked these out over two thousand years. The methodology is physical; the framework beneath it is not. The Dispatches set out the connection in full.",
+    a: "Everything a training plan alone can't reach. The mechanical problems — load, volume, recovery — are solved. What actually stalls athletes isn't mechanical: governing what you can't control, sustaining effort without motivation, performing without forcing, holding a standard no one's watching. The Stoics, existentialists, and Eastern traditions worked this out over two thousand years. The methodology is physical; the framework underneath it isn't. The Dispatches lay out the full connection.",
   },
   {
-    q: "What distinguishes this institution from a generic coaching application?",
-    a: "Generic applications produce templates. This institution produces programmes through a two-stage process: an assessment engine first classifies the practitioner's training state, producing a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive is then used to construct the sessions. No two intake profiles produce the same output.",
+    q: "What makes this different from a generic coaching app?",
+    a: "Generic apps produce templates. We produce programmes through a two-stage process: an assessment engine classifies your training state into a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive builds the sessions. No two intake profiles produce the same output.",
   },
   {
     q: "Is access to a training facility required?",
-    a: "No. The intake captures equipment context — full facility, dumbbells only, or minimal setup — and exercise selection is adapted accordingly. The movement patterns required by the methodology remain intact regardless of available equipment.",
+    a: "No. The intake captures your equipment — full facility, dumbbells only, or minimal setup — and exercise selection adapts to it. The required movement patterns stay intact regardless of what you have access to.",
   },
   {
     q: "How is injury or physical restriction handled?",
-    a: "Restrictions entered during intake are translated into exclusion criteria. The construction engine routes around them. For complex, post-surgical, or chronic presentations, the Practice or Stewardship level is the appropriate entry point — those levels include direct correspondence and oversight that cannot be substituted by automated constraint resolution alone.",
+    a: "Restrictions entered at intake become exclusion criteria. The engine routes around them. For complex, post-surgical, or chronic cases, Practice or Stewardship is the right entry point — those levels include direct correspondence and oversight that automation alone can't replace.",
   },
   {
     q: "How frequently should the programme be rebuilt?",
-    a: "Rebuild when the practitioner's state changes materially: schedule shifts, significant fatigue accumulation, return from a deload, or six to eight weeks of continuous work in the current block. Foundation practitioners rebuild on demand. Practice and Stewardship practitioners receive in-cycle adjustments as part of their level of engagement.",
+    a: "Rebuild when your state changes materially: a schedule shift, a fatigue spike, coming off a deload, or six to eight weeks in the same block. Foundation members rebuild on demand. Practice and Stewardship members get in-cycle adjustments built into their level.",
   },
   {
     q: "What conditioning methods are used?",
-    a: "Short-duration, purpose-directed work: loaded carries, kettlebell or dumbbell circuits, tempo work, and bodyweight complexes. All conditioning is 10–25 minutes in duration and selected to protect the strength work, not impair it. Long-duration steady-state work is not prescribed unless it is an explicit objective of the practitioner.",
+    a: "Short, purpose-built work: loaded carries, kettlebell or dumbbell circuits, tempo work, bodyweight complexes. All of it runs 10–25 minutes and is chosen to protect the strength work, not undercut it. Long steady-state work only shows up if it's an explicit goal of yours.",
   },
   {
     q: "What is the minimum term for each level?",
-    a: "Foundation and Practice carry no minimum term. Stewardship requires a six-month commitment. Structural adaptation does not compound meaningfully over shorter horizons, and the Stewardship level is designed specifically for long-horizon development. After the initial period, engagement continues month to month or transitions to a lower level.",
+    a: "Foundation and Practice have no minimum term. Stewardship requires six months. Structural adaptation doesn't compound meaningfully on shorter horizons — Stewardship is built for the long game. After that, it runs month to month or steps down a level.",
   },
   {
-    q: "Does this institution provide medical or rehabilitation advice?",
-    a: "No. Deus Performance is a practice of performance education. It does not constitute medical advice, rehabilitation guidance, or clinical counsel of any kind. Practitioners with active medical conditions should consult a licensed clinician before enrolling in any programme.",
+    q: "Do you provide medical or rehabilitation advice?",
+    a: "No. Deus Performance is performance education — not medical advice, rehabilitation guidance, or clinical counsel of any kind. If you have an active medical condition, consult a licensed clinician before starting any programme.",
   },
   {
     q: "Who administers the programme?",
-    a: "Deus Performance operates as an independent practice. All programme delivery, correspondence, and review is handled through the institution. For any enquiry outside the scope of this reference, use the Correspondence page.",
+    a: "Deus Performance operates as an independent practice. We handle all programme delivery, correspondence, and review directly. For anything outside this reference, use the Correspondence page.",
   },
 ];
 

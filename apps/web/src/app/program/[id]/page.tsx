@@ -75,13 +75,13 @@ export default async function ProgramPage({
       <main className="min-h-screen pt-[60px]">
         {failed || !record ? (
           <FailureNotice
-            title="This program could not be found."
-            body="The link may be incorrect, the program may have expired, or the engine may be unreachable. Run a fresh assessment — it takes two minutes."
+            title="We couldn't find this program."
+            body="The link's wrong, the program expired, or the engine's unreachable. Run a fresh assessment — it takes two minutes."
           />
         ) : isEngineError(record.program) ? (
           <FailureNotice
             title="The engine declined to compromise."
-            body="A complete, safe week could not be built from the submitted constraints. Rather than deliver a degraded program, the engine returned the conflict. Adjust your answers and run the assessment again."
+            body="The submitted constraints can't build a complete, safe week. Rather than deliver a degraded program, the engine hands back the conflict. Adjust your answers and run the assessment again."
             reasons={record.program.reasons}
           />
         ) : (
@@ -119,8 +119,8 @@ export default async function ProgramPage({
                 Donum Dei.
               </p>
               <p className="mx-auto mb-8 max-w-[420px] font-bask text-[15px] leading-[1.8] text-ink2">
-                This is week one. Keep the engine adapting to you — fatigue
-                check-ins, progression, substitutions — from $49/month.
+                Week one is done. Keep the engine adapting to you — fatigue
+                check-ins, progression, swaps — from $49/month.
               </p>
               <Link href="/#pricing" className="btn-primary">
                 See plans

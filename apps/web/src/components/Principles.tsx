@@ -2,17 +2,17 @@ const PRINCIPLES = [
   {
     num: "i.",
     title: "The Gift Is Not Permanent by Default",
-    body: "Joints degrade without protection. Movement patterns dissolve without practice. Strength erodes without intelligent load. The body's capacity is not a fixed inheritance — it is a living account that requires deposits.",
+    body: "Joints degrade without protection. Movement dissolves without practice. Strength erodes without smart load. Capacity isn't a fixed inheritance — it's an account, and it only grows with deposits.",
   },
   {
     num: "ii.",
     title: "Intensity Is Not Evidence of Care",
-    body: "Volume that destroys the infrastructure it was meant to develop is not diligence — it is waste. The measure of a sound programme is not its severity. It is the structural integrity it protects and the capacity it returns over time.",
+    body: "Volume that wrecks the infrastructure it's supposed to build isn't diligence. It's waste. A good programme isn't measured by how hard it hits — it's measured by what it protects and what it returns.",
   },
   {
     num: "iii.",
     title: "The Decades Are the Measure",
-    body: "A body trained for thirty years of useful life outperforms one that peaked at thirty-two. Longevity is not a concession made to age. It is the strategy that makes sustained performance possible.",
+    body: "A body built for thirty years of output beats one that peaked at thirty-two. Longevity isn't a concession to age. It's the strategy.",
   },
 ];
 
@@ -32,20 +32,18 @@ export default function Principles() {
         <div className="font-bask text-[15px] text-ink2 leading-[1.9]">
           <p className="mb-[17px]">
             <strong className="text-ink font-bold">Deus</strong> — the divine
-            source. The body is given, not earned. A gift carries the obligation
-            to receive it well: you do not discard it or let it deteriorate
-            through indifference. You develop it with the care the giver
-            intended.
+            source. The body is given, not earned. A gift comes with an
+            obligation: don&apos;t waste it. Don&apos;t let it erode through
+            indifference. Develop it with the care it was given with.
           </p>
           <p className="mb-[17px]">
-            The body&apos;s capacity for adaptation, strength, and recovery is
-            extraordinary by design. Its tolerance for sustained neglect is not.
+            The body&apos;s capacity to adapt, strengthen, and recover is
+            extraordinary by design. Its tolerance for neglect is not.
           </p>
           <p>
-            The institution holds that physical development is not a pursuit of
-            aesthetics or performance metrics. It is an act of stewardship over
-            something that was given rather than earned. That framing changes
-            everything about how a programme is built.
+            Physical development isn&apos;t a pursuit of aesthetics or
+            metrics. It&apos;s stewardship of something you were given, not
+            something you earned. That changes how a programme gets built.
           </p>
         </div>
       </div>

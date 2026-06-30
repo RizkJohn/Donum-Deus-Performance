@@ -24,9 +24,9 @@ export default function FinalCta() {
           <strong>Now honor it.</strong>
         </h2>
         <p className="font-bask text-[15px] text-ink2 mx-auto mb-[34px] max-w-[480px] leading-[1.85]">
-          Complete the intake. A programme is constructed around your current
-          state, your schedule, and your body&apos;s actual constraints — from
-          first principles, not from defaults.
+          Complete the intake. Your programme gets built around your actual
+          state, schedule, and constraints — from first principles, never
+          from a default.
         </p>
         <Link
           href="/assess"

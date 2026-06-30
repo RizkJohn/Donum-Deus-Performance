@@ -17,7 +17,7 @@ const PRIORITIES = [
   {
     n: "4",
     title: "Work Capacity",
-    desc: "Without the accumulation of systemic fatigue that undermines the above",
+    desc: "Built without the fatigue that undercuts everything above it",
   },
   {
     n: "5",
@@ -27,7 +27,7 @@ const PRIORITIES = [
   {
     n: "6",
     title: "Performance",
-    desc: "Context-specific, always protected by the five priorities beneath it",
+    desc: "Context-specific — always protected by the five priorities under it",
   },
 ];
 
@@ -46,10 +46,9 @@ export default function OrderSection() {
           <em className="text-warm">resolves</em> them.
         </h2>
         <p className="font-bask text-[14px] text-ink2 mb-[28px] leading-[1.8] max-w-[370px]">
-          Every programme produced by this institution resolves competing demands
-          in a fixed hierarchy. Structural integrity is never traded for
-          performance. Performance is never traded for aesthetics. The order is
-          non-negotiable.
+          Every programme resolves competing demands in a fixed hierarchy.
+          Structural integrity never trades for performance. Performance
+          never trades for aesthetics. The order doesn&apos;t move.
         </p>
         <div className="flex flex-col">
           {PRIORITIES.map((item) => (

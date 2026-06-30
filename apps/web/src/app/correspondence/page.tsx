@@ -13,12 +13,12 @@ const CONTACT_INFO = [
   {
     label: "Format",
     value: "Remote · In-person (select locations)",
-    desc: "In-person engagement available for Stewardship practitioners.",
+    desc: "In-person available for Stewardship members.",
   },
   {
     label: "Response window",
     value: "Monday – Friday · 09:00 – 18:00",
-    desc: "Stewardship practitioners: urgent matters are addressed outside these hours.",
+    desc: "Stewardship members: urgent matters get handled outside these hours.",
   },
 ];
 
@@ -37,9 +37,9 @@ export default function CorrespondencePage() {
             Direct <em className="text-warm">enquiry.</em>
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[560px]">
-            For level enquiries, complex presentations, or any matter that falls
-            outside the intake process. All correspondence is reviewed within one
-            business day.
+            For level questions, complex presentations, or anything outside
+            the intake process. Every message gets read within one business
+            day.
           </p>
         </section>
 
@@ -65,8 +65,8 @@ export default function CorrespondencePage() {
                   ))}
                 </div>
                 <p className="font-bask italic text-[12px] text-ink3 leading-[1.75]">
-                  No automated routing. All submissions are read and responded to
-                  directly.
+                  No automated routing. Every submission gets read and
+                  answered directly.
                 </p>
               </div>
 

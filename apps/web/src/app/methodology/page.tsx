@@ -13,32 +13,32 @@ const PRINCIPLES = [
   {
     n: "i.",
     title: "CNS Management",
-    body: "A maximum of two high-demand sessions per week. No consecutive high-output days. Conditioning is never permitted to impair the strength work it nominally supports. The nervous system is treated as a finite resource — not a training target.",
+    body: "Two high-demand sessions per week, max. No consecutive high-output days. Conditioning never gets to impair the strength work it's supposed to support. The nervous system is a finite resource — not a target.",
   },
   {
     n: "ii.",
     title: "Movement Inventory",
-    body: "Every weekly cycle must contain a squat pattern, a hinge pattern, horizontal push and pull, vertical push and pull, rotation or anti-rotation, and gait or carry. Any pattern absent from the week is a gap. Gaps are corrected before delivery.",
+    body: "Every week needs a squat pattern, a hinge pattern, horizontal push and pull, vertical push and pull, rotation or anti-rotation, and gait or carry. A missing pattern is a gap. Gaps get fixed before delivery.",
   },
   {
     n: "iii.",
     title: "Session Architecture",
-    body: "Warmup, power expression (when appropriate), strength, accessory work, core, and mobility cooldown. The sequence is fixed by logic. Volume within each block is calibrated to the practitioner's current state. Redundant work is removed.",
+    body: "Warmup, power expression (when it's called for), strength, accessory work, core, mobility cooldown. The sequence is fixed by logic. Volume in each block calibrates to your current state. Redundant work gets cut.",
   },
   {
     n: "iv.",
     title: "State-Adaptive Volume",
-    body: "Three states are recognised: progress, maintain, deload. The programme is built to the current state, not the desired one. Volume is reduced before intensity. Conditioning is removed before accessories. The hierarchy of reduction is fixed.",
+    body: "Three states exist: progress, maintain, deload. The programme builds to your current state, not the one you wish you were in. Volume drops before intensity. Conditioning gets cut before accessories. The order of reduction is fixed.",
   },
   {
     n: "v.",
     title: "Schedule Anchoring",
-    body: "High-demand sessions are placed furthest from the practitioner's highest-obligation days. Lower-body and rotational stress are never stacked in adjacent sessions. The training week is structured around the practitioner's life, not against it.",
+    body: "High-demand sessions sit furthest from your highest-obligation days. Lower-body and rotational stress never stack on adjacent sessions. The week is built around your life, not against it.",
   },
   {
     n: "vi.",
     title: "Constraint-First Construction",
-    body: "A programme is not generated and then checked. It is built from resolved constraints outward. Every exercise, every volume prescription, every rest interval has a reason. Nothing is present because it was the nearest available option.",
+    body: "A programme isn't generated and then checked. It's built outward from resolved constraints. Every exercise, every volume call, every rest interval has a reason. Nothing's there because it was the nearest option.",
   },
 ];
 
@@ -46,17 +46,17 @@ const PROCESS = [
   {
     n: "01",
     title: "Assessment",
-    desc: "Profile, objectives, schedule density, and current state evaluated. No ambiguous inputs accepted.",
+    desc: "Profile, goals, schedule, current state — evaluated. No ambiguous inputs accepted.",
   },
   {
     n: "02",
     title: "Directive",
-    desc: "Training state classified. Fatigue index computed. Progression direction, movement priorities, and constraints resolved.",
+    desc: "Training state classified. Fatigue index computed. Progression direction, movement priorities, constraints — resolved.",
   },
   {
     n: "03",
     title: "Construction",
-    desc: "Weekly structure and daily sessions built from directives. Exercise selection scored against novelty, fatigue cost, and equipment.",
+    desc: "Weekly structure and daily sessions built from the directive. Exercises scored against novelty, fatigue cost, and equipment.",
   },
   {
     n: "04",
@@ -81,10 +81,10 @@ export default function MethodologyPage() {
             construction.
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[620px]">
-            The mind is trained first; the body follows. But conviction is not a
-            method — every programme produced by this institution is a structured
-            weekly training system resolved against a fixed set of constraints.
-            No session is delivered unless all constraints are satisfied.
+            The mind trains first; the body follows. But conviction isn&apos;t
+            a method — every programme is a structured weekly system resolved
+            against a fixed set of constraints. No session ships until every
+            constraint is satisfied.
           </p>
         </section>
 
@@ -138,8 +138,8 @@ export default function MethodologyPage() {
         {/* CTA */}
         <div className="border-t border-line px-5 py-[44px] text-center md:px-[52px]">
           <p className="font-bask text-[14px] text-ink2 mb-[20px] leading-[1.8]">
-            The methodology does not vary by level of engagement. What differs is
-            the depth of oversight.
+            The methodology doesn&apos;t change by level of engagement. What
+            changes is the depth of oversight.
           </p>
           <div className="flex flex-col sm:flex-row gap-[14px] items-center justify-center">
             <Link href="/assess" className="btn-primary">

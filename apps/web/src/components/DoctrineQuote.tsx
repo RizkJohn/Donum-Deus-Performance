@@ -22,11 +22,11 @@ export default function DoctrineQuote() {
           className="font-bask italic text-ink leading-[1.65] mb-[20px]"
           style={{ fontSize: "clamp(19px, 2.6vw, 32px)" }}
         >
-          &ldquo;The body is not an obstacle to be overcome. It is the{" "}
+          &ldquo;The body isn&apos;t an obstacle. It&apos;s the{" "}
           <strong className="not-italic font-bold text-accent">medium</strong>{" "}
-          through which everything you will ever accomplish passes. To neglect
-          it diminishes the gift. To develop it with intelligence — that is the
-          only act of gratitude that remains.&rdquo;
+          everything else passes through. Neglect it, and you diminish the
+          gift. Train it with intelligence — that&apos;s the only gratitude
+          that counts.&rdquo;
         </p>
         <div className="flex items-center gap-[13px] font-mono text-[8px] tracking-[0.24em] uppercase text-ink3">
           <span className="w-[22px] h-px bg-line2 flex-shrink-0" aria-hidden="true" />

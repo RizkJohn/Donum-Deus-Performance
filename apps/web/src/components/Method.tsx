@@ -5,7 +5,7 @@ const FEATURES = [
   },
   {
     title: "Complete movement coverage",
-    body: "Every week covers squat, hinge, push, pull, rotation, carry, and jump. No pattern is skipped because it is unfashionable.",
+    body: "Every week covers squat, hinge, push, pull, rotation, carry, and jump. No pattern gets skipped because it's unfashionable.",
   },
   {
     title: "Fatigue-adaptive volume",
@@ -17,7 +17,7 @@ const FEATURES = [
   },
   {
     title: "Never to failure",
-    body: "Primary lifts stop one to three reps short of failure, every time. Longevity is a constraint the engine cannot violate.",
+    body: "Primary lifts stop one to three reps short of failure, every time. Longevity is a constraint the engine won't violate.",
   },
 ];
 

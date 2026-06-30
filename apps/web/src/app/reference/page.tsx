@@ -6,7 +6,7 @@ import FaqAccordion from "@/components/FaqAccordion";
 export const metadata: Metadata = {
   title: "Reference — Deus Performance",
   description:
-    "Common questions on the practice: philosophy and training, custom programming, equipment, injury management, conditioning methods, and more.",
+    "Common questions on the practice — philosophy and training, custom programming, equipment, injury management, conditioning methods, and more.",
 };
 
 export default function ReferencePage() {

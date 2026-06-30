@@ -30,9 +30,8 @@ export default function DispatchesPage() {
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[560px]">
             The doctrine, worked out one idea at a time. Each dispatch takes a
-            single principle from the philosophical foundation and follows it
-            into the training hall — where the abstraction either holds or it
-            does not.
+            single principle and drags it into the training hall — where the
+            abstraction either holds up or it doesn&apos;t.
           </p>
         </section>
 

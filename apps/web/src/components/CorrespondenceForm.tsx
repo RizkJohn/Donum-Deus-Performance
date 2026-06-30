@@ -17,7 +17,7 @@ export default function CorrespondenceForm() {
           Received
         </p>
         <p className="font-bask italic text-[14px] text-ink2 leading-[1.75]">
-          A reply will follow within one business day.
+          We&apos;ll reply within one business day.
         </p>
       </div>
     );
@@ -27,7 +27,7 @@ export default function CorrespondenceForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-[18px]">
         <div>
-          <label className="field-label">Given Name</label>
+          <label className="field-label">First Name</label>
           <input
             type="text"
             required
@@ -36,7 +36,7 @@ export default function CorrespondenceForm() {
           />
         </div>
         <div>
-          <label className="field-label">Family Name</label>
+          <label className="field-label">Last Name</label>
           <input
             type="text"
             required
@@ -56,7 +56,7 @@ export default function CorrespondenceForm() {
           />
         </div>
         <div>
-          <label className="field-label">Nature of Enquiry</label>
+          <label className="field-label">What&apos;s This About?</label>
           <select className="field-input" defaultValue="general">
             <option value="general">General enquiry</option>
             <option value="foundation">Level I — Foundation</option>
@@ -70,11 +70,11 @@ export default function CorrespondenceForm() {
         <textarea
           rows={5}
           className="field-input resize-none"
-          placeholder="Your objective, current situation, constraints, history — whatever provides relevant context for the enquiry."
+          placeholder="Your goal, current situation, constraints, history — whatever's relevant."
         />
       </div>
       <button type="submit" className="btn-primary w-full text-center py-[13px]">
-        Submit Correspondence
+        Send Correspondence
       </button>
     </form>
   );

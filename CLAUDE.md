@@ -163,4 +163,16 @@ within a single file and preserve the existing token system.
 
 - Institution: **Deus Performance**; operating entity: **Riz Management LLC**.
 - Tagline: *Deus. The body is a gift. Train it accordingly.*
-- Tone: precise, disciplined, no hype. Movement-based, constraint-driven.
+- Tone: modern and punchy, not academic. Short sentences. Contractions
+  (isn't/doesn't/that's/you're). No archaic or formal-institutional phrasing
+  ("the practitioner," "one's training") — write directly to the reader
+  ("you," "your"). No hype, no filler, no hedging.
+- Keep the philosophical core intact — the Latin etymology (corpus/deus/
+  "deus dedit"), the four schools (Stoicism, Existentialism, Eastern
+  Philosophy, Greek Virtue Ethics), and the discipline-over-outcome thesis
+  are the product's differentiator. Rewrite the *delivery*, never strip the
+  *idea*: same argument, tighter sentence, more energy. This applies to
+  every page, component, and Dispatch — and to any new content generated for
+  the brand (see `apps/content_bot/generator.py`'s `SYSTEM_PROMPT`).
+- Legal/compliance copy (privacy policy, terms of service, medical
+  disclaimers) is exempt — precision there outranks style.

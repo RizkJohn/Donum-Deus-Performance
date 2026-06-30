@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Philosophy — Deus Performance",
   description:
-    "Why this institution exists. Performance education grounded in Stoicism, Existentialism, Eastern philosophy, and Greek Virtue Ethics.",
+    "Why we exist. Performance education grounded in Stoicism, Existentialism, Eastern philosophy, and Greek Virtue Ethics.",
 };
 
 const SCHOOLS = [
@@ -14,28 +14,28 @@ const SCHOOLS = [
     idx: "i · Stoicism",
     name: "The Dichotomy of Control",
     greek: "prohairesis — the faculty of choice",
-    body: "The result is never yours to own — the clock, the podium, the verdict of others. What is yours is the rep you did not skip, the breath you governed, the standard you held when no one was watching. Master the input; release the outcome. The Stoics built an entire discipline on that division, and it is the only game an athlete can actually win.",
+    body: "The result was never yours to own — the clock, the podium, the verdict of others. What's yours is the rep you didn't skip, the breath you governed, the standard you held when no one was watching. Master the input. Release the outcome. The Stoics built a discipline on that one division — and it's the only game you can actually win.",
     figures: "Epictetus · Marcus Aurelius · Seneca",
   },
   {
     idx: "ii · Existentialism",
     name: "Meaning in the Effort",
     greek: "amor fati — love of one's fate",
-    body: "Everyone wants the result. Nietzsche asked for something harder: to love the fate that produces it — the dawn sessions no one applauds, the plateaus that test patience, the setbacks that expose character. Not to tolerate the grind, but to will it. The athlete who finds meaning in the work never runs out of reason to return to it.",
+    body: "Everyone wants the result. Nietzsche demanded something harder: love the fate that produces it — the dawn sessions no one applauds, the plateaus that test your patience, the setbacks that expose your character. Not tolerate the grind. Want it. The athlete who loves the work never runs out of reasons to show up.",
     figures: "Nietzsche · Sartre · Camus · Frankl",
   },
   {
     idx: "iii · Eastern Philosophy",
     name: "Effortless Action",
     greek: "wú wéi — acting without forcing",
-    body: "Wu wei is not passivity. It is what remains when training runs so deep that execution stops being a decision. Forcing creates tension; tension creates error; error destroys performance. You cannot grip your way to a personal best. The practice is built to be drilled until it disappears — so that on the day, you trust it and let the result arrive.",
+    body: "Wu wei isn't passivity. It's what's left when training runs so deep that execution stops being a decision. Forcing creates tension. Tension creates error. Error kills performance. You can't grip your way to a personal best. The practice gets drilled until it disappears — so on the day, you trust it and let the result come.",
     figures: "Laozi · Zhuangzi · Zen tradition",
   },
   {
     idx: "iv · Greek Virtue Ethics",
     name: "Excellence as a Way of Being",
     greek: "aretē — excellence · eudaimonia — flourishing",
-    body: "Arete was never a medal. It was the full, consistent expression of one's highest capability — in how you train, how you rest, how you show up unobserved. Eudaimonia, human flourishing, is built across thousands of decisions no one sees. Build the person, and the results follow. Your pursuit is not a season. It is a standard.",
+    body: "Arete was never a medal. It was the full, consistent expression of your highest capability — in how you train, how you rest, how you show up when no one's watching. Eudaimonia, human flourishing, gets built across thousands of unseen decisions. Build the person, and the results follow. Your pursuit isn't a season. It's a standard.",
     figures: "Aristotle · the Hellenic tradition",
   },
 ];
@@ -44,30 +44,30 @@ const COMMITMENTS = [
   {
     n: "i.",
     title: "Structure Before Load",
-    body: "Joint integrity is the non-negotiable first priority of every programme. It is not a constraint on development — it is the precondition for development. Without it, all subsequent work is spent compensating for what the structure no longer supports.",
+    body: "Joint integrity is the non-negotiable first priority of every programme. It's not a constraint on development — it's the precondition for it. Skip it, and every rep after just compensates for what the structure can't support.",
   },
   {
     n: "ii.",
     title: "Built From First Principles",
-    body: "Every programme is constructed from the practitioner's actual inputs: age, body composition, schedule density, fatigue state, movement restrictions, and stated objectives. No template is applied. No default fills an unexamined variable.",
+    body: "Every programme is built from your actual inputs: age, body composition, schedule, fatigue state, movement restrictions, goals. No template. No default filling in what wasn't examined.",
   },
   {
     n: "iii.",
     title: "Intelligent Overload Only",
-    body: "The programme distinguishes between productive stress — the kind that drives adaptation — and accumulated damage. Volume is modulated to the practitioner's current state. Progression is applied only when the conditions for it exist.",
+    body: "The programme tells the difference between productive stress — the kind that drives adaptation — and accumulated damage. Volume adjusts to your current state. Progression only happens when the conditions for it exist.",
   },
   {
     n: "iv.",
     title: "The Decades Are the Measure",
-    body: "Every decision made in programming today is an investment in the practitioner's capacity twenty years from now. That horizon is what separates the development of a body from the consumption of one.",
+    body: "Every decision made today is an investment in your capacity twenty years out. That horizon is what separates developing a body from burning through one.",
   },
 ];
 
 const REFUSALS = [
-  "Present a template as a custom programme. If the intake does not materially change the output, the intake serves no purpose and the output is dishonest.",
-  "Prescribe volume that compromises joint integrity in exchange for short-term performance. The structural cost is always paid. Only the timing is uncertain.",
-  "Disregard fatigue state. A programme that cannot adapt to where the practitioner is today is a schedule, not a programme. Schedules do not build anything of consequence.",
-  "Allow conditioning to undermine the strength work it is intended to complement. Everything in a session has a fatigue cost. Only expenditures with commensurate returns are permitted.",
+  "Present a template as a custom programme. If the intake doesn't change the output, the intake is theater and the output is dishonest.",
+  "Prescribe volume that trades joint integrity for short-term performance. The structural cost always gets paid. Only the timing is uncertain.",
+  "Disregard fatigue state. A programme that can't adapt to where you are today is a schedule, not a programme. Schedules don't build anything that matters.",
+  "Let conditioning undermine the strength work it's supposed to complement. Everything in a session costs fatigue. Only spend it where the return matches.",
 ];
 
 export default function PhilosophyPage() {
@@ -85,10 +85,10 @@ export default function PhilosophyPage() {
             Why this institution <em className="text-warm">exists.</em>
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[620px]">
-            Performance education has been reduced to a product category.
-            Templates are sold as precision. Volume is sold as care. Generic
-            outputs are sold as personalisation. This institution was founded to
-            work against every part of that.
+            Performance education got reduced to a product category. Templates
+            get sold as precision. Volume gets sold as care. Generic output
+            gets sold as personalisation. We exist to fight every part of
+            that.
           </p>
         </section>
 
@@ -96,21 +96,21 @@ export default function PhilosophyPage() {
         <div className="border-t border-b border-line" style={{ background: "var(--bg1)" }}>
           <div className="mx-auto max-w-[1300px] px-5 py-[40px] md:px-[52px]">
             <div className="font-mono text-[8px] tracking-[0.24em] uppercase text-ink3 mb-[22px]">
-              Etymology · A detailed account of the institutional name
+              Etymology · What the name actually means
             </div>
             <div className="flex flex-col gap-[1px] bg-line max-w-[860px]">
               {[
                 {
                   word: "corpus",
                   pos: "Latin noun · neuter · third declension",
-                  meaning: "The body; a thing freely given without prior obligation",
-                  note: "The body is given freely. A gift carries a specific social weight — a gift received without reciprocal obligation nonetheless creates a debt of respect toward the giver's intention. To receive a gift and treat it carelessly is not neutrality. It is refusal.",
+                  meaning: "The body; given freely, without prior obligation",
+                  note: "The body is given freely. But a gift still carries weight — receiving it creates a debt of respect toward what the giver intended. Treat it carelessly, and that's not neutral. That's refusal.",
                 },
                 {
                   word: "deus",
                   pos: "Latin noun · masculine · second declension · from Proto-Indo-European *dyew-",
-                  meaning: "God; a divine being; the ultimate and originating source",
-                  note: "Root of English: deity, divine, divinity. Deus positions the source of the gift as categorically greater than both the gift and its recipient. The capacity you carry in your body was not constructed by you. It arrived through a process that exceeds your authorship.",
+                  meaning: "God; the divine, originating source",
+                  note: "Root of deity, divine, divinity. Deus puts the source above both the gift and the one who receives it. The capacity in your body wasn't built by you. It arrived through something bigger than your authorship.",
                 },
               ].map((row) => (
                 <div
@@ -138,12 +138,11 @@ export default function PhilosophyPage() {
                   deus dedit
                 </div>
                 <div className="font-bask italic text-[13px] text-ink2 leading-[1.7] max-w-[620px]">
-                  God has given. A statement of origin that is also a statement
-                  of responsibility. If the body is a gift of divine origin, then
-                  how it is trained is a moral question, not merely a technical
-                  one. This institution holds that the answer to that question is
-                  structured, intelligent, long-horizon physical development. The
-                  name is the doctrine.
+                  God has given. A statement of origin that's also a statement
+                  of responsibility. If the body is a gift, training it is a
+                  moral question, not just a technical one. Our answer:
+                  structured, intelligent, long-horizon development. The name
+                  is the doctrine.
                 </div>
               </div>
             </div>
@@ -160,11 +159,11 @@ export default function PhilosophyPage() {
               className="font-bask italic leading-[1.7] mb-[14px]"
               style={{ fontSize: "clamp(15px, 2.2vw, 22px)", color: "rgba(243,239,232,0.9)" }}
             >
-              &ldquo;Most practitioners do not fail because they lack effort.
-              They fail because no one built a system around their actual life —
+              &ldquo;Most people don&apos;t fail from lack of effort. They
+              fail because no one built a system around their actual life —
               their schedule, their body, their current state.{" "}
               <strong className="not-italic font-bold" style={{ color: "#f3efe8" }}>
-                That is the problem this institution was built to solve.
+                That&apos;s the problem we exist to solve.
               </strong>
               &rdquo;
             </p>
@@ -184,13 +183,13 @@ export default function PhilosophyPage() {
               className="font-bask italic text-ink leading-[1.75] mb-[14px]"
               style={{ fontSize: "clamp(15px, 2vw, 21px)" }}
             >
-              Every athletic plateau is a{" "}
-              <em className="text-accent">philosophical</em> problem before it
-              becomes a physical one. The Stoics, the existentialists, and the
-              Eastern masters solved the same questions the modern athlete faces:
-              how to govern what cannot be controlled, how to find meaning in
-              suffering, how to{" "}
-              <em className="text-warm">perform without forcing.</em>
+              Every plateau is{" "}
+              <em className="text-accent">philosophical</em> before it&apos;s
+              physical. The Stoics, the existentialists, and the Eastern
+              masters already solved what the modern athlete is facing: how to
+              govern what you can&apos;t control, how to find meaning in the
+              grind, how to{" "}
+              <em className="text-warm">perform without forcing it.</em>
             </p>
             <div className="font-mono text-[8px] tracking-[0.22em] uppercase text-ink3">
               Core Thesis · Deus Performance
@@ -208,10 +207,9 @@ export default function PhilosophyPage() {
             Four traditions that govern the <em className="text-warm">practice.</em>
           </h2>
           <p className="font-bask text-[14px] text-ink2 leading-[1.85] mb-[36px] max-w-[580px]">
-            The methodology is physical. The framework beneath it is not. Every
-            programme this institution builds rests on four bodies of thought
-            that have spent two thousand years answering the questions a training
-            plan alone cannot.
+            The methodology is physical. The framework underneath it isn&apos;t.
+            Every programme rests on four traditions that spent two thousand
+            years answering questions a training plan alone can&apos;t.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line">
             {SCHOOLS.map((s) => (
@@ -245,7 +243,7 @@ export default function PhilosophyPage() {
 
         {/* Commitments */}
         <section className="mx-auto max-w-[1300px] px-5 py-[52px] md:px-[52px]">
-          <div className="kicker mb-[14px]">Institutional Commitments</div>
+          <div className="kicker mb-[14px]">Core Commitments</div>
           <h2
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[28px] text-ink"
             style={{ fontSize: "clamp(28px, 3.8vw, 52px)" }}
@@ -270,7 +268,7 @@ export default function PhilosophyPage() {
           </div>
 
           {/* Refusals */}
-          <div className="kicker mb-[14px]">What the institution will not do</div>
+          <div className="kicker mb-[14px]">What we won&apos;t do</div>
           <h3
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[24px] text-ink"
             style={{ fontSize: "clamp(22px, 3vw, 42px)" }}

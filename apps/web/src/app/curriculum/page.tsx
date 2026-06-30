@@ -13,7 +13,7 @@ const LEVELS = [
   {
     level: "Level I",
     name: "Foundation",
-    desc: "A complete programme, delivered for independent execution.",
+    desc: "A complete programme, built for you to run on your own.",
     fee: "27",
     period: "Per month · No minimum term",
     featured: false,
@@ -31,7 +31,7 @@ const LEVELS = [
   {
     level: "Level II",
     name: "Practice",
-    desc: "Foundation, with direct oversight and monthly programme review.",
+    desc: "Foundation, plus direct oversight and a monthly review.",
     fee: "87",
     period: "Per month · No minimum term",
     featured: true,
@@ -49,7 +49,7 @@ const LEVELS = [
   {
     level: "Level III",
     name: "Stewardship",
-    desc: "A full engagement structured around the practitioner's entire life.",
+    desc: "A full engagement built around your entire life.",
     fee: "197",
     period: "Per month · Six-month minimum",
     featured: false,
@@ -81,10 +81,9 @@ export default function CurriculumPage() {
             Three levels of <em className="text-warm">engagement.</em>
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[600px]">
-            The methodology does not vary by level. The doctrine does not vary by
-            level. What differs is the depth of the relationship between the
-            practitioner and the practice — and accordingly, the degree of direct
-            oversight that relationship requires.
+            The methodology doesn&apos;t change by level. Neither does the
+            doctrine. What changes is how closely we work together — and the
+            oversight that requires.
           </p>
         </section>
 
@@ -151,8 +150,7 @@ export default function CurriculumPage() {
         <div className="mx-auto max-w-[1300px] px-5 py-[28px] md:px-[52px]">
           <div className="border border-line bg-bg1 p-[24px] text-center max-w-[760px] mx-auto">
             <p className="font-bask italic text-[14px] text-ink3 mb-[14px]">
-              Uncertain which level of engagement is appropriate for your
-              situation?
+              Not sure which level fits your situation?
             </p>
             <Link href="/correspondence" className="btn-ghost">
               Submit a correspondence →

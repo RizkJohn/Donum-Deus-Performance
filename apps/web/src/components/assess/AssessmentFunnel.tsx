@@ -261,8 +261,8 @@ export default function AssessmentFunnel() {
           Generating your week
         </h2>
         <p className="mb-6 max-w-[360px] text-[11px] tracking-[0.04em] text-ink3">
-          The engine is distributing nervous-system load, budgeting volume, and
-          validating movement coverage. This takes a moment.
+          The engine is distributing load, budgeting volume, and checking
+          movement coverage. Almost there.
         </p>
         <div className="h-[2px] w-[280px] overflow-hidden bg-line">
           <div className="h-full w-1/2 animate-pulse bg-accent" />
@@ -280,9 +280,9 @@ export default function AssessmentFunnel() {
           <em className="font-normal italic text-warm">compromise.</em>
         </h2>
         <p className="mb-6 font-bask text-[15px] leading-[1.8] text-ink2">
-          A complete, safe week could not be built from your answers. Rather
-          than hand you a degraded program, the engine returns the conflict.
-          Adjust the inputs below and try again.
+          Your answers can&apos;t build a complete, safe week. Rather than hand
+          you a degraded program, the engine hands back the conflict. Adjust
+          the inputs below and try again.
         </p>
         <ul className="mb-8 flex flex-col gap-px border border-line bg-line">
           {errorReasons.map((r) => (
@@ -316,10 +316,10 @@ export default function AssessmentFunnel() {
       <div className="mx-auto max-w-[560px] px-6 py-24">
         <p className="kicker mb-4">Connection failed</p>
         <h2 className="mb-5 font-play text-[32px] font-black leading-[1] tracking-[-0.02em] text-ink">
-          We could not reach the engine.
+          We couldn&apos;t reach the engine.
         </h2>
         <p className="mb-8 font-bask text-[15px] leading-[1.8] text-ink2">
-          Your answers are preserved. Check your connection and submit again.
+          Your answers are safe. Check your connection and submit again.
         </p>
         <button
           type="button"
@@ -514,8 +514,8 @@ export default function AssessmentFunnel() {
                   ))}
                 </div>
                 <p className="mt-2 text-[9px] italic text-ink3">
-                  The objective hierarchy still governs: joint integrity and
-                  movement quality come before everything you select here.
+                  Joint integrity and movement quality still come first —
+                  before anything you pick here.
                 </p>
               </div>
             </fieldset>
@@ -579,7 +579,7 @@ export default function AssessmentFunnel() {
                   ))}
                 </div>
                 <p className="mt-2 text-[9px] italic text-ink3">
-                  The day before any sport day is automatically kept low-load.
+                  The day before any sport day stays low-load, automatically.
                 </p>
               </div>
               <div>
@@ -710,8 +710,8 @@ export default function AssessmentFunnel() {
                   ))}
                 </div>
                 <p className="mt-2 text-[9px] italic text-ink3">
-                  Affected joints are routed around via approved substitutions —
-                  the week stays complete.
+                  Affected joints get routed around with approved swaps — the
+                  week stays complete.
                 </p>
               </div>
             </fieldset>
