@@ -4,9 +4,9 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Curriculum — Deus Performance",
+  title: "Pricing — Deus Performance",
   description:
-    "Three levels of engagement: Foundation ($27/mo), Practice ($87/mo), Stewardship ($197/mo). The methodology does not vary by level.",
+    "Three levels of engagement: Foundation ($39/mo), Practice ($149/mo), Stewardship ($399/mo). The methodology does not vary by level.",
 };
 
 const LEVELS = [
@@ -14,7 +14,7 @@ const LEVELS = [
     level: "Level I",
     name: "Foundation",
     desc: "A complete programme, built for you to run on your own.",
-    fee: "27",
+    fee: "39",
     period: "Per month · No minimum term",
     featured: false,
     featuredLabel: null,
@@ -32,7 +32,7 @@ const LEVELS = [
     level: "Level II",
     name: "Practice",
     desc: "Foundation, plus direct oversight and a monthly review.",
-    fee: "87",
+    fee: "149",
     period: "Per month · No minimum term",
     featured: true,
     featuredLabel: "Most selected",
@@ -50,7 +50,7 @@ const LEVELS = [
     level: "Level III",
     name: "Stewardship",
     desc: "A full engagement built around your entire life.",
-    fee: "197",
+    fee: "399",
     period: "Per month · Six-month minimum",
     featured: false,
     featuredLabel: null,
@@ -66,14 +66,14 @@ const LEVELS = [
   },
 ];
 
-export default function CurriculumPage() {
+export default function PricingPage() {
   return (
     <>
       <Nav />
       <main className="pt-[58px]">
         {/* Header */}
         <section className="mx-auto max-w-[1300px] px-5 py-[52px] md:px-[52px]">
-          <div className="kicker mb-[14px]">Curriculum</div>
+          <div className="kicker mb-[14px]">Pricing</div>
           <h1
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[22px] text-ink max-w-[600px]"
             style={{ fontSize: "clamp(36px, 5vw, 68px)" }}

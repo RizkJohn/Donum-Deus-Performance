@@ -2,8 +2,8 @@ import Link from "next/link";
 
 const TIERS = [
   {
-    name: "Engine",
-    price: 49,
+    name: "Foundation",
+    price: 39,
     desc: "The full adaptive engine, self-directed.",
     featured: false,
     features: [
@@ -14,24 +14,24 @@ const TIERS = [
     ],
   },
   {
-    name: "Hybrid",
-    price: 199,
+    name: "Practice",
+    price: 149,
     desc: "The engine, reviewed by a human coach.",
     featured: true,
     features: [
-      "Everything in Engine",
+      "Everything in Foundation",
       "Monthly coach review of your programming",
       "Form feedback on submitted video",
       "Direct messaging with your coach",
     ],
   },
   {
-    name: "Premium",
-    price: 750,
+    name: "Stewardship",
+    price: 399,
     desc: "A dedicated coach, engine-assisted.",
     featured: false,
     features: [
-      "Everything in Hybrid",
+      "Everything in Practice",
       "Dedicated coach",
       "Custom periodization across training blocks",
       "Weekly one-on-one consults",
@@ -65,9 +65,9 @@ export default function Pricing() {
               </span>
             )}
             <p className="mb-[14px] font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
-              {t.name === "Engine"
+              {t.name === "Foundation"
                 ? "Self-directed"
-                : t.name === "Hybrid"
+                : t.name === "Practice"
                   ? "Coach-reviewed"
                   : "Coach-led"}
             </p>

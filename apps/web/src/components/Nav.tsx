@@ -6,7 +6,7 @@ import { useState } from "react";
 const NAV_LINKS = [
   "Philosophy",
   "Methodology",
-  "Curriculum",
+  "Pricing",
   "Dispatches",
   "Reference",
   "Correspondence",

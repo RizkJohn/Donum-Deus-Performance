@@ -145,8 +145,8 @@ export default function MethodologyPage() {
             <Link href="/assess" className="btn-primary">
               Begin the Assessment
             </Link>
-            <Link href="/curriculum" className="btn-ghost">
-              View the Curriculum →
+            <Link href="/pricing" className="btn-ghost">
+              View Pricing →
             </Link>
           </div>
         </div>

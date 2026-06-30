@@ -3,7 +3,7 @@ import Link from "next/link";
 const FOOTER_LINKS = [
   "Philosophy",
   "Methodology",
-  "Curriculum",
+  "Pricing",
   "Dispatches",
   "Reference",
   "Correspondence",

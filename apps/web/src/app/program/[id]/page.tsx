@@ -120,9 +120,9 @@ export default async function ProgramPage({
               </p>
               <p className="mx-auto mb-8 max-w-[420px] font-bask text-[15px] leading-[1.8] text-ink2">
                 Week one is done. Keep the engine adapting to you — fatigue
-                check-ins, progression, swaps — from $49/month.
+                check-ins, progression, swaps — from $39/month.
               </p>
-              <Link href="/#pricing" className="btn-primary">
+              <Link href="/pricing" className="btn-primary">
                 See plans
               </Link>
             </section>
