@@ -115,7 +115,7 @@ async def test_erasure_removes_state_and_feedback(client):
     d = await client.request("DELETE", "/v1/data", json={"email": email})
     assert d.status_code == 200
     body = d.json()
-    assert body["deleted_programmes"] >= 1
+    assert body["deleted_programs"] >= 1
     assert body["deleted_feedback"] >= 1
     assert body["deleted_athlete_state"] == 1
 

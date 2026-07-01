@@ -62,7 +62,7 @@ def build_developer_block(
         }
         block += (
             "\n\n---\n\n### PROGRAMMING DIRECTIVES (Assessment Layer — guidance)\n\n"
-            + "Honour these within the plan: bias selection toward movement_priority "
+            + "Honor these within the plan: bias selection toward movement_priority "
             + "and the intensity_target; prefer novel exercises and de-prioritise "
             + "avoid_recent_exercises. These NEVER override the precomputed plan or "
             + "the hard safety rules.\n\n"

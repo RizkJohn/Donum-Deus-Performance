@@ -148,8 +148,9 @@ export function ProgramPdf({ record }: { record: ProgramRecord }) {
   const Footer = () => (
     <View style={s.footer} fixed>
       <Text style={s.footerMotto}>
-        Deus. The body is a gift. Train it accordingly. — Not medical advice;
-        this programme does not constitute clinical guidance.
+        Deus Performance is a practice of performance education. It does not
+        constitute medical advice, rehabilitation guidance, or clinical
+        counsel of any kind.
       </Text>
       <Text
         style={s.footerPage}

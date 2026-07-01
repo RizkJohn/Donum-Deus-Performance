@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Methodology — Deus Performance",
   description:
-    "Six principles of programme construction. CNS management, movement inventory, session architecture, and constraint-first training design.",
+    "Six principles of program construction. CNS management, movement inventory, session architecture, and constraint-first training design.",
 };
 
 const PRINCIPLES = [
@@ -28,7 +28,7 @@ const PRINCIPLES = [
   {
     n: "iv.",
     title: "State-Adaptive Volume",
-    body: "Three states are recognised: progress, maintain, deload. The programme is built to the current state, not the desired one. Volume is reduced before intensity. Conditioning is removed before accessories. The hierarchy of reduction is fixed.",
+    body: "Three states are recognized: progress, maintain, deload. The program is built to the current state, not the desired one. Volume is reduced before intensity. Conditioning is removed before accessories. The hierarchy of reduction is fixed.",
   },
   {
     n: "v.",
@@ -38,7 +38,7 @@ const PRINCIPLES = [
   {
     n: "vi.",
     title: "Constraint-First Construction",
-    body: "A programme is not generated and then checked. It is built from resolved constraints outward. Every exercise, every volume prescription, every rest interval has a reason. Nothing is present because it was the nearest available option.",
+    body: "A program is not generated and then checked. It is built from resolved constraints outward. Every exercise, every volume prescription, every rest interval has a reason. Nothing is present because it was the nearest available option.",
   },
 ];
 
@@ -61,7 +61,7 @@ const PROCESS = [
   {
     n: "04",
     title: "Delivery",
-    desc: "Complete programme delivered. Every constraint satisfied before it reaches you. Print or export as PDF.",
+    desc: "Complete program delivered. Every constraint satisfied before it reaches you. Print or export as PDF.",
   },
 ];
 
@@ -77,12 +77,12 @@ export default function MethodologyPage() {
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[22px] text-ink max-w-[700px]"
             style={{ fontSize: "clamp(36px, 5vw, 68px)" }}
           >
-            Six <em className="text-warm">principles</em> of programme
+            Six <em className="text-warm">principles</em> of program
             construction.
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[620px]">
             The mind is trained first; the body follows. But conviction is not a
-            method — every programme produced by this institution is a structured
+            method — every program produced by this institution is a structured
             weekly training system resolved against a fixed set of constraints.
             No session is delivered unless all constraints are satisfied.
           </p>
@@ -116,7 +116,7 @@ export default function MethodologyPage() {
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[28px] text-ink"
             style={{ fontSize: "clamp(26px, 3.5vw, 48px)" }}
           >
-            From assessment <em className="text-warm">to programme.</em>
+            From assessment <em className="text-warm">to program.</em>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-line">
             {PROCESS.map((step) => (

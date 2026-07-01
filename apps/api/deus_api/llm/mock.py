@@ -64,7 +64,7 @@ class MockProvider:
         return GenerationResult(parsed=program, raw_text="", stop_reason="end_turn")
 
     def _pick_for_group(self, group: str, plan: PrecomputedPlan, library: Library):
-        """First allowed exercise covering the group, honouring the engine's
+        """First allowed exercise covering the group, honoring the engine's
         variation-priority order (`allowed_exercise_ids` is pre-sorted novel →
         stale, aversions last). Prefer Low CNS so picks sit safely on Low-CNS
         days (jump has only High options — placed on a High day when one exists).

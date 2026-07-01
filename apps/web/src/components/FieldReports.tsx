@@ -7,21 +7,21 @@ const REPORTS = [
       "Three programs a week for a year and my knees stopped complaining. Nothing flashy — the work just arrives in the right order.",
     initials: "MK",
     name: "M. Kessler",
-    meta: "Engine tier · 14 months",
+    meta: "Foundation tier · 14 months",
   },
   {
     quote:
       "I play pickup on Thursdays. The engine quietly made Wednesday a light day every single week. No app I've used understood that.",
     initials: "DR",
     name: "D. Ramirez",
-    meta: "Hybrid tier · 8 months",
+    meta: "Practice tier · 8 months",
   },
   {
     quote:
       "I reported a rough sleep week and the volume dropped before I asked. Same lifts, less grind, no lost ground. That earned my trust.",
     initials: "AS",
     name: "A. Sayed",
-    meta: "Engine tier · 6 months",
+    meta: "Foundation tier · 6 months",
   },
 ];
 

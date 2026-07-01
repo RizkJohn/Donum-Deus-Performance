@@ -19,7 +19,7 @@ export default function Footer() {
     <footer className="border-t border-line px-[52px] py-[22px] max-md:px-5">
       <div className="mx-auto max-w-[1300px] flex items-center justify-between flex-wrap gap-[14px]">
         <div className="font-bask italic text-[12px] text-warm">
-          deus · the gift of God
+          Donum Dei · the gift of God
         </div>
         <nav className="flex gap-5 flex-wrap" aria-label="Footer navigation">
           {FOOTER_LINKS.map((item) => (
@@ -60,7 +60,7 @@ export default function Footer() {
           Deus Performance is a practice of performance education. It does not
           constitute medical, rehabilitation, or clinical advice of any kind.
           Consult a licensed clinician before beginning any new training
-          programme.
+          program.
         </p>
       </div>
     </footer>

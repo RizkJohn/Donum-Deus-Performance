@@ -80,15 +80,12 @@ export default function DispatchesPage() {
 
         {/* Dispatch list */}
         <div className="mx-auto max-w-[1300px] px-5 md:px-[52px]">
-          {rest.map((d, i) => (
+          {rest.map((d) => (
             <Link
               key={d.slug}
               href={`/dispatches/${d.slug}`}
               className="flex flex-col sm:flex-row items-start gap-4 sm:gap-0 py-[22px] border-b border-line hover:bg-bg1 transition-colors px-0 sm:px-0 group"
             >
-              <div className="font-play italic text-[28px] text-line2 sm:min-w-[56px] leading-[1] flex-shrink-0 sm:pt-[2px]">
-                {String(i + 2).padStart(2, "0")}
-              </div>
               <div className="flex-1 sm:pr-[20px]">
                 <div className="font-mono text-[8px] tracking-[0.14em] uppercase text-ink3 mb-[5px]">
                   {d.tag}
