@@ -8,7 +8,10 @@
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| First milestone | Engine pipeline + revamped landing | Highest-value foundation; no auth/payments yet |
+| First milestone | Engine pipeline + revamped landing | Highest-value foundation |
+| Accounts | Stateless JWT (FastAPI) + httpOnly cookie BFF (Next.js) | Two separately-deployed services; Next.js Route Handlers hold the browser-facing session, FastAPI stays a pure token-verifying API |
+| Billing | Stripe Checkout + Billing Portal | No self-built payment/subscription logic; tier↔price resolved server-side from env, never hardcoded client-side |
+| Email | Provider-agnostic (`mock`\|`resend`) | Same pattern as `LLM_PROVIDER` — offline by default, one real provider swapped in via env |
 | Backend | Python 3.11, FastAPI, PostgreSQL | Pydantic maps 1:1 to the engine JSON contracts |
 | LLM layer | Provider-agnostic + tiered models | Claude (Anthropic) default; mock provider for key-free dev/tests. Tiered per stage: Opus 4.8 reasons over the assessment, Sonnet 4.6 generates sessions, Haiku 4.5 powers chat — assessment is deterministic by default so Opus only bills on demand |
 | Frontend | Next.js + React + Tailwind | SEO, analytics, funnel A/B testing — parity with top coaching platforms |
@@ -69,8 +72,12 @@ rule regardless of what the model returns.
 │   │   │   ├── models/   # Pydantic contracts (input_contract, program, library)
 │   │   │   ├── engine/   # spec_loader, decision_engine, fatigue, qc/, retry, pipeline
 │   │   │   ├── llm/      # base (Protocol), claude, mock, factory
-│   │   │   ├── routes/   # /v1/generate, /v1/assess, /healthz
-│   │   │   └── db/       # SQLAlchemy models + session (leads, program_runs)
+│   │   │   ├── routes/   # /v1/generate, /v1/assess, /v1/auth/*, /v1/me/*,
+│   │   │   │             # /v1/billing/*, /healthz
+│   │   │   ├── auth/     # hashing (bcrypt), tokens (PyJWT), get_current_user dep
+│   │   │   ├── billing/  # thin Stripe SDK wrapper (client.py)
+│   │   │   ├── email/    # base (Protocol), mock, resend_provider, factory
+│   │   │   └── db/       # SQLAlchemy models + session (leads, program_runs, users)
 │   │   ├── data/         # exercise_library.json, substitution_rules.json (DERIVED)
 │   │   ├── scripts/      # port_library.py (markdown → JSON generator)
 │   │   └── tests/
@@ -144,20 +151,55 @@ class LLMProvider(Protocol):
 
 ## Web app (marketing + funnel)
 
-- **Landing (`/`)** — revamp of `deus_v2.html` design (dark sage palette
-  `#0b0f0c` / accent `#7caf58`; Playfair Display / DM Mono / Libre
-  Baskerville via `next/font`), restructured for conversion: hero with single
-  CTA → free AI assessment, social proof, method, three-tier pricing
-  (Self-Service / Hybrid / Premium per business blueprint), FAQ, final CTA.
+- **Landing (`/`)** — philosophy-driven doctrine site (parchment/navy palette;
+  Playfair Display / DM Mono / Libre Baskerville via `next/font`): Hero →
+  DoctrineQuote → Principles → Inscription → OrderSection → FinalCta. Dedicated
+  sub-pages carry the rest: `/philosophy`, `/methodology`, `/curriculum`
+  (pricing — see `lib/pricing.ts`), `/dispatches`, `/reference`,
+  `/correspondence`. (`Pricing.tsx`/`Faq.tsx`/`HowItWorks.tsx`/`Method.tsx`/
+  `FieldReports.tsx` exist but are not currently imported by any route — kept
+  in sync, not wired in.)
 - **Funnel (`/assess`)** — multi-step quiz mapping to `input_contract.md`
-  (profile → goals → schedule → state → practice/preferences → email/review),
-  POSTs to `/v1/assess`, routes to result.
+  (profile → goals → schedule → state → practice/preferences → email/review,
+  with an optional "create an account" checkbox on the final step), POSTs to
+  `/v1/assess`, routes to result.
 - **Result (`/program/[id]`)** — the **Coach's Read** (the `TrainingAssessment`
   abstraction: readiness, training state, stimulus, priorities, intensity),
   weekly split (CNS badges), session cards, block tables, a **downloadable
   branded program PDF** (`@react-pdf/renderer`, client-side — zero server cost),
   and a **check-in form** posting reinforcement signals to `/v1/feedback`.
+- **Dashboard (`/dashboard`)** — protected (see below); current program +
+  history, reusing `ProgramView`/`CoachsRead`/`DownloadPdfButton`.
 - SEO: per-route metadata, sitemap, robots, OpenGraph, JSON-LD.
+
+## Accounts, billing, and email
+
+- **Accounts**: FastAPI (`routes/auth.py`) issues a stateless JWT on
+  signup/login (`bcrypt` hash, `PyJWT` sign, `AUTH_JWT_SECRET` — override in
+  any real deployment). Next.js Route Handlers under `app/api/auth/*` are the
+  actual session boundary: they call FastAPI, then set an httpOnly `deus_session`
+  cookie on the *web* origin, sidestepping cross-origin cookie issues between
+  the two separately-deployed services. `proxy.ts` (Next.js 16's file
+  convention, formerly `middleware.ts`) protects `/dashboard`. `GET
+  /v1/me/programs` (`routes/me.py`) joins `Lead.email == current_user.email` —
+  the same join `routes/assess.py` already uses for GDPR export — so an
+  account sees every program ever generated for its address, including ones
+  from before the account existed. No FK added to `program_runs`/`leads`
+  (`create_all` can't alter already-existing tables; there's no Alembic yet).
+- **Billing**: `routes/billing.py` — `POST /v1/billing/checkout {tier}` creates
+  a Stripe Checkout Session (tier→price resolved from `STRIPE_PRICE_*` env
+  vars); `POST /v1/billing/portal` opens the Billing Portal; `POST
+  /v1/billing/webhook` (signature-verified) syncs `User.subscription_tier
+  /status` on `checkout.session.completed` / `customer.subscription.updated
+  /deleted`. `app/checkout/route.ts` is a redirecting Next.js Route Handler
+  (not a page) — pricing CTAs link to it with a plain `<a>`, not `next/link`,
+  since `Link`'s client-side soft-navigation would issue an RSC prefetch
+  instead of following the redirect. Returns a clear 400 instead of an SDK
+  crash when Stripe env vars are unset.
+- **Email**: mirrors the `llm/` provider-agnostic pattern exactly —
+  `EMAIL_PROVIDER=mock` (default, offline, in-memory outbox for tests) |
+  `resend`. Triggers: program-ready email after a successful `/v1/assess`,
+  welcome email on signup.
 
 ## Local development
 
@@ -172,12 +214,26 @@ LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
 - Persistent athlete state (`athlete_states`), two-layer Assessment→Programming
   split, variation/novelty engine, reinforcement signals (`/v1/feedback`),
   tiered models, and a client-rendered program PDF.
+- Accounts (signup/login/dashboard), Stripe billing (checkout/portal/webhook),
+  and provider-agnostic email delivery (program-ready + welcome).
+
+## Known gotcha — CSP vs. dev-mode hydration
+
+`next.config.ts`'s CSP `script-src` has no `unsafe-eval`. Turbopack's **dev**
+client relies on `eval()` for HMR, so under `next dev` the browser silently
+blocks it and React never finishes hydrating — buttons/forms fall back to raw
+HTML behavior (e.g. a form native-submits as a GET instead of running its
+`onSubmit`). Production builds never call `eval()`, so `next build && next
+start` is unaffected. **Verify interactive changes against a production
+build, not `next dev`**, until this is resolved (tracked: either add a CSP
+nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 
 ## Deferred (documented stubs)
 
-- Auth, payments, and gating the PDF/ongoing adaptation behind a subscription.
+- Gating the PDF/ongoing adaptation behind the subscription status Stripe
+  reports (billing is wired; enforcement is not).
 - Haiku chat-coach surface (model tier configured; UI not built).
+- Password reset / email verification; OAuth/social login.
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
-- Email delivery of the PDF; Redis/Qdrant; Alembic migrations (currently
-  `create_all` on fresh DBs).
+- Redis/Qdrant; Alembic migrations (currently `create_all` on fresh DBs).
