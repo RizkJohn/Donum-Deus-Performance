@@ -8,6 +8,7 @@ import CheckInForm from "@/components/program/CheckInForm";
 import DownloadPdfButton from "@/components/program/DownloadPdfButton";
 import { getProgram } from "@/lib/api";
 import { fatigueStateFor, isEngineError, type ProgramRecord } from "@/lib/types";
+import { TIERS } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -142,7 +143,7 @@ export default async function ProgramPage({
               <p className="mx-auto mb-8 max-w-[420px] font-bask text-[15px] leading-[1.8] text-ink2">
                 This is week one. Keep the engine adapting to you — fatigue
                 check-ins, progression, variation, substitutions — from
-                $30/month.
+                ${TIERS[0].price}/month.
               </p>
               <Link href="/#pricing" className="btn-primary">
                 See plans

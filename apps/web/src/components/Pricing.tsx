@@ -1,43 +1,5 @@
 import Link from "next/link";
-
-const TIERS = [
-  {
-    name: "Engine",
-    price: 30,
-    desc: "The full adaptive engine, self-directed.",
-    featured: false,
-    features: [
-      "Adaptive weekly programs that learn from your history",
-      "Your coach's read — readiness, stimulus, priorities — every week",
-      "A downloadable, branded program PDF each cycle",
-      "Fatigue check-ins, variation, and injury/equipment substitutions",
-    ],
-  },
-  {
-    name: "Hybrid",
-    price: 90,
-    desc: "The engine, reviewed by a human coach.",
-    featured: true,
-    features: [
-      "Everything in Engine",
-      "Monthly coach review of your programming",
-      "Form feedback on submitted video",
-      "Direct messaging with your coach",
-    ],
-  },
-  {
-    name: "Premium",
-    price: 250,
-    desc: "A dedicated coach, engine-assisted.",
-    featured: false,
-    features: [
-      "Everything in Hybrid",
-      "Dedicated coach",
-      "Custom periodization across training blocks",
-      "Weekly one-on-one consults",
-    ],
-  },
-];
+import { TIERS } from "@/lib/pricing";
 
 export default function Pricing() {
   return (
@@ -55,7 +17,7 @@ export default function Pricing() {
       <div className="mt-11 grid grid-cols-1 gap-px border border-line bg-line md:grid-cols-3">
         {TIERS.map((t) => (
           <div
-            key={t.name}
+            key={t.id}
             className={`relative flex flex-col p-[30px] pt-10 transition-colors ${
               t.featured ? "bg-bg2" : "bg-bg hover:bg-bg1"
             }`}
@@ -66,11 +28,7 @@ export default function Pricing() {
               </span>
             )}
             <p className="mb-[14px] font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
-              {t.name === "Engine"
-                ? "Self-directed"
-                : t.name === "Hybrid"
-                  ? "Coach-reviewed"
-                  : "Coach-led"}
+              {t.tagline}
             </p>
             <h3 className="mb-[6px] font-play text-[20px] font-bold uppercase tracking-[0.02em] text-ink">
               {t.name}
@@ -108,6 +66,15 @@ export default function Pricing() {
             >
               Start free assessment
             </Link>
+            {/* Plain <a>, not next/link: /checkout is a redirecting Route
+                Handler, not a page — Link's client-side soft-navigation
+                would issue an RSC prefetch instead of following the redirect. */}
+            <a
+              href={`/checkout?tier=${t.id}`}
+              className="mt-[10px] block w-full px-[18px] py-[10px] text-center font-mono text-[9px] font-medium uppercase tracking-[0.14em] text-ink3 transition-colors hover:text-ink"
+            >
+              Already assessed? Subscribe to {t.name} →
+            </a>
           </div>
         ))}
       </div>

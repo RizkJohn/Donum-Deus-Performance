@@ -1,5 +1,16 @@
 import type { NextConfig } from "next";
 
+// The API origin the browser is actually allowed to call. Computed at build
+// time so a plain-HTTP local/docker-compose API (the documented default) is
+// not silently blocked by CSP — `https:` alone only covers HTTPS deployments.
+function apiOrigin(): string {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").origin;
+  } catch {
+    return "http://localhost:8000";
+  }
+}
+
 const securityHeaders = [
   // Prevent clickjacking
   { key: "X-Frame-Options", value: "DENY" },
@@ -24,8 +35,9 @@ const securityHeaders = [
   //    would replace this with a nonce via Next.js middleware.
   //  - fonts.googleapis.com (stylesheet) and fonts.gstatic.com (font files) are
   //    required for Google Fonts loaded via next/font.
-  //  - connect-src includes https: to allow the API URL to be configured at
-  //    runtime via NEXT_PUBLIC_API_URL without a build-time CSP rebuild.
+  //  - connect-src includes https: for any HTTPS API deployment, plus the
+  //    exact configured NEXT_PUBLIC_API_URL origin so a plain-HTTP local/
+  //    docker-compose API isn't blocked (the two are not the same set).
   {
     key: "Content-Security-Policy",
     value: [
@@ -34,7 +46,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data:",
-      "connect-src 'self' https:",
+      `connect-src 'self' https: ${apiOrigin()}`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

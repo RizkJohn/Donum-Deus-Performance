@@ -161,6 +161,8 @@ export default function AssessmentFunnel() {
   // Step 6 — email + consent
   const [email, setEmail] = useState("");
   const [consented, setConsented] = useState(false);
+  const [createAccount, setCreateAccount] = useState(false);
+  const [password, setPassword] = useState("");
 
   const fatigueScore = useMemo(
     () => (sleepScore + sorenessScore + energyScore + stressScore) / 4,
@@ -211,6 +213,8 @@ export default function AssessmentFunnel() {
         return "Enter a valid email address.";
       if (!consented)
         return "Confirm that you have read and agree to the Privacy Policy and Terms of Service.";
+      if (createAccount && password.length < 8)
+        return "Choose a password of at least 8 characters, or uncheck account creation.";
     }
     return null;
   }
@@ -283,6 +287,19 @@ export default function AssessmentFunnel() {
         setErrorReasons(res.program.reasons);
         setPhase("engine_error");
         return;
+      }
+      if (createAccount) {
+        // Best-effort: an existing account (or any hiccup) never blocks the
+        // athlete from seeing the program they just generated.
+        try {
+          await fetch("/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+        } catch {
+          // ignored — the program itself still delivers
+        }
       }
       router.push(`/program/${res.id}`);
     } catch {
@@ -963,10 +980,45 @@ export default function AssessmentFunnel() {
                   >
                     Terms of Service
                   </Link>
-                  . I understand that Deus Performance is not a medical provider
-                  and this programme does not constitute clinical advice.
+                  . I understand that Deus Performance is a practice of
+                  performance education and this program does not constitute
+                  medical or clinical advice.
                 </span>
               </label>
+
+              {/* Optional account creation */}
+              <label className="mt-5 flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  id="create-account"
+                  checked={createAccount}
+                  onChange={(e) => setCreateAccount(e.target.checked)}
+                  className="mt-[2px] h-[14px] w-[14px] shrink-0 cursor-pointer accent-[var(--accent)]"
+                />
+                <span className="text-[10px] leading-[1.7] text-ink3 group-hover:text-ink2 transition-colors">
+                  Create an account so this program (and every one after it)
+                  is waiting in a dashboard — optional.
+                </span>
+              </label>
+              {createAccount && (
+                <div className="mt-3">
+                  <label className="field-label" htmlFor="account-password">
+                    Password
+                  </label>
+                  <input
+                    id="account-password"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={8}
+                    className="field-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="mt-2 text-[9px] italic text-ink3">
+                    At least 8 characters.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

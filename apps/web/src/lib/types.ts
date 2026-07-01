@@ -182,6 +182,14 @@ export interface ProgramRecord {
   created_at: string;
 }
 
+export type ProgramListItem = Omit<ProgramRecord, "email" | "state_summary">;
+
+export interface MyProgramsResponse {
+  email: string;
+  state_summary: AthleteStateSummary | null;
+  programs: ProgramListItem[];
+}
+
 export function isEngineError(p: ProgramOrError): p is EngineError {
   return (
     typeof p === "object" &&

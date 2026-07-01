@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
   "Philosophy",
@@ -14,6 +14,14 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((r) => r.json())
+      .then((d) => setAuthed(Boolean(d?.authed)))
+      .catch(() => setAuthed(false));
+  }, []);
 
   return (
     <nav
@@ -60,6 +68,12 @@ export default function Nav() {
           </Link>
         ))}
         <Link
+          href={authed ? "/dashboard" : "/login"}
+          className="font-mono text-[9px] tracking-[0.17em] uppercase text-ink3 hover:text-ink transition-colors"
+        >
+          {authed ? "Dashboard" : "Log in"}
+        </Link>
+        <Link
           href="/assess"
           className="font-mono text-[9px] tracking-[0.15em] uppercase px-[18px] py-[7px] border border-accent text-accent hover:bg-accent hover:text-[#f3efe8] transition-all"
         >
@@ -88,6 +102,13 @@ export default function Nav() {
               {item}
             </Link>
           ))}
+          <Link
+            href={authed ? "/dashboard" : "/login"}
+            className="font-mono text-[9px] tracking-[0.17em] uppercase text-ink3 hover:text-ink transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            {authed ? "Dashboard" : "Log in"}
+          </Link>
           <Link
             href="/assess"
             className="font-mono text-[9px] tracking-[0.15em] uppercase px-[18px] py-[9px] border border-accent text-accent w-full text-center mt-[5px] hover:bg-accent hover:text-[#f3efe8] transition-all"

@@ -1,4 +1,10 @@
-import type { AssessRequest, AssessResponse, Feedback, ProgramRecord } from "./types";
+import type {
+  AssessRequest,
+  AssessResponse,
+  Feedback,
+  MyProgramsResponse,
+  ProgramRecord,
+} from "./types";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -55,5 +61,13 @@ export function submitFeedback(
   return request("/v1/feedback", {
     method: "POST",
     body: JSON.stringify(body),
+  });
+}
+
+/** GET /v1/me/programs — the dashboard's data source (auth required). */
+export function getMyPrograms(token: string): Promise<MyProgramsResponse> {
+  return request<MyProgramsResponse>("/v1/me/programs", {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
   });
 }
