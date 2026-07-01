@@ -66,3 +66,23 @@ class Feedback(Base):
     run_id: Mapped[str] = mapped_column(ForeignKey("program_runs.id"))
     signals: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class User(Base):
+    """An account. Deliberately NOT foreign-keyed to program_runs/leads —
+    dashboard queries join on email (see routes/me.py), matching the join
+    routes/assess.py already uses for GDPR export/erasure. That lets accounts
+    ship without altering any existing table (SQLAlchemy `create_all` only
+    creates missing tables; it can't add columns to ones that already exist
+    in a live database, and there's no Alembic yet)."""
+
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String(255))
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    subscription_tier: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    subscription_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

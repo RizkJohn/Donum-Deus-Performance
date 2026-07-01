@@ -68,11 +68,13 @@ async def client(tmp_path, monkeypatch):
     monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path}/test.db")
     from deus_api import config
     from deus_api.db import session as db_session
+    from deus_api.email.factory import reset_email_provider
     from deus_api.main import create_app
 
     config.get_settings.cache_clear()
     db_session._engine = None
     db_session._sessionmaker = None
+    reset_email_provider()
 
     app = create_app()
     await db_session.init_db()
@@ -83,3 +85,4 @@ async def client(tmp_path, monkeypatch):
     config.get_settings.cache_clear()
     db_session._engine = None
     db_session._sessionmaker = None
+    reset_email_provider()

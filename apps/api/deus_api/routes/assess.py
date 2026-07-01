@@ -16,6 +16,8 @@ _email_adapter = TypeAdapter(EmailStr)
 from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun
 from ..db.session import get_db
 from ..deps import get_lib
+from ..email.factory import get_email_provider
+from ..email.templates import program_ready_email
 from ..engine.athlete_state import load_or_init, update_exposure
 from ..models.athlete_state import AthleteState
 from ..models.input_contract import GenerateRequest
@@ -63,6 +65,10 @@ async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict
 
     db.add(Lead(email=email, run_id=run.id))
     await db.commit()
+
+    if result.program is not None:
+        subject, html = program_ready_email(run.id)
+        await get_email_provider().send(to=email, subject=subject, html=html)
 
     return {
         "id": run.id,
@@ -143,7 +149,7 @@ async def delete_data(
 
     await db.commit()
     return {
-        "deleted_programmes": len(run_ids),
+        "deleted_programs": len(run_ids),
         "deleted_feedback": len(feedback),
         "deleted_athlete_state": 1 if state_row is not None else 0,
         "message": "All personal data associated with this email has been permanently deleted.",
@@ -157,7 +163,7 @@ async def export_data(
 ) -> dict:
     """GDPR right of access / CCPA right to know.
 
-    Returns all assessment inputs and programme records associated with the
+    Returns all assessment inputs and program records associated with the
     given email address in a structured, portable format.
 
     Note: This endpoint requires only an email address for access. A future
@@ -178,10 +184,10 @@ async def export_data(
 
     records = [
         {
-            "programme_id": run.id,
+            "program_id": run.id,
             "submitted_at": lead.created_at.isoformat(),
             "assessment_inputs": run.payload,
-            "programme_generated": run.program is not None,
+            "program_generated": run.program is not None,
         }
         for lead, run in rows
     ]
