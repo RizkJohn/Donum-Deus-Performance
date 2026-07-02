@@ -23,3 +23,14 @@ def apply_volume_reduction(base_budget: int, score: float) -> int:
     if score >= 4.0:
         return max(3, int(base_budget * (1 - VOLUME_REDUCTION)))
     return base_budget
+
+
+def max_high_cns_days(score: float) -> int:
+    """CNS budget ceiling is 3, reduced by fatigue tier (fatigue_model.md
+    CNS BUDGET): 3 low / 2 moderate / 1 high. No consecutive High days at any
+    tier — enforced separately by the decision engine and QC gate."""
+    if score >= 4.0:
+        return 1
+    if score >= 3.0:
+        return 2
+    return 3

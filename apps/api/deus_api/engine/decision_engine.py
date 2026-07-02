@@ -1,9 +1,10 @@
 """The deterministic, safety-critical core.
 
 Given a validated client payload, computes the PrecomputedPlan: training-day
-selection, CNS distribution (max 2 High, never consecutive, pre-sport day
-Low), volume budget (fatigue-adjusted), progression flag, and the allowed
-exercise pool after injury pruning. The LLM never decides any of this.
+selection, CNS distribution (fatigue-adjusted max High days -- 3 low / 2
+moderate / 1 high fatigue tier, never consecutive, pre-sport day Low), volume
+budget (fatigue-adjusted), progression flag, and the allowed exercise pool
+after injury pruning. The LLM never decides any of this.
 
 Returns EngineError({"error":"UNSATISFIABLE_CONSTRAINTS", ...}) when the
 constraints cannot be satisfied — never a partial plan.
@@ -14,7 +15,7 @@ from ..models.athlete_state import AthleteState
 from ..models.decision import COVERAGE_GROUPS, PlanDay, PrecomputedPlan
 from ..models.errors import EngineError
 from ..models.input_contract import DAY_ORDER, GenerateRequest
-from .fatigue import apply_volume_reduction, progression_flag
+from .fatigue import apply_volume_reduction, max_high_cns_days, progression_flag
 from .library_loader import Library
 from .substitution import blocked_ids_for_injuries
 from .variation import prioritize_pool
@@ -86,13 +87,15 @@ def build_plan(
             f"{MIN_COVERAGE_EXERCISES} required weekly movement patterns"
         ])
 
-    # --- CNS assignment: <= 2 High, no consecutive (calendar), pre-sport Low
+    # --- CNS assignment: fatigue-adjusted max High, no consecutive (calendar),
+    #     pre-sport Low
+    cns_cap = max_high_cns_days(req.state.fatigue_score)
     pre_sport = {
         DAY_ORDER[(_calendar_index(d) - 1) % 7] for d in sport_day_set
     }
     high_days: set[str] = set()
     for day in chosen:
-        if len(high_days) >= 2:
+        if len(high_days) >= cns_cap:
             break
         if day in pre_sport:
             continue
@@ -130,4 +133,5 @@ def build_plan(
         allowed_exercise_ids=allowed,
         blocked_exercise_ids=sorted(blocked),
         required_groups=required_groups,
+        max_high_cns_days=cns_cap,
     )

@@ -9,14 +9,40 @@ def _idx(day):
     return DAY_ORDER.index(day)
 
 
-def test_cns_limits(library):
+def test_cns_limits_low_fatigue_allows_three(library):
+    # default fatigue (sleep=soreness=energy=stress=2.0) -> score 2.0 -> low -> cap 3
     plan = build_plan(make_request(training_age="Advanced",
                                    available_days=DAY_ORDER), library)
     assert isinstance(plan, PrecomputedPlan)
+    assert plan.max_high_cns_days == 3
     highs = [d.day for d in plan.days if d.cns == "High"]
-    assert len(highs) <= 2
+    assert len(highs) <= 3
     idxs = sorted(_idx(d) for d in highs)
     assert all(b - a > 1 for a, b in zip(idxs, idxs[1:]))
+
+
+def test_cns_limits_moderate_fatigue_caps_at_two(library):
+    plan = build_plan(
+        make_request(training_age="Advanced", available_days=DAY_ORDER,
+                     sleep=3, soreness=3, energy=3, stress=3),
+        library,
+    )
+    assert isinstance(plan, PrecomputedPlan)
+    assert plan.max_high_cns_days == 2
+    highs = [d.day for d in plan.days if d.cns == "High"]
+    assert len(highs) <= 2
+
+
+def test_cns_limits_high_fatigue_caps_at_one(library):
+    plan = build_plan(
+        make_request(training_age="Advanced", available_days=DAY_ORDER,
+                     sleep=4, soreness=4, energy=4, stress=4),
+        library,
+    )
+    assert isinstance(plan, PrecomputedPlan)
+    assert plan.max_high_cns_days == 1
+    highs = [d.day for d in plan.days if d.cns == "High"]
+    assert len(highs) <= 1
 
 
 def test_pre_sport_day_is_low(library):

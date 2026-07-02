@@ -4,6 +4,7 @@ from conftest import make_request
 from deus_api.engine.decision_engine import build_plan
 from deus_api.engine.qc.validator import validate
 from deus_api.llm.mock import MockProvider
+from deus_api.models.input_contract import DAY_ORDER
 
 
 @pytest.fixture
@@ -49,6 +50,34 @@ def test_three_high_days_rejected(good, library):
         d["cns"] = "High"
     report = validate(program, req, plan, library)
     assert "cns_limits" in _failed_names(report)
+
+
+def test_low_fatigue_three_high_days_allowed(library):
+    # Advanced + all 7 days available, default (low) fatigue -> cap 3.
+    # Regression guard: the QC gate must read the fatigue-adjusted cap off
+    # the plan, not a hardcoded ceiling, or this would be wrongly rejected.
+    req = make_request(training_age="Advanced", available_days=list(DAY_ORDER))
+    plan = build_plan(req, library)
+    assert plan.max_high_cns_days == 3
+    program = MockProvider()._build_program(plan, library)
+    assert sum(1 for d in program["weekly_split"] if d["cns"] == "High") == 3
+    report = validate(program, req, plan, library)
+    assert report.passed, report.reasons
+
+
+def test_moderate_fatigue_lowers_cap_to_two(library):
+    req = make_request(sleep=3, soreness=3, energy=3, stress=3)
+    plan = build_plan(req, library)
+    assert plan.max_high_cns_days == 2
+    program = MockProvider()._build_program(plan, library)
+    report = validate(program, req, plan, library)
+    assert report.passed, report.reasons
+    # Forcing a 3rd High day beyond the moderate-fatigue cap must fail.
+    lows = [d for d in program["weekly_split"] if d["cns"] == "Low"]
+    if lows:
+        lows[0]["cns"] = "High"
+        report = validate(program, req, plan, library)
+        assert "cns_limits" in _failed_names(report)
 
 
 def test_volume_cap_rejected(good, library):

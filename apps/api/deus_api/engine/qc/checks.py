@@ -40,11 +40,15 @@ def check_schema_valid(raw: dict) -> tuple[CheckResult, Program | None]:
         return _fail("schema_valid", reasons, ["<structure>"]), None
 
 
-def check_cns_limits(program: Program) -> CheckResult:
+def check_cns_limits(program: Program, plan: PrecomputedPlan) -> CheckResult:
+    """Fatigue-adjusted ceiling (fatigue_model.md CNS BUDGET): 3 low / 2
+    moderate / 1 high fatigue tier. `plan.max_high_cns_days` is the
+    decision engine's precomputed value for this request's fatigue score —
+    never a hardcoded constant."""
     highs = [d.day for d in program.weekly_split if d.cns == "High"]
     reasons = []
-    if len(highs) > 2:
-        reasons.append(f"{len(highs)} High-CNS days; max is 2")
+    if len(highs) > plan.max_high_cns_days:
+        reasons.append(f"{len(highs)} High-CNS days; max is {plan.max_high_cns_days}")
     idxs = sorted(DAY_ORDER.index(d) for d in highs)
     for a, b in zip(idxs, idxs[1:]):
         if b - a == 1:

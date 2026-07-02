@@ -116,8 +116,9 @@ files if you touch them:
 
 - **Output is JSON only.** No prose. On unsatisfiable input, return
   `{"error":"UNSATISFIABLE_CONSTRAINTS","reasons":[...]}`.
-- **CNS:** max 2 High-CNS days/week; no consecutive High-CNS days; pre-sport day
-  is Low CNS.
+- **CNS:** max High-CNS days/week is fatigue-adjusted (3 low / 2 moderate / 1
+  high fatigue tier, see `fatigue_model.md` CNS BUDGET); no consecutive
+  High-CNS days; pre-sport day is Low CNS.
 - **Weekly movement coverage required:** squat, hinge, push (h/v), pull (h/v),
   rotation/anti-rotation, carry/locomotion, jump.
 - **Block order is fixed:** Warmup → Power → Strength → Accessory → Core →

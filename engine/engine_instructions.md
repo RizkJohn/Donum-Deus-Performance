@@ -23,8 +23,9 @@ If conflicts occur:
 5. Volume targets
 
 ## CNS MANAGEMENT
-- Max 2 High CNS days/week
-- No consecutive High CNS days
+- Max High CNS days/week is fatigue-adjusted: 3 (low fatigue) / 2 (moderate) / 1
+  (high fatigue) — see fatigue_model.md CNS BUDGET.
+- No consecutive High CNS days, at any fatigue tier.
 - Pre-sport day = Low CNS
 - Post-high-output = Low CNS or Recovery
 

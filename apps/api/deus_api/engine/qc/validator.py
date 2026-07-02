@@ -37,7 +37,7 @@ def validate(
 
     results = [
         schema_result,
-        checks.check_cns_limits(program),
+        checks.check_cns_limits(program, plan),
         checks.check_pre_sport_low_cns(program, req),
         checks.check_movement_coverage(program, library),
         checks.check_block_order(program),

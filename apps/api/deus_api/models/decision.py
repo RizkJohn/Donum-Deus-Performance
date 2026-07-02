@@ -39,3 +39,4 @@ class PrecomputedPlan(BaseModel):
     allowed_exercise_ids: list[str]  # library minus injury-blocked, post-substitution
     blocked_exercise_ids: list[str]
     required_groups: list[str]  # keys of COVERAGE_GROUPS
+    max_high_cns_days: int  # fatigue-adjusted ceiling: 3 low / 2 moderate / 1 high

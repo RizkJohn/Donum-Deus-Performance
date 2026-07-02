@@ -118,7 +118,8 @@ of truth; UPPERCASE files are narrative companions).
 Each is a pure function returning `{name, passed, offending_fields, reasons}`:
 
 1. `schema_valid` — strict structural validation (`additionalProperties:false`, enums, regexes, sets 1–6, notes ≤120)
-2. `cns_limits` — ≤2 High-CNS days/week; no consecutive High days
+2. `cns_limits` — fatigue-adjusted ceiling (3 low / 2 moderate / 1 high fatigue
+   tier, `PrecomputedPlan.max_high_cns_days`); no consecutive High days
 3. `pre_sport_low_cns` — day before any sport day is Low CNS
 4. `movement_coverage` — week covers squat, hinge, push, pull, rotation/anti-rotation, carry/locomotion, jump
 5. `block_order` — Warmup→Power→Strength→Accessory→Core→Mobility; days Mon→Sun
