@@ -6,14 +6,20 @@ DELETE /v1/data        — GDPR/CCPA right to erasure: delete all records for an
 GET  /v1/data          — GDPR right of access: export all records for an email
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict, EmailStr, TypeAdapter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 _email_adapter = TypeAdapter(EmailStr)
 
-from ..billing.access import has_active_subscription, has_used_free_program
+from ..billing.access import (
+    free_program_ip_limit_exceeded,
+    has_active_subscription,
+    has_used_free_program,
+    is_disposable_email,
+    record_free_program_grant,
+)
 from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun
 from ..db.session import get_db
 from ..deps import get_lib
@@ -46,15 +52,39 @@ class AssessRequest(BaseModel):
 
 
 @router.post("/v1/assess")
-async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
+async def assess(req: AssessRequest, request: Request, db: AsyncSession = Depends(get_db)) -> dict:
     email = str(req.email)
 
-    if await has_used_free_program(db, email) and not await has_active_subscription(db, email):
-        raise HTTPException(
-            status_code=402,
-            detail="Your free program is complete. Subscribe to keep training — "
-            "the engine adapts weekly based on your feedback.",
-        )
+    # Subscribers are exempt from every free-program abuse check below --
+    # they've already paid, so an email-domain heuristic or an IP shared with
+    # other free-tier signups must never lock out someone who's a customer.
+    ip = request.client.host if request.client else "unknown"
+    subscribed = await has_active_subscription(db, email)
+    is_free_grant = False
+
+    if not subscribed:
+        if await has_used_free_program(db, email):
+            raise HTTPException(
+                status_code=402,
+                detail="Your free program is complete. Subscribe to keep training — "
+                "the engine adapts weekly based on your feedback.",
+            )
+
+        if is_disposable_email(email):
+            raise HTTPException(
+                status_code=422,
+                detail="Please use a permanent email address — the engine needs "
+                "to reach you as your program adapts, so disposable/temporary "
+                "email addresses aren't supported.",
+            )
+
+        if free_program_ip_limit_exceeded(ip):
+            raise HTTPException(
+                status_code=402,
+                detail="The free program limit for this network has been reached "
+                "for today. Subscribe to continue, or try again tomorrow.",
+            )
+        is_free_grant = True
 
     # Load persistent athlete state (or initialise) and fold in this check-in.
     row = await db.get(AthleteStateRow, email)
@@ -65,6 +95,8 @@ async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict
     # Fold the prescribed work back into exposure (only on a real program).
     if result.program is not None:
         update_exposure(state, run.program, get_lib())
+        if is_free_grant:
+            record_free_program_grant(ip)
 
     if row is None:
         db.add(AthleteStateRow(email=email, state=state.model_dump()))

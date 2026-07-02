@@ -98,6 +98,7 @@ async def client(tmp_path, monkeypatch):
     monkeypatch.setenv("DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path}/test.db")
     from deus_api import config
     from deus_api.db import session as db_session
+    from deus_api.billing.access import _FreeProgramIpTracker
     from deus_api.email.factory import reset_email_provider
     from deus_api.main import create_app
     from deus_api.middleware import RateLimitMiddleware
@@ -106,10 +107,11 @@ async def client(tmp_path, monkeypatch):
     db_session._engine = None
     db_session._sessionmaker = None
     reset_email_provider()
-    # Per-IP store is a ClassVar (shared across the whole pytest session by
-    # design, for a real single-process deployment) -- reset it per test or
-    # unrelated tests bleed into each other's rate-limit window.
+    # Both stores below are ClassVars (shared across the whole pytest session
+    # by design, for a real single-process deployment) -- reset per test or
+    # unrelated tests bleed into each other's rate-limit/free-grant window.
     RateLimitMiddleware._store.clear()
+    _FreeProgramIpTracker.reset()
 
     app = create_app()
     await db_session.init_db()
@@ -122,3 +124,4 @@ async def client(tmp_path, monkeypatch):
     db_session._sessionmaker = None
     reset_email_provider()
     RateLimitMiddleware._store.clear()
+    _FreeProgramIpTracker.reset()

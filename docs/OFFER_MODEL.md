@@ -66,6 +66,47 @@ logic and maps directly onto how the product is actually used.
   going to be free — this only changes what happens after the first
   Foundation-equivalent program.
 
+## Abuse resistance
+
+A one-email-one-program gate is trivial to route around with a second real
+inbox or a disposable one — "creating multiple accounts using different
+emails, or a temporary email service" was the specific concern this section
+answers. Layered, cheapest-first (`billing/access.py`):
+
+1. **Disposable/temporary email domains are rejected outright** (422, before
+   any generation runs) via the `disposable-email-domains` package — an
+   offline, no-network-call, ~7,900-domain blocklist (mailinator.com,
+   10minutemail.com, guerrillamail.com, yopmail.com, etc.), maintained
+   upstream. There's no legitimate reason to use a throwaway inbox for a
+   product that emails you your program and needs to reach you as it adapts.
+   It does **not** flag privacy-forwarding services (SimpleLogin, Fastmail
+   masked email, Apple Hide My Email) — those are real, persistent inboxes,
+   not the target.
+2. **Provider alias tricks are collapsed to one identity** before the
+   free-program check (`_gate_identity`): `name+anything@`-tagging is
+   stripped for every provider (widely honored, not Gmail-specific), and
+   Gmail/Googlemail's dot-insensitivity (`j.a.ne@gmail.com` ==
+   `jane@gmail.com`) is collapsed for those two domains specifically, since
+   it isn't universal RFC behavior elsewhere. This is bookkeeping-only — the
+   raw address is still what's stored, displayed, and emailed.
+3. **A per-IP velocity cap on free (unpaid) grants specifically** — 3 per
+   24 hours, deliberately generous since shared/NAT'd IPs are common
+   (a household, a gym's wifi, a coworking space) and a false positive here
+   just means "subscribe to keep going," not a dead end. It only throttles
+   farming via several distinct real inboxes from one network; it never
+   applies to an already-subscribed athlete, at any volume.
+
+Deliberately not built (proportionate to actual risk right now, not
+launch-blocking): CAPTCHA/challenge widgets (Cloudflare Turnstile is a
+plausible free, low-friction addition if scripted/bot signups become a
+real problem — it's weaker against a single motivated human manually trying
+several real inboxes, which the layers above already cover), phone/SMS
+verification, and device fingerprinting — all heavier levers worth reaching
+for only if abuse is actually observed at a level these don't stop. The
+per-IP store is in-memory/per-process (same documented tradeoff as
+`middleware.RateLimitMiddleware`): correct for a single-instance deployment,
+resets on restart, would need a shared store for multi-instance.
+
 ## What this doesn't cover (still open)
 
 - Whether to add a Future-style money-back guarantee on the first paid
