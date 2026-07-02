@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Mono, Libre_Baskerville } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -81,6 +82,7 @@ export default function RootLayout({
         <div className="grain" aria-hidden="true" />
         <div className="grid-lines" aria-hidden="true" />
         <div className="relative z-10">{children}</div>
+        <Analytics />
       </body>
     </html>
   );

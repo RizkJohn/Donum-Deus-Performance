@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,6 +18,10 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    if settings.sentry_dsn:
+        # No-op unless SENTRY_DSN is set (dev/test never set it) — auto-hooks
+        # FastAPI/Starlette exception capture, nothing else to wire.
+        sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
     app = FastAPI(
         title="Deus Performance Engine API",
         version="0.1.0",

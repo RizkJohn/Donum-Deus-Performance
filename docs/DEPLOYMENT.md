@@ -72,11 +72,15 @@ Railway's target per their instructions.
 
 ## Optional, free-tier, recommended before taking real traffic
 
-- **Sentry** (error monitoring) — catches production auth/billing/LLM
-  failures you'd otherwise only find by a user reporting them.
-- **UptimeRobot** — pings `/healthz`; alerts you if the API goes down.
-- **PostHog** (free tier) + **Vercel Analytics** — funnel/traffic visibility.
-
-None of these are wired into the codebase yet — they're single-snippet
-integrations (a DSN env var for Sentry, a script tag for PostHog) to add
-if/when you create the accounts.
+- **Sentry** (error monitoring) — already wired (`deus_api/main.py`): set
+  `SENTRY_DSN` in Railway's env vars and it activates automatically, no code
+  changes needed. Leave it unset and it's a complete no-op — catches
+  production auth/billing/LLM failures you'd otherwise only find by a user
+  reporting them.
+- **Vercel Analytics** — already wired (`app/layout.tsx`, `@vercel/analytics`).
+  Activates automatically once deployed on Vercel; nothing to configure.
+- **UptimeRobot** — not wired (nothing to wire — it's an external pinger).
+  Point it at `https://<your-api-domain>/healthz`; alerts you if the API goes
+  down.
+- **PostHog** (free tier) — not wired yet. Funnel/drop-off visibility beyond
+  what Vercel Analytics' page views give you; add if/when you want it.

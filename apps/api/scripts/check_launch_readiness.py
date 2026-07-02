@@ -105,6 +105,12 @@ def _check(settings) -> list[Finding]:
             detail="mock — welcome/program-ready emails are not actually sent",
         ))
 
+    findings.append(Finding(
+        ok=bool(settings.sentry_dsn), critical=False, label="SENTRY_DSN",
+        detail="not set — production errors are only visible in host logs"
+        if not settings.sentry_dsn else "set",
+    ))
+
     for label, value in (("CORS_ORIGINS", settings.cors_origins), ("WEB_URL", settings.web_url)):
         is_local = "localhost" in value
         findings.append(Finding(

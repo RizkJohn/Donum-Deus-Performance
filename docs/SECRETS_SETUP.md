@@ -77,7 +77,14 @@ Set `EMAIL_PROVIDER=resend`. You'll also need to verify the sending domain
 until then, leave `EMAIL_PROVIDER=mock` (emails are logged, not sent, and
 nothing crashes).
 
-### 6. `CORS_ORIGINS` / `WEB_URL` / `NEXT_PUBLIC_API_URL`
+### 6. Sentry — optional, recommended
+[sentry.io](https://sentry.io) → New Project → FastAPI → copy the DSN into
+`SENTRY_DSN`. That's the entire integration — `deus_api/main.py` initializes
+it automatically when the variable is set, and does nothing at all when it
+isn't. No web-side setup: `@vercel/analytics` is already active for anything
+deployed on Vercel with no key required.
+
+### 7. `CORS_ORIGINS` / `WEB_URL` / `NEXT_PUBLIC_API_URL`
 Once both services are deployed: `CORS_ORIGINS` and `WEB_URL` (API's env) =
 your web app's real URL; `NEXT_PUBLIC_API_URL` (web's env) = your API's real
 URL. Both are plain URLs, not secrets, but wrong values will break

@@ -59,6 +59,9 @@ class Settings(BaseSettings):
     # Inbox that receives /correspondence contact-form submissions.
     contact_email: str = "hello@deusperformance.com"
 
+    # Error monitoring (Sentry). Empty = disabled; no-op, no account needed.
+    sentry_dsn: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:
