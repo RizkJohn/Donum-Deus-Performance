@@ -17,6 +17,11 @@ _REPO_ROOT = _API_ROOT.parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    # "development" (default) keeps `make check-env` informational only —
+    # mock providers and dev defaults are expected. Set to "production" in
+    # your real deployment's env vars to make it a hard go/no-go gate.
+    environment: str = "development"
+
     database_url: str = "sqlite+aiosqlite:///./deus.db"
     llm_provider: str = "mock"  # mock | claude
     anthropic_api_key: str = ""

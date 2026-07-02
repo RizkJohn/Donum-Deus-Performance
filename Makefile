@@ -1,4 +1,4 @@
-.PHONY: dev test seed-library api web bot bot-daemon
+.PHONY: dev test seed-library api web bot bot-daemon check-env
 
 dev: ## run the full stack (postgres + api + web), mock provider by default
 	docker compose up --build
@@ -14,6 +14,9 @@ test: ## run the engine test suite (mock provider, offline)
 
 seed-library: ## regenerate derived JSON from the canonical engine markdown
 	cd apps/api && python3 scripts/port_library.py
+
+check-env: ## report which production secrets are missing (see docs/SECRETS_SETUP.md)
+	cd apps/api && python3 scripts/check_launch_readiness.py
 
 bot: ## run the content bot once (generates POSTS_PER_RUN posts and exits)
 	cd apps/content_bot && pip install -q -r requirements.txt && python3 bot.py
