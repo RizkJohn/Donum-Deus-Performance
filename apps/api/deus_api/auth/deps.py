@@ -22,6 +22,9 @@ async def get_current_user(
         claims = decode_token(token)
     except jwt.PyJWTError:
         raise _UNAUTHORIZED
+    if claims.get("scope"):
+        # Single-purpose tokens (e.g. password-reset) never authenticate a session.
+        raise _UNAUTHORIZED
     user = await db.get(User, claims.get("sub"))
     if user is None:
         raise _UNAUTHORIZED

@@ -84,3 +84,81 @@ async def test_me_returns_current_user(client):
 async def test_me_rejects_garbage_token(client):
     r = await client.get("/v1/auth/me", headers={"Authorization": "Bearer not-a-real-token"})
     assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_password_reset_request_is_202_for_unknown_email(client):
+    # Never reveals whether the account exists.
+    r = await client.post("/v1/auth/password-reset/request", json={"email": "ghost@example.com"})
+    assert r.status_code == 202
+
+
+@pytest.mark.asyncio
+async def test_password_reset_request_sends_email_for_known_account(client):
+    from deus_api.email.factory import get_email_provider
+
+    payload = {"email": "reset@example.com", "password": "correcthorse"}
+    await client.post("/v1/auth/signup", json=payload)
+
+    r = await client.post("/v1/auth/password-reset/request", json={"email": "reset@example.com"})
+    assert r.status_code == 202
+    outbox = get_email_provider().outbox
+    assert any(e["to"] == "reset@example.com" and "Reset" in e["subject"] for e in outbox)
+
+
+@pytest.mark.asyncio
+async def test_password_reset_confirm_full_flow(client):
+    from deus_api.auth.tokens import issue_reset_token
+
+    payload = {"email": "flow@example.com", "password": "oldpassword"}
+    signup = await client.post("/v1/auth/signup", json=payload)
+    user_id = signup.json()["user"]["id"]
+
+    token = issue_reset_token(user_id, "flow@example.com")
+    confirm = await client.post(
+        "/v1/auth/password-reset/confirm", json={"token": token, "password": "newpassword123"}
+    )
+    assert confirm.status_code == 200
+
+    old_login = await client.post("/v1/auth/login", json=payload)
+    assert old_login.status_code == 401
+
+    new_login = await client.post(
+        "/v1/auth/login", json={"email": "flow@example.com", "password": "newpassword123"}
+    )
+    assert new_login.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_password_reset_confirm_rejects_session_token(client):
+    payload = {"email": "sessiontoken@example.com", "password": "correcthorse"}
+    signup = await client.post("/v1/auth/signup", json=payload)
+    session_token = signup.json()["token"]
+
+    r = await client.post(
+        "/v1/auth/password-reset/confirm",
+        json={"token": session_token, "password": "irrelevant123"},
+    )
+    assert r.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_password_reset_token_does_not_authenticate_a_session(client):
+    from deus_api.auth.tokens import issue_reset_token
+
+    payload = {"email": "resetnotsession@example.com", "password": "correcthorse"}
+    signup = await client.post("/v1/auth/signup", json=payload)
+    user_id = signup.json()["user"]["id"]
+
+    reset_token = issue_reset_token(user_id, "resetnotsession@example.com")
+    r = await client.get("/v1/auth/me", headers={"Authorization": f"Bearer {reset_token}"})
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_password_reset_confirm_rejects_garbage_token(client):
+    r = await client.post(
+        "/v1/auth/password-reset/confirm",
+        json={"token": "not-a-real-token", "password": "irrelevant123"},
+    )
+    assert r.status_code == 400

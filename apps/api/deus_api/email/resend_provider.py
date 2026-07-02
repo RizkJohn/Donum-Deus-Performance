@@ -14,8 +14,11 @@ class ResendEmailProvider:
         resend.api_key = api_key
         self._from = from_address
 
-    async def send(self, *, to: str, subject: str, html: str) -> SendResult:
-        result = resend.Emails.send(
-            {"from": self._from, "to": [to], "subject": subject, "html": html}
-        )
+    async def send(
+        self, *, to: str, subject: str, html: str, reply_to: str | None = None
+    ) -> SendResult:
+        payload = {"from": self._from, "to": [to], "subject": subject, "html": html}
+        if reply_to:
+            payload["reply_to"] = reply_to
+        result = resend.Emails.send(payload)
         return SendResult(sent=True, provider_id=result.get("id"))

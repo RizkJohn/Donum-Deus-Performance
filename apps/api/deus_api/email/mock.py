@@ -10,6 +10,8 @@ class MockEmailProvider:
     def __init__(self) -> None:
         self.outbox: list[dict] = []
 
-    async def send(self, *, to: str, subject: str, html: str) -> SendResult:
-        self.outbox.append({"to": to, "subject": subject, "html": html})
+    async def send(
+        self, *, to: str, subject: str, html: str, reply_to: str | None = None
+    ) -> SendResult:
+        self.outbox.append({"to": to, "subject": subject, "html": html, "reply_to": reply_to})
         return SendResult(sent=True, provider_id=f"mock-{len(self.outbox)}")

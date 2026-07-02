@@ -9,6 +9,8 @@ import jwt
 from ..config import get_settings
 
 ALGORITHM = "HS256"
+RESET_TOKEN_TTL = timedelta(hours=1)
+RESET_SCOPE = "password_reset"
 
 
 def issue_token(user_id: str, email: str) -> str:
@@ -19,6 +21,22 @@ def issue_token(user_id: str, email: str) -> str:
         "email": email,
         "iat": now,
         "exp": now + timedelta(days=settings.auth_token_ttl_days),
+    }
+    return jwt.encode(payload, settings.auth_jwt_secret, algorithm=ALGORITHM)
+
+
+def issue_reset_token(user_id: str, email: str) -> str:
+    """Single-purpose, short-lived token for the password-reset link. The
+    `scope` claim is what stops it from also working as a session token (see
+    `get_current_user`) and stops a session token from being replayed here."""
+    settings = get_settings()
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "scope": RESET_SCOPE,
+        "iat": now,
+        "exp": now + RESET_TOKEN_TTL,
     }
     return jwt.encode(payload, settings.auth_jwt_secret, algorithm=ALGORITHM)
 

@@ -16,4 +16,6 @@ class SendResult(BaseModel):
 class EmailProvider(Protocol):
     name: str
 
-    async def send(self, *, to: str, subject: str, html: str) -> SendResult: ...
+    async def send(
+        self, *, to: str, subject: str, html: str, reply_to: str | None = None
+    ) -> SendResult: ...

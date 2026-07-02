@@ -20,6 +20,17 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
+class PasswordResetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: str
+    password: str = Field(min_length=8, max_length=200)
+
+
 class UserOut(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str

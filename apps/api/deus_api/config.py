@@ -56,6 +56,9 @@ class Settings(BaseSettings):
     email_from: str = "Deus Performance <programs@deusperformance.com>"
     web_url: str = "http://localhost:3000"
 
+    # Inbox that receives /correspondence contact-form submissions.
+    contact_email: str = "hello@deusperformance.com"
+
 
 @lru_cache
 def get_settings() -> Settings:

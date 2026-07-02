@@ -11,7 +11,9 @@ async def test_mock_provider_records_outbox():
     provider = MockEmailProvider()
     result = await provider.send(to="a@b.com", subject="hi", html="<p>hi</p>")
     assert result.sent
-    assert provider.outbox == [{"to": "a@b.com", "subject": "hi", "html": "<p>hi</p>"}]
+    assert provider.outbox == [
+        {"to": "a@b.com", "subject": "hi", "html": "<p>hi</p>", "reply_to": None}
+    ]
 
 
 def test_factory_defaults_to_mock(settings):

@@ -221,8 +221,11 @@ web) — `railway.json` at the repo root configures the Railway build.
 - Persistent athlete state (`athlete_states`), two-layer Assessment→Programming
   split, variation/novelty engine, reinforcement signals (`/v1/feedback`),
   tiered models, and a client-rendered program PDF.
-- Accounts (signup/login/dashboard), Stripe billing (checkout/portal/webhook),
-  and provider-agnostic email delivery (program-ready + welcome).
+- Accounts (signup/login/dashboard/password-reset), Stripe billing
+  (checkout/portal/webhook), a public contact form (`/correspondence` →
+  `/v1/correspondence`, forwards to `CONTACT_EMAIL` with reply-to set to the
+  submitter), and provider-agnostic email delivery (program-ready, welcome,
+  password-reset, correspondence).
 
 ## Known gotcha — CSP vs. dev-mode hydration
 
@@ -240,7 +243,9 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 - Gating the PDF/ongoing adaptation behind the subscription status Stripe
   reports (billing is wired; enforcement is not).
 - Haiku chat-coach surface (model tier configured; UI not built).
-- Password reset / email verification; OAuth/social login.
+- Email verification; OAuth/social login. (Password reset shipped: single-use,
+  1-hour JWT with a `password_reset` scope claim so it can't double as a
+  session token — see `auth/tokens.py`, `/forgot-password`, `/reset-password`.)
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
 - Redis/Qdrant; Alembic migrations (currently `create_all` on fresh DBs).
