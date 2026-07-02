@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 _email_adapter = TypeAdapter(EmailStr)
 
+from ..billing.access import has_active_subscription, has_used_free_program
 from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun
 from ..db.session import get_db
 from ..deps import get_lib
@@ -47,6 +48,13 @@ class AssessRequest(BaseModel):
 @router.post("/v1/assess")
 async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
     email = str(req.email)
+
+    if await has_used_free_program(db, email) and not await has_active_subscription(db, email):
+        raise HTTPException(
+            status_code=402,
+            detail="Your free program is complete. Subscribe to keep training — "
+            "the engine adapts weekly based on your feedback.",
+        )
 
     # Load persistent athlete state (or initialise) and fold in this check-in.
     row = await db.get(AthleteStateRow, email)

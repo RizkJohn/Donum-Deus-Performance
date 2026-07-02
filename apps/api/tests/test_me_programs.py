@@ -1,6 +1,6 @@
 import pytest
 
-from conftest import make_request
+from conftest import make_request, subscribe
 
 
 @pytest.mark.asyncio
@@ -10,12 +10,12 @@ async def test_me_programs_requires_auth(client):
 
 
 @pytest.mark.asyncio
-async def test_dashboard_sees_programs_generated_before_signup(client):
+async def test_dashboard_sees_programs_generated_before_signup(client, monkeypatch):
     """The dashboard joins on email — an account should see every program ever
     generated for its address, including ones from before the account existed."""
     email = "returning@example.com"
 
-    # Program generated anonymously, before any account exists.
+    # Program generated anonymously, before any account exists (the free one).
     pre = await client.post(
         "/v1/assess", json={"email": email, "payload": make_request().model_dump()}
     )
@@ -27,7 +27,9 @@ async def test_dashboard_sees_programs_generated_before_signup(client):
     )
     token = signup.json()["token"]
 
-    # A second program, generated after the account exists.
+    # A second program requires an active subscription (billing/access.py).
+    await subscribe(client, monkeypatch, email)
+
     post = await client.post(
         "/v1/assess", json={"email": email, "payload": make_request().model_dump()}
     )

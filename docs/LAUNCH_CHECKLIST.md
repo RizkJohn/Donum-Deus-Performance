@@ -44,18 +44,7 @@ update the Stripe webhook URL to the deployed API → run
 `ENVIRONMENT=production python3 apps/api/scripts/check_launch_readiness.py`
 before pointing real traffic at it.
 
-## 5. One open product decision (not code — needs your call)
-**Should a free/unpaid account be able to use the engine and download
-programs?** Stripe billing is fully wired (checkout, portal, webhook,
-`User.subscription_status`), but nothing currently checks that status before
-serving a program or PDF — anyone with an account gets full access today.
-That's fine for a small, hand-picked first cohort you're onboarding directly;
-it becomes a real revenue leak the moment signups are open to the public.
-Tell me when you want this gated and I'll wire it — it's a scoped change,
-just one I didn't want to guess the UX for (hard paywall vs. a one-time free
-program vs. something else).
-
-## 6. Content/legal pass (not code)
+## 5. Content/legal pass (not code)
 - [ ] Read `/privacy` and `/terms` once more against what the assessment
       funnel actually collects (injuries, training history) — it's already
       written US-primary/international-universal, just worth a final human
@@ -69,4 +58,6 @@ CNS engine fix (fatigue-adjusted 3/2/1 cap), password reset flow
 (`/forgot-password`, `/reset-password`), a working contact form
 (`/correspondence` now actually sends), Sentry + Vercel Analytics wired
 dormant, `make check-env` launch-readiness gate, Railway/Vercel deployment
-config. Full detail in the commit history on this branch.
+config, and the offer model (`docs/OFFER_MODEL.md` — one free program per
+email, subscription required for a second). Full detail in the commit
+history on this branch.

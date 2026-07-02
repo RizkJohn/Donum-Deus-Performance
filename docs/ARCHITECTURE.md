@@ -226,6 +226,10 @@ web) — `railway.json` at the repo root configures the Railway build.
   `/v1/correspondence`, forwards to `CONTACT_EMAIL` with reply-to set to the
   submitter), and provider-agnostic email delivery (program-ready, welcome,
   password-reset, correspondence).
+- The offer model (`docs/OFFER_MODEL.md`): one complete program free per
+  email, no account required; a second program requires an active
+  subscription (`billing/access.py`, enforced in `routes/assess.py`). An
+  `UNSATISFIABLE_CONSTRAINTS` result never spends the free program.
 
 ## Known gotcha — CSP vs. dev-mode hydration
 
@@ -240,8 +244,6 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 
 ## Deferred (documented stubs)
 
-- Gating the PDF/ongoing adaptation behind the subscription status Stripe
-  reports (billing is wired; enforcement is not).
 - Haiku chat-coach surface (model tier configured; UI not built).
 - Email verification; OAuth/social login. (Password reset shipped: single-use,
   1-hour JWT with a `password_reset` scope claim so it can't double as a

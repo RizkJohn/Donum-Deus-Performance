@@ -1,6 +1,6 @@
 import pytest
 
-from conftest import make_request
+from conftest import make_request, subscribe
 
 # `client` fixture lives in conftest.py (shared across route test modules).
 
@@ -65,18 +65,66 @@ async def test_assess_accepts_preferences(client):
 
 
 @pytest.mark.asyncio
-async def test_persistent_state_accumulates_across_cycles(client):
+async def test_persistent_state_accumulates_across_cycles(client, monkeypatch):
     email = "returning@example.com"
     body = {"email": email, "payload": make_request().model_dump()}
 
     r1 = await client.post("/v1/assess", json=body)
     assert r1.json()["state_summary"]["cycle_count"] == 1
 
+    # A second program requires an active subscription (billing/access.py).
+    await subscribe(client, monkeypatch, email)
+
     r2 = await client.post("/v1/assess", json=body)
     second = r2.json()
     # state is persistent and folds forward, not reset each time
     assert second["state_summary"]["cycle_count"] == 2
     assert sum(second["state_summary"]["recent_movement_patterns"].values()) > 0
+
+
+@pytest.mark.asyncio
+async def test_second_assessment_without_subscription_is_paywalled(client):
+    email = "onefree@example.com"
+    body = {"email": email, "payload": make_request().model_dump()}
+
+    r1 = await client.post("/v1/assess", json=body)
+    assert r1.status_code == 200
+
+    r2 = await client.post("/v1/assess", json=body)
+    assert r2.status_code == 402
+
+
+@pytest.mark.asyncio
+async def test_subscribed_athlete_gets_unlimited_programs(client, monkeypatch):
+    email = "subscriber@example.com"
+    body = {"email": email, "payload": make_request().model_dump()}
+
+    r1 = await client.post("/v1/assess", json=body)
+    assert r1.status_code == 200
+
+    await subscribe(client, monkeypatch, email)
+
+    r2 = await client.post("/v1/assess", json=body)
+    assert r2.status_code == 200
+    r3 = await client.post("/v1/assess", json=body)
+    assert r3.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_unsatisfiable_first_result_does_not_spend_free_program(client):
+    email = "unsatisfiable@example.com"
+    # A single available day with a Beginner budget can't cover the required
+    # weekly movement patterns -- see test_decision_engine.py's equivalent.
+    payload = make_request(training_age="Beginner", available_days=["Monday"]).model_dump()
+
+    r1 = await client.post("/v1/assess", json={"email": email, "payload": payload})
+    assert r1.status_code == 200
+    assert "error" in r1.json()["program"]
+
+    # Still free: the engine declined to compromise, nothing was delivered.
+    r2 = await client.post("/v1/assess", json={"email": email, "payload": payload})
+    assert r2.status_code == 200
+    assert "error" in r2.json()["program"]
 
 
 @pytest.mark.asyncio

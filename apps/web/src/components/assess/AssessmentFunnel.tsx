@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { submitAssessment } from "@/lib/api";
+import { ApiError, submitAssessment } from "@/lib/api";
 import {
   fatigueStateFor,
   isEngineError,
@@ -119,7 +119,7 @@ const STEPS = [
   { title: "Review", sub: "Confirm & generate" },
 ];
 
-type Phase = "form" | "submitting" | "engine_error" | "network_error";
+type Phase = "form" | "submitting" | "engine_error" | "network_error" | "subscription_required";
 
 export default function AssessmentFunnel() {
   const router = useRouter();
@@ -302,7 +302,11 @@ export default function AssessmentFunnel() {
         }
       }
       router.push(`/program/${res.id}`);
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setPhase("subscription_required");
+        return;
+      }
       setPhase("network_error");
     }
   }
@@ -393,6 +397,27 @@ export default function AssessmentFunnel() {
         >
           Return to review
         </button>
+      </div>
+    );
+  }
+
+  if (phase === "subscription_required") {
+    return (
+      <div className="mx-auto max-w-[560px] px-6 py-24">
+        <p className="kicker mb-4">Your free program is complete</p>
+        <h2 className="mb-5 font-play text-[32px] font-black leading-[1] tracking-[-0.02em] text-ink">
+          The diagnosis is <em className="font-normal italic text-warm">done.</em>{" "}
+          The practice continues.
+        </h2>
+        <p className="mb-8 font-bask text-[15px] leading-[1.8] text-ink2">
+          Every athlete gets one complete, real program from the engine at no
+          cost. Training your state as it changes — week to week, cycle to
+          cycle — is the practice itself, and that is what a subscription
+          keeps running.
+        </p>
+        <Link href="/curriculum" className="btn-primary inline-block">
+          View the tiers
+        </Link>
       </div>
     );
   }
