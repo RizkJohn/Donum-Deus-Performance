@@ -85,7 +85,8 @@ rule regardless of what the model returns.
 ├── packages/schemas/     # Shared JSON Schemas (derived from engine/*.md)
 ├── frontend/             # Legacy static mockups (deus_v2.html = design reference)
 ├── docker-compose.yml    # postgres + api + web
-└── Makefile              # make dev / make test / make seed-library
+├── railway.json          # Railway build config for apps/api (see docs/DEPLOYMENT.md)
+└── Makefile              # make dev / make test / make seed-library / make check-env
 ```
 
 ## Engine spec → code mapping
@@ -207,8 +208,13 @@ class LLMProvider(Protocol):
 ```
 docker compose up        # postgres + api (mock provider) + web — no API key needed
 make test                # pytest: unit + 100-program contract test (mock provider)
+make check-env           # report missing/default production secrets
 LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
 ```
+
+See `docs/SECRETS_SETUP.md` for obtaining real credentials and
+`docs/DEPLOYMENT.md` for deploying (Railway for API+Postgres, Vercel for
+web) — `railway.json` at the repo root configures the Railway build.
 
 ## Shipped in this milestone
 
