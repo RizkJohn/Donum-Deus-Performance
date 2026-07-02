@@ -14,7 +14,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "What distinguishes this institution from a generic coaching application?",
-    a: "Generic applications produce templates. This institution produces programmes through a two-stage process: an assessment engine first classifies the practitioner's training state, producing a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive is then used to construct the sessions. No two intake profiles produce the same output.",
+    a: "Generic applications produce templates. This institution produces programs through a two-stage process: an assessment engine first classifies the practitioner's training state, producing a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive is then used to construct the sessions. No two intake profiles produce the same output.",
   },
   {
     q: "Is access to a training facility required?",
@@ -25,7 +25,7 @@ const FAQ_ITEMS: FaqItem[] = [
     a: "Restrictions entered during intake are translated into exclusion criteria. The construction engine routes around them. For complex, post-surgical, or chronic presentations, the Practice or Stewardship level is the appropriate entry point — those levels include direct correspondence and oversight that cannot be substituted by automated constraint resolution alone.",
   },
   {
-    q: "How frequently should the programme be rebuilt?",
+    q: "How frequently should the program be rebuilt?",
     a: "Rebuild when the practitioner's state changes materially: schedule shifts, significant fatigue accumulation, return from a deload, or six to eight weeks of continuous work in the current block. Foundation practitioners rebuild on demand. Practice and Stewardship practitioners receive in-cycle adjustments as part of their level of engagement.",
   },
   {
@@ -38,11 +38,11 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Does this institution provide medical or rehabilitation advice?",
-    a: "No. Deus Performance is a practice of performance education. It does not constitute medical advice, rehabilitation guidance, or clinical counsel of any kind. Practitioners with active medical conditions should consult a licensed clinician before enrolling in any programme.",
+    a: "No. Deus Performance is a practice of performance education. It does not constitute medical advice, rehabilitation guidance, or clinical counsel of any kind. Practitioners with active medical conditions should consult a licensed clinician before enrolling in any program.",
   },
   {
-    q: "Who administers the programme?",
-    a: "Deus Performance operates as an independent practice. All programme delivery, correspondence, and review is handled through the institution. For any enquiry outside the scope of this reference, use the Correspondence page.",
+    q: "Who administers the program?",
+    a: "Deus Performance operates as an independent practice. All program delivery, correspondence, and review is handled through the institution. For any inquiry outside the scope of this reference, use the Correspondence page.",
   },
 ];
 

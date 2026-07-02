@@ -9,6 +9,9 @@ Day = Literal[
 ]
 TrainingAge = Literal["Beginner", "Intermediate", "Advanced"]
 FatigueState = Literal["low", "moderate", "high"]
+TrainingEnvironment = Literal["full_gym", "home", "minimal"]
+RecoveryCapacity = Literal["low", "moderate", "high"]
+NoveltyTolerance = Literal["low", "medium", "high"]
 
 DAY_ORDER: list[str] = [
     "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
@@ -67,9 +70,27 @@ class State(BaseModel):
         return self._fatigue_state
 
 
+class Preferences(BaseModel):
+    """Optional athlete-practice inputs (RedesignGuide athlete-state seed).
+
+    All fields default so legacy payloads validate unchanged. They feed the
+    Assessment Layer and Variation Engine — never the deterministic safety
+    core (CNS / coverage / volume / intensity stay rule-governed).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    training_environment: TrainingEnvironment = "full_gym"
+    preferred_modalities: list[str] = Field(default_factory=list)
+    exercise_aversions: list[str] = Field(default_factory=list)
+    novelty_tolerance: NoveltyTolerance = "medium"
+    # Derived from age + training_age + fatigue when left None.
+    recovery_capacity: RecoveryCapacity | None = None
+
+
 class GenerateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     client_profile: ClientProfile
     goals: Goals
     schedule: Schedule
     state: State
+    preferences: Preferences = Field(default_factory=Preferences)

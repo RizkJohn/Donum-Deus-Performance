@@ -2,69 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { TIERS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Curriculum — Deus Performance",
   description:
-    "Three levels of engagement: Foundation ($27/mo), Practice ($87/mo), Stewardship ($197/mo). The methodology does not vary by level.",
+    "Three levels of engagement: Foundation ($20/mo), Practice ($120/mo), Stewardship ($240/mo). The methodology does not vary by level.",
 };
-
-const LEVELS = [
-  {
-    level: "Level I",
-    name: "Foundation",
-    desc: "A complete programme, delivered for independent execution.",
-    fee: "27",
-    period: "Per month · No minimum term",
-    featured: false,
-    featuredLabel: null,
-    includes: [
-      "Programme constructed from your intake profile",
-      "Rebuild on demand when your state or schedule changes",
-      "Full weekly structure and daily session detail",
-      "Movement notes and substitution library",
-      "Print and PDF export",
-      "Written correspondence — 48-hour response",
-    ],
-    tier: "foundation",
-  },
-  {
-    level: "Level II",
-    name: "Practice",
-    desc: "Foundation, with direct oversight and monthly programme review.",
-    fee: "87",
-    period: "Per month · No minimum term",
-    featured: true,
-    featuredLabel: "Most selected",
-    includes: [
-      "Everything in Foundation",
-      "Monthly 45-minute review with Deus Performance",
-      "Weekly movement review via video submission",
-      "Substitutions built for specific restrictions",
-      "In-cycle programme adjustments between rebuilds",
-      "Priority correspondence — 24-hour response",
-    ],
-    tier: "practice",
-  },
-  {
-    level: "Level III",
-    name: "Stewardship",
-    desc: "A full engagement structured around the practitioner's entire life.",
-    fee: "197",
-    period: "Per month · Six-month minimum",
-    featured: false,
-    featuredLabel: null,
-    includes: [
-      "Everything in Practice",
-      "Weekly 30-minute consultation",
-      "Daily correspondence — 12-hour response",
-      "Quarterly assessment and full programme recalibration",
-      "Travel, event, and peak-output cycle planning",
-      "Injury, setback, and return-to-practice management",
-    ],
-    tier: "stewardship",
-  },
-];
 
 export default function CurriculumPage() {
   return (
@@ -92,38 +36,38 @@ export default function CurriculumPage() {
         <div className="border-t border-line">
           <div className="mx-auto max-w-[1300px] px-5 py-[40px] md:px-[52px]">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-line">
-              {LEVELS.map((l) => (
+              {TIERS.map((t) => (
                 <div
-                  key={l.level}
+                  key={t.id}
                   className="flex flex-col p-[24px] md:p-[32px] relative"
-                  style={{ background: l.featured ? "var(--bg1)" : "var(--bg)" }}
+                  style={{ background: t.featured ? "var(--bg1)" : "var(--bg)" }}
                 >
-                  {l.featuredLabel && (
+                  {t.featuredLabel && (
                     <div className="absolute top-0 right-0 bg-accent font-mono text-[7px] tracking-[0.18em] uppercase px-[10px] py-[5px]"
                          style={{ color: "#f3efe8" }}>
-                      {l.featuredLabel}
+                      {t.featuredLabel}
                     </div>
                   )}
                   <div className="font-mono text-[8px] tracking-[0.22em] uppercase text-accent mb-[6px]">
-                    {l.level}
+                    {t.level}
                   </div>
                   <div className="font-play font-normal text-[26px] text-ink mb-[6px] leading-[1.1]">
-                    {l.name}
+                    {t.name}
                   </div>
                   <p className="font-bask text-[13px] text-ink2 leading-[1.7] mb-[20px]">
-                    {l.desc}
+                    {t.desc}
                   </p>
                   <div className="mb-[4px]">
                     <span className="font-play font-normal text-[42px] text-ink leading-[1]">
                       <span className="text-[22px] text-ink3 align-top mt-[8px] inline-block">$</span>
-                      {l.fee}
+                      {t.price}
                     </span>
                   </div>
                   <div className="font-mono text-[8px] tracking-[0.14em] uppercase text-ink3 mb-[24px]">
-                    {l.period}
+                    {t.period}
                   </div>
                   <ul className="flex flex-col gap-[9px] mb-[28px] flex-1">
-                    {l.includes.map((item, i) => (
+                    {t.includes.map((item, i) => (
                       <li key={i} className="flex items-start gap-[8px]">
                         <span className="text-accent mt-[2px] flex-shrink-0 font-mono text-[10px]">
                           ✓
@@ -135,12 +79,23 @@ export default function CurriculumPage() {
                     ))}
                   </ul>
                   <Link
-                    href={`/assess?tier=${l.tier}`}
-                    className="btn-primary text-center w-full"
+                    href="/assess"
+                    className="btn-primary text-center w-full mb-[8px]"
                     style={{ fontSize: "10px", padding: "11px 20px" }}
                   >
-                    Apply — {l.name}
+                    Start free assessment
                   </Link>
+                  {/* Plain <a>, not next/link: /checkout is a redirecting
+                      Route Handler, not a page — Link's client-side soft-
+                      navigation would issue an RSC prefetch instead of
+                      following the redirect. */}
+                  <a
+                    href={`/checkout?tier=${t.id}`}
+                    className="text-center w-full font-mono text-[9px] uppercase tracking-[0.1em] text-ink3 hover:text-ink transition-colors"
+                    style={{ padding: "6px 0" }}
+                  >
+                    Already assessed? Subscribe →
+                  </a>
                 </div>
               ))}
             </div>

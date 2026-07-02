@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: "Who builds the programs — a person or a machine?",
-    a: "Both, by design. Deterministic rules decide everything that touches safety: training-day split, nervous-system distribution, volume budget, movement coverage, progression and deload flags. A language model fills exercise selections inside that frame, and the result is re-validated against every rule. On the Hybrid and Premium tiers, a human coach reviews and refines on top.",
+    a: "Both, by design. Deterministic rules decide everything that touches safety: training-day split, nervous-system distribution, volume budget, movement coverage, progression and deload flags. A language model fills exercise selections inside that frame, and the result is re-validated against every rule. On the Practice and Stewardship tiers, a human coach reviews and refines on top.",
   },
 ];
 

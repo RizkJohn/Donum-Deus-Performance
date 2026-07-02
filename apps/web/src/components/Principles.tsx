@@ -7,7 +7,7 @@ const PRINCIPLES = [
   {
     num: "ii.",
     title: "Intensity Is Not Evidence of Care",
-    body: "Volume that destroys the infrastructure it was meant to develop is not diligence — it is waste. The measure of a sound programme is not its severity. It is the structural integrity it protects and the capacity it returns over time.",
+    body: "Volume that destroys the infrastructure it was meant to develop is not diligence — it is waste. The measure of a sound program is not its severity. It is the structural integrity it protects and the capacity it returns over time.",
   },
   {
     num: "iii.",
@@ -45,7 +45,7 @@ export default function Principles() {
             The institution holds that physical development is not a pursuit of
             aesthetics or performance metrics. It is an act of stewardship over
             something that was given rather than earned. That framing changes
-            everything about how a programme is built.
+            everything about how a program is built.
           </p>
         </div>
       </div>

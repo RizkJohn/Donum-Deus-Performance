@@ -56,9 +56,9 @@ export default function CorrespondenceForm() {
           />
         </div>
         <div>
-          <label className="field-label">Nature of Enquiry</label>
+          <label className="field-label">Nature of Inquiry</label>
           <select className="field-input" defaultValue="general">
-            <option value="general">General enquiry</option>
+            <option value="general">General inquiry</option>
             <option value="foundation">Level I — Foundation</option>
             <option value="practice">Level II — Practice</option>
             <option value="stewardship">Level III — Stewardship</option>
@@ -70,7 +70,7 @@ export default function CorrespondenceForm() {
         <textarea
           rows={5}
           className="field-input resize-none"
-          placeholder="Your objective, current situation, constraints, history — whatever provides relevant context for the enquiry."
+          placeholder="Your objective, current situation, constraints, history — whatever provides relevant context for the inquiry."
         />
       </div>
       <button type="submit" className="btn-primary w-full text-center py-[13px]">

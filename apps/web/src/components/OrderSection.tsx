@@ -46,7 +46,7 @@ export default function OrderSection() {
           <em className="text-warm">resolves</em> them.
         </h2>
         <p className="font-bask text-[14px] text-ink2 mb-[28px] leading-[1.8] max-w-[370px]">
-          Every programme produced by this institution resolves competing demands
+          Every program produced by this institution resolves competing demands
           in a fixed hierarchy. Structural integrity is never traded for
           performance. Performance is never traded for aesthetics. The order is
           non-negotiable.

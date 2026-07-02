@@ -16,9 +16,14 @@ For a performance coaching app where the assessment engine must:
 
 | Function | Recommended Claude Model | Why |
 | --- | --- | --- |
-| Core assessment + reasoning engine | Claude Opus 4.1 | Best deep reasoning, abstraction, longitudinal planning, nuanced adaptation |
-| High-volume day-to-day program generation | Claude Sonnet 4 | Much cheaper/faster while retaining strong reasoning |
-| Lightweight UI interactions/chat | Claude Haiku 3.5 | Cost-efficient conversational layer |
+| Core assessment + reasoning engine | Claude Opus 4.8 | Best deep reasoning, abstraction, longitudinal planning, nuanced adaptation |
+| High-volume day-to-day program generation | Claude Sonnet 4.6 | Much cheaper/faster while retaining strong reasoning |
+| Lightweight UI interactions/chat | Claude Haiku 4.5 | Cost-efficient conversational layer |
+
+> Implementation note: these tiers are wired in `apps/api/deus_api/config.py`
+> (`assessment_model` / `generation_model` / `chat_model`). The Assessment
+> Layer is deterministic by default, so the Opus tier only bills when
+> `LLM_PROVIDER=claude`. The mock provider runs the whole pipeline offline.
 
 # **Critical Point**
 
@@ -251,8 +256,8 @@ Otherwise adaptation remains superficial.
 
 Use:
 
-- Opus 4.1 for assessment/reasoning
-- Sonnet 4 for session generation
+- Opus 4.8 for assessment/reasoning
+- Sonnet 4.6 for session generation
 
 This is likely optimal for:
 
@@ -263,7 +268,7 @@ This is likely optimal for:
 
 # **When Sonnet Alone Is Enough**
 
-Use only Sonnet 4 if:
+Use only Sonnet 4.6 if:
 
 - <10k active users
 - simpler progression systems

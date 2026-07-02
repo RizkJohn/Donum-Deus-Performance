@@ -6,7 +6,7 @@ import CorrespondenceForm from "@/components/CorrespondenceForm";
 export const metadata: Metadata = {
   title: "Correspondence — Deus Performance",
   description:
-    "Direct enquiry for level selection, complex presentations, or any matter outside the standard intake process.",
+    "Direct inquiry for level selection, complex presentations, or any matter outside the standard intake process.",
 };
 
 const CONTACT_INFO = [
@@ -34,10 +34,10 @@ export default function CorrespondencePage() {
             className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[18px] text-ink"
             style={{ fontSize: "clamp(36px, 5vw, 68px)" }}
           >
-            Direct <em className="text-warm">enquiry.</em>
+            Direct <em className="text-warm">inquiry.</em>
           </h1>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[560px]">
-            For level enquiries, complex presentations, or any matter that falls
+            For level inquiries, complex presentations, or any matter that falls
             outside the intake process. All correspondence is reviewed within one
             business day.
           </p>

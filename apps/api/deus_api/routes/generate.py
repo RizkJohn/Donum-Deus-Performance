@@ -12,34 +12,43 @@ from ..config import get_settings
 from ..db.models import ProgramRun
 from ..db.session import get_db
 from ..deps import get_lib, get_provider, get_specs
-from ..engine.pipeline import generate_program
+from ..engine.pipeline import PipelineResult, generate_program
+from ..models.athlete_state import AthleteState
 from ..models.input_contract import GenerateRequest
 
 router = APIRouter()
 
 
-async def run_pipeline(req: GenerateRequest, db: AsyncSession) -> ProgramRun:
+async def run_pipeline(
+    req: GenerateRequest, db: AsyncSession, *, state: AthleteState | None = None
+) -> tuple[ProgramRun, PipelineResult]:
+    """Run the full pipeline and persist the run. Returns (row, result) so
+    callers (assess) can fold the generated program back into athlete state."""
     provider = get_provider()
+    settings = get_settings()
     result = await generate_program(
         req,
         provider=provider,
         specs=get_specs(),
         library=get_lib(),
-        max_attempts=get_settings().max_attempts,
+        max_attempts=settings.max_attempts,
+        state=state,
+        generation_model=settings.generation_model,
     )
     run = ProgramRun(
         payload=req.model_dump(),
         program=result.output,
+        assessment=result.assessment.model_dump() if result.assessment else None,
         provider=provider.name,
         attempts=result.attempts,
         qc_history=result.qc_history,
     )
     db.add(run)
     await db.commit()
-    return run
+    return run, result
 
 
 @router.post("/v1/generate")
 async def generate(req: GenerateRequest, db: AsyncSession = Depends(get_db)) -> dict:
-    run = await run_pipeline(req, db)
+    run, _ = await run_pipeline(req, db)
     return run.program

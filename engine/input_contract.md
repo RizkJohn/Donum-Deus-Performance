@@ -24,6 +24,21 @@
   }
 }
 
+## OPTIONAL (athlete-state seed — defaults applied when omitted; legacy payloads valid)
+
+{
+  "preferences": {
+    "training_environment": "full_gym|home|minimal   (default full_gym)",
+    "preferred_modalities": ["string"],
+    "exercise_aversions":   ["string"],
+    "novelty_tolerance":    "low|medium|high   (default medium)",
+    "recovery_capacity":    "low|moderate|high|null   (derived from age+training_age when null)"
+  }
+}
+
+- preferences feed ONLY the Assessment Layer + Variation Engine. They never
+  touch the deterministic safety core (CNS / coverage / volume / intensity).
+
 ## DERIVED (computed by engine — never supplied by client)
 - fatigue_score = average(sleep, soreness, energy, stress), clamped [1–5]
 - fatigue_state = high (>=4.0) | moderate (3.0–3.9) | low (<3.0)

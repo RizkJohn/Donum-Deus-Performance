@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             where our service is accessible.
           </p>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] mb-[48px]">
-            We collect the minimum data necessary to generate your programme. We
+            We collect the minimum data necessary to generate your program. We
             do not sell your data, share it for advertising, or run tracking of
             any kind.
           </p>
@@ -87,8 +87,8 @@ export default function PrivacyPage() {
                 Deus Performance is operated by Riz Management LLC
                 (&ldquo;we,&rdquo; &ldquo;us,&rdquo; &ldquo;our&rdquo;). We
                 are a US-based company providing a constraint-driven adaptive
-                training engine that generates personalised weekly training
-                programmes from a structured assessment. Our service is available
+                training engine that generates personalized weekly training
+                programs from a structured assessment. Our service is available
                 to users globally; where local law imposes requirements beyond
                 what this policy already satisfies, we comply with those
                 requirements.
@@ -106,14 +106,14 @@ export default function PrivacyPage() {
               <h2 className="section-head">Information We Collect</h2>
               <P>
                 We collect only the information required to generate your
-                training programme. No data is collected speculatively.
+                training program. No data is collected speculatively.
               </P>
               <Table
                 rows={[
                   {
                     label: "Contact information",
                     detail:
-                      "Your email address, submitted on the final step of the assessment, used to associate your programme with a retrievable record.",
+                      "Your email address, submitted on the final step of the assessment, used to associate your program with a retrievable record.",
                   },
                   {
                     label: "Physical profile",
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
                   {
                     label: "Fitness goals",
                     detail:
-                      "Primary goal and optional secondary goals selected from a fixed list. Used to weight the objective hierarchy governing programme construction.",
+                      "Primary goal and optional secondary goals selected from a fixed list. Used to weight the objective hierarchy governing program construction.",
                   },
                   {
                     label: "Schedule",
@@ -181,7 +181,7 @@ export default function PrivacyPage() {
                 </p>
                 <BulletList
                   items={[
-                    "Used exclusively to generate your training programme — not for any other purpose.",
+                    "Used exclusively to generate your training program — not for any other purpose.",
                     "Never sold, shared for advertising, or disclosed to insurers, employers, or data brokers.",
                     "Not used to make decisions about your insurance, employment, credit, or housing.",
                     "Transmitted to Anthropic's API (when Claude is the configured LLM provider) only as structured fitness inputs — your email is never included in AI model calls.",
@@ -201,19 +201,19 @@ export default function PrivacyPage() {
               <h2 className="section-head">How We Use Your Information</h2>
               <P>
                 Every data point collected serves a single operational purpose:
-                constructing and returning your training programme.
+                constructing and returning your training program.
               </P>
               <Table
                 rows={[
                   {
-                    label: "Programme generation",
+                    label: "Program generation",
                     detail:
                       "Your profile, goals, schedule, and state are passed to the engine, which applies hard constraint rules and — optionally — an AI language model to produce exercise selections and load parameters.",
                   },
                   {
-                    label: "Programme retrieval",
+                    label: "Program retrieval",
                     detail:
-                      "Your email is stored alongside a unique programme ID so your generated week can be retrieved via the link we return.",
+                      "Your email is stored alongside a unique program ID so your generated week can be retrieved via the link we return.",
                   },
                   {
                     label: "Service improvement",
@@ -224,7 +224,7 @@ export default function PrivacyPage() {
               />
               <P>
                 We do not use your data to send promotional email, serve
-                advertising, build behavioural profiles, infer characteristics
+                advertising, build behavioral profiles, infer characteristics
                 you have not disclosed, or train AI models on your personal
                 information.
               </P>
@@ -242,7 +242,7 @@ export default function PrivacyPage() {
                   Riz Management LLC does not sell, rent, trade, or share your
                   personal information with third parties for monetary or other
                   valuable consideration. We have never done so. We do not share
-                  your personal information for cross-context behavioural
+                  your personal information for cross-context behavioral
                   advertising. This applies to all categories of personal
                   information we hold, including health and wellness data.
                 </p>
@@ -324,8 +324,8 @@ export default function PrivacyPage() {
               <SectionNumber n={8} />
               <h2 className="section-head">Data Retention</h2>
               <P>
-                Your assessment data and programme are retained so that you can
-                retrieve your programme via its unique link. We do not currently
+                Your assessment data and program are retained so that you can
+                retrieve your program via its unique link. We do not currently
                 operate automated deletion schedules.
               </P>
               <P>
@@ -347,7 +347,7 @@ export default function PrivacyPage() {
                 privacy policies accurately describe data practices, which this
                 policy does. A growing number of US states have enacted
                 comprehensive consumer privacy laws that give residents specific
-                rights over their personal information. We honour those rights
+                rights over their personal information. We honor those rights
                 for all users, not only residents of states that mandate them.
               </P>
 
@@ -385,7 +385,7 @@ export default function PrivacyPage() {
                   items={[
                     "You may request that we stop collecting your consumer health data at any time by ceasing use of the assessment.",
                     "You may request deletion of all health and wellness data we hold for your email address.",
-                    "We will not sell, share, or use your health data for purposes beyond generating your programme.",
+                    "We will not sell, share, or use your health data for purposes beyond generating your program.",
                     "We obtained your affirmative consent before collecting health data, via the consent checkbox on the assessment form.",
                   ]}
                 />
@@ -418,14 +418,14 @@ export default function PrivacyPage() {
               <h2 className="section-head">Your Rights — International</h2>
               <P>
                 Our service is accessible globally. We apply the same data
-                minimisation and rights-honouring approach regardless of
-                jurisdiction. The following summarises rights under the major
+                minimization and rights-honoring approach regardless of
+                jurisdiction. The following summarizes rights under the major
                 international frameworks applicable to non-US users.
               </P>
 
               <SubBox label="EU General Data Protection Regulation (GDPR) & UK GDPR">
                 <P className="mb-[12px]">
-                  Legal bases: contract performance (generating the programme
+                  Legal bases: contract performance (generating the program
                   you requested), consent (checkbox at assessment submission),
                   and legitimate interests (improving constraint accuracy via
                   anonymised data). You may withdraw consent at any time by
@@ -473,7 +473,7 @@ export default function PrivacyPage() {
                 <P>
                   We apply the rights most analogous to those in your
                   jurisdiction (access, correction, deletion, portability, and
-                  objection). Contact us and we will honour the applicable
+                  objection). Contact us and we will honor the applicable
                   requirements.
                 </P>
               </SubBox>
@@ -506,7 +506,7 @@ export default function PrivacyPage() {
               <SectionNumber n={12} />
               <h2 className="section-head">Data Security</h2>
               <P>
-                We implement reasonable technical and organisational measures to
+                We implement reasonable technical and organizational measures to
                 protect your personal information. These include:
               </P>
               <BulletList

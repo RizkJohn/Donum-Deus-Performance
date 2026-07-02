@@ -1,43 +1,5 @@
 import Link from "next/link";
-
-const TIERS = [
-  {
-    name: "Engine",
-    price: 49,
-    desc: "The full adaptive engine, self-directed.",
-    featured: false,
-    features: [
-      "AI-generated weekly programs",
-      "Fatigue check-ins that adjust volume",
-      "Equipment & injury substitutions",
-      "Complete movement coverage, every week",
-    ],
-  },
-  {
-    name: "Hybrid",
-    price: 199,
-    desc: "The engine, reviewed by a human coach.",
-    featured: true,
-    features: [
-      "Everything in Engine",
-      "Monthly coach review of your programming",
-      "Form feedback on submitted video",
-      "Direct messaging with your coach",
-    ],
-  },
-  {
-    name: "Premium",
-    price: 750,
-    desc: "A dedicated coach, engine-assisted.",
-    featured: false,
-    features: [
-      "Everything in Hybrid",
-      "Dedicated coach",
-      "Custom periodization across training blocks",
-      "Weekly one-on-one consults",
-    ],
-  },
-];
+import { TIERS } from "@/lib/pricing";
 
 export default function Pricing() {
   return (
@@ -47,14 +9,15 @@ export default function Pricing() {
         Choose your <em className="font-normal italic text-warm">measure.</em>
       </h2>
       <p className="max-w-[560px] font-bask text-[16px] leading-[1.8] text-ink2">
-        Start with the free assessment — no card required. See your first
-        program before you decide anything.
+        Start with the free assessment — no card required. Your first week is
+        yours to keep, as a branded program PDF with the coach&apos;s read.
+        Subscribe when you want the engine to keep adapting to you.
       </p>
 
       <div className="mt-11 grid grid-cols-1 gap-px border border-line bg-line md:grid-cols-3">
         {TIERS.map((t) => (
           <div
-            key={t.name}
+            key={t.id}
             className={`relative flex flex-col p-[30px] pt-10 transition-colors ${
               t.featured ? "bg-bg2" : "bg-bg hover:bg-bg1"
             }`}
@@ -65,11 +28,7 @@ export default function Pricing() {
               </span>
             )}
             <p className="mb-[14px] font-mono text-[9px] uppercase tracking-[0.24em] text-accent">
-              {t.name === "Engine"
-                ? "Self-directed"
-                : t.name === "Hybrid"
-                  ? "Coach-reviewed"
-                  : "Coach-led"}
+              {t.tagline}
             </p>
             <h3 className="mb-[6px] font-play text-[20px] font-bold uppercase tracking-[0.02em] text-ink">
               {t.name}
@@ -107,11 +66,20 @@ export default function Pricing() {
             >
               Start free assessment
             </Link>
+            {/* Plain <a>, not next/link: /checkout is a redirecting Route
+                Handler, not a page — Link's client-side soft-navigation
+                would issue an RSC prefetch instead of following the redirect. */}
+            <a
+              href={`/checkout?tier=${t.id}`}
+              className="mt-[10px] block w-full px-[18px] py-[10px] text-center font-mono text-[9px] font-medium uppercase tracking-[0.14em] text-ink3 transition-colors hover:text-ink"
+            >
+              Already assessed? Subscribe to {t.name} →
+            </a>
           </div>
         ))}
       </div>
       <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.1em] text-ink3">
-        Start with the free assessment — no card required.
+        Free assessment · first program PDF included · no card required.
       </p>
     </section>
   );

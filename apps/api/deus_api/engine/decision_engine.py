@@ -9,12 +9,15 @@ Returns EngineError({"error":"UNSATISFIABLE_CONSTRAINTS", ...}) when the
 constraints cannot be satisfied — never a partial plan.
 """
 
+from ..models.assessment import TrainingAssessment
+from ..models.athlete_state import AthleteState
 from ..models.decision import COVERAGE_GROUPS, PlanDay, PrecomputedPlan
 from ..models.errors import EngineError
 from ..models.input_contract import DAY_ORDER, GenerateRequest
 from .fatigue import apply_volume_reduction, progression_flag
 from .library_loader import Library
 from .substitution import blocked_ids_for_injuries
+from .variation import prioritize_pool
 
 # Training days and base volume (exercises/session, <= 8) by training age.
 TARGET_DAYS = {"Beginner": 3, "Intermediate": 4, "Advanced": 5}
@@ -27,7 +30,18 @@ def _calendar_index(day: str) -> int:
     return DAY_ORDER.index(day)
 
 
-def build_plan(req: GenerateRequest, library: Library) -> PrecomputedPlan | EngineError:
+def build_plan(
+    req: GenerateRequest,
+    library: Library,
+    assessment: TrainingAssessment | None = None,
+    state: AthleteState | None = None,
+) -> PrecomputedPlan | EngineError:
+    """Deterministic plan. When an `assessment` + `state` are supplied (the live
+    pipeline), the Variation Engine reorders the allowed pool (novel → stale,
+    soft aversions last) and movement priority drives coverage-group sequencing.
+    Injuries remain HARD blocks; aversions are SOFT (kept for coverage, picked
+    last). All hard safety rules are unchanged. Back-compat: called with just
+    (req, library) it behaves exactly as before."""
     reasons: list[str] = []
 
     # --- eligible training days: available minus sport days, Mon→Sun order
@@ -97,11 +111,23 @@ def build_plan(req: GenerateRequest, library: Library) -> PrecomputedPlan | Engi
         for d in chosen
     ]
 
+    # --- variation: reorder the allowed pool (novel first) and demote soft
+    #     aversions to the tail; sequence coverage groups by movement priority.
+    required_groups = list(COVERAGE_GROUPS)
+    if assessment is not None and state is not None:
+        ordered = prioritize_pool(state, allowed, assessment.novelty_target)
+        soft_avoid = set(assessment.exclusions) & set(allowed)
+        allowed = [i for i in ordered if i not in soft_avoid] + [
+            i for i in ordered if i in soft_avoid
+        ]
+        if set(assessment.movement_priority) == set(COVERAGE_GROUPS):
+            required_groups = list(assessment.movement_priority)
+
     return PrecomputedPlan(
         days=days,
         volume_budget=budget,
         flag=progression_flag(req.state.fatigue_score),
         allowed_exercise_ids=allowed,
         blocked_exercise_ids=sorted(blocked),
-        required_groups=list(COVERAGE_GROUPS),
+        required_groups=required_groups,
     )

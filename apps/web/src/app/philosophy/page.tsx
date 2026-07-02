@@ -44,17 +44,17 @@ const COMMITMENTS = [
   {
     n: "i.",
     title: "Structure Before Load",
-    body: "Joint integrity is the non-negotiable first priority of every programme. It is not a constraint on development — it is the precondition for development. Without it, all subsequent work is spent compensating for what the structure no longer supports.",
+    body: "Joint integrity is the non-negotiable first priority of every program. It is not a constraint on development — it is the precondition for development. Without it, all subsequent work is spent compensating for what the structure no longer supports.",
   },
   {
     n: "ii.",
     title: "Built From First Principles",
-    body: "Every programme is constructed from the practitioner's actual inputs: age, body composition, schedule density, fatigue state, movement restrictions, and stated objectives. No template is applied. No default fills an unexamined variable.",
+    body: "Every program is constructed from the practitioner's actual inputs: age, body composition, schedule density, fatigue state, movement restrictions, and stated objectives. No template is applied. No default fills an unexamined variable.",
   },
   {
     n: "iii.",
     title: "Intelligent Overload Only",
-    body: "The programme distinguishes between productive stress — the kind that drives adaptation — and accumulated damage. Volume is modulated to the practitioner's current state. Progression is applied only when the conditions for it exist.",
+    body: "The program distinguishes between productive stress — the kind that drives adaptation — and accumulated damage. Volume is modulated to the practitioner's current state. Progression is applied only when the conditions for it exist.",
   },
   {
     n: "iv.",
@@ -64,9 +64,9 @@ const COMMITMENTS = [
 ];
 
 const REFUSALS = [
-  "Present a template as a custom programme. If the intake does not materially change the output, the intake serves no purpose and the output is dishonest.",
+  "Present a template as a custom program. If the intake does not materially change the output, the intake serves no purpose and the output is dishonest.",
   "Prescribe volume that compromises joint integrity in exchange for short-term performance. The structural cost is always paid. Only the timing is uncertain.",
-  "Disregard fatigue state. A programme that cannot adapt to where the practitioner is today is a schedule, not a programme. Schedules do not build anything of consequence.",
+  "Disregard fatigue state. A program that cannot adapt to where the practitioner is today is a schedule, not a program. Schedules do not build anything of consequence.",
   "Allow conditioning to undermine the strength work it is intended to complement. Everything in a session has a fatigue cost. Only expenditures with commensurate returns are permitted.",
 ];
 
@@ -87,7 +87,7 @@ export default function PhilosophyPage() {
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] max-w-[620px]">
             Performance education has been reduced to a product category.
             Templates are sold as precision. Volume is sold as care. Generic
-            outputs are sold as personalisation. This institution was founded to
+            outputs are sold as personalization. This institution was founded to
             work against every part of that.
           </p>
         </section>
@@ -209,7 +209,7 @@ export default function PhilosophyPage() {
           </h2>
           <p className="font-bask text-[14px] text-ink2 leading-[1.85] mb-[36px] max-w-[580px]">
             The methodology is physical. The framework beneath it is not. Every
-            programme this institution builds rests on four bodies of thought
+            program this institution builds rests on four bodies of thought
             that have spent two thousand years answering the questions a training
             plan alone cannot.
           </p>
