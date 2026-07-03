@@ -20,8 +20,10 @@ def get_engine():
 async def init_db() -> None:
     engine = get_engine()
     async with engine.begin() as conn:
-        # Milestone 1: create_all on startup. Alembic migrations come with
-        # the first schema change that needs data preservation.
+        # create_all is checkfirst — a harmless no-op once Alembic (alembic/)
+        # has already created the tables. Kept for zero-setup local/test runs
+        # against sqlite; any deployed Postgres is migrated via `alembic
+        # upgrade head` (run automatically in the Docker image's CMD).
         await conn.run_sync(Base.metadata.create_all)
 
 

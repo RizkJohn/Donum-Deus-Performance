@@ -78,6 +78,7 @@ rule regardless of what the model returns.
 │   │   │   ├── billing/  # thin Stripe SDK wrapper (client.py)
 │   │   │   ├── email/    # base (Protocol), mock, resend_provider, factory
 │   │   │   └── db/       # SQLAlchemy models + session (leads, program_runs, users)
+│   │   ├── alembic/      # migrations — env.py reads DATABASE_URL + Base.metadata
 │   │   ├── data/         # exercise_library.json, substitution_rules.json (DERIVED)
 │   │   ├── scripts/      # port_library.py (markdown → JSON generator)
 │   │   └── tests/
@@ -85,7 +86,7 @@ rule regardless of what the model returns.
 ├── packages/schemas/     # Shared JSON Schemas (derived from engine/*.md)
 ├── frontend/             # Legacy static mockups (deus_v2.html = design reference)
 ├── docker-compose.yml    # postgres + api + web
-└── Makefile              # make dev / make test / make seed-library
+└── Makefile              # make dev / make test / make seed-library / make migrate
 ```
 
 ## Engine spec → code mapping
@@ -184,8 +185,10 @@ class LLMProvider(Protocol):
   /v1/me/programs` (`routes/me.py`) joins `Lead.email == current_user.email` —
   the same join `routes/assess.py` already uses for GDPR export — so an
   account sees every program ever generated for its address, including ones
-  from before the account existed. No FK added to `program_runs`/`leads`
-  (`create_all` can't alter already-existing tables; there's no Alembic yet).
+  from before the account existed. No FK added to `program_runs`/`leads` —
+  deliberate, to avoid coupling accounts to the funnel's pre-signup data;
+  Alembic (`apps/api/alembic/`) could add one in a future migration if that
+  changes, but it isn't a tooling limitation anymore.
 - **Billing**: `routes/billing.py` — `POST /v1/billing/checkout {tier}` creates
   a Stripe Checkout Session (tier→price resolved from `STRIPE_PRICE_*` env
   vars); `POST /v1/billing/portal` opens the Billing Portal; `POST
@@ -207,7 +210,16 @@ class LLMProvider(Protocol):
 docker compose up        # postgres + api (mock provider) + web — no API key needed
 make test                # pytest: unit + 100-program contract test (mock provider)
 LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
+make migrate              # apply Alembic migrations to $DATABASE_URL
+make migration m="..."    # autogenerate a new migration from a model change
 ```
+
+Schema changes: edit `db/models.py`, then `make migration m="..."` to
+autogenerate the revision, review the generated `alembic/versions/*.py` by
+hand, and commit it alongside the model change. The Docker image runs
+`alembic upgrade head` before `uvicorn` starts, so any deployed environment
+(docker-compose's Postgres today, whatever hosts production Postgres next)
+picks up new migrations on deploy automatically.
 
 ## Shipped in this milestone
 
@@ -236,4 +248,4 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 - Password reset / email verification; OAuth/social login.
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
-- Redis/Qdrant; Alembic migrations (currently `create_all` on fresh DBs).
+- Redis/Qdrant.
