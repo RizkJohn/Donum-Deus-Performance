@@ -199,7 +199,10 @@ class LLMProvider(Protocol):
   (not a page) — pricing CTAs link to it with a plain `<a>`, not `next/link`,
   since `Link`'s client-side soft-navigation would issue an RSC prefetch
   instead of following the redirect. Returns a clear 400 instead of an SDK
-  crash when Stripe env vars are unset.
+  crash when Stripe env vars are unset. **Enforcement** (`billing/gate.py`):
+  first program free, adaptation paid — repeat `/v1/assess`, `/v1/feedback`,
+  and the dashboard return 402 without an active/trialing subscription, but
+  only once `STRIPE_SECRET_KEY` is configured.
 - **Email**: mirrors the `llm/` provider-agnostic pattern exactly —
   `EMAIL_PROVIDER=mock` (default, offline, in-memory outbox for tests) |
   `resend`. Triggers: program-ready email after a successful `/v1/assess`,
@@ -276,8 +279,12 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 
 ## Deferred (documented stubs)
 
-- Gating the PDF/ongoing adaptation behind the subscription status Stripe
-  reports (billing is wired; enforcement is not).
+- ~~Gating ongoing adaptation behind subscription status~~ — shipped
+  (`billing/gate.py`): first program free; repeat `/v1/assess`,
+  `/v1/feedback`, and `/v1/me/programs` require an account whose
+  `subscription_status` is active/trialing. Enforcement activates only when
+  `STRIPE_SECRET_KEY` is set — without Stripe there'd be no way to pay, so
+  everything stays open (dev, preview, pre-Stripe production).
 - Haiku chat-coach surface (model tier configured; UI not built).
 - Email verification on signup; OAuth/social login. (Password reset shipped:
   `POST /v1/auth/reset-request` → emailed purpose-scoped code →

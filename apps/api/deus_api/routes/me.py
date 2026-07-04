@@ -5,11 +5,12 @@ an account can see every program ever generated for its email address,
 including ones generated before the account existed.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth.deps import get_current_user
+from ..billing.gate import enforcement_enabled, is_active
 from ..db.models import AthleteStateRow, Lead, ProgramRun, User
 from ..db.session import get_db
 from ..models.athlete_state import AthleteState
@@ -32,6 +33,16 @@ def _state_summary(state: AthleteState) -> dict:
 async def my_programs(
     user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
+    # Dashboard history is part of the paid product (billing/gate.py model);
+    # open while Stripe is unconfigured so dev/preview stays fully usable.
+    if enforcement_enabled() and not is_active(user):
+        raise HTTPException(
+            status_code=402,
+            detail=(
+                "Your program history requires an active subscription. "
+                "Choose a tier on the Curriculum page to continue."
+            ),
+        )
     rows = (
         await db.execute(
             select(Lead, ProgramRun)

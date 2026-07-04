@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth.tokens import decode_data_token, issue_data_token
 from ..billing import client as billing_client
+from ..billing.gate import require_active_subscription
 from ..config import get_settings
 from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun, User
 from ..db.session import get_db
@@ -55,6 +56,14 @@ class AssessRequest(BaseModel):
 @router.post("/v1/assess")
 async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
     email = str(req.email)
+
+    # First program is free; a repeat assessment is ongoing adaptation and
+    # requires an active subscription (billing/gate.py — no-op w/o Stripe).
+    prior = (
+        await db.execute(select(Lead).where(Lead.email == email).limit(1))
+    ).scalar_one_or_none()
+    if prior is not None:
+        await require_active_subscription(db, email)
 
     # Load persistent athlete state (or initialise) and fold in this check-in.
     row = await db.get(AthleteStateRow, email)
