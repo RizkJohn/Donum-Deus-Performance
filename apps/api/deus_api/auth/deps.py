@@ -22,7 +22,12 @@ async def get_current_user(
         claims = decode_token(token)
     except jwt.PyJWTError:
         raise _UNAUTHORIZED
-    user = await db.get(User, claims.get("sub"))
+    # Purpose-scoped data tokens (auth/tokens.issue_data_token) share the
+    # signing secret but are never sessions: no `sub`, always a `purpose`.
+    sub = claims.get("sub")
+    if not sub or "purpose" in claims:
+        raise _UNAUTHORIZED
+    user = await db.get(User, sub)
     if user is None:
         raise _UNAUTHORIZED
     return user

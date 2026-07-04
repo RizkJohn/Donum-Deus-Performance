@@ -203,7 +203,16 @@ class LLMProvider(Protocol):
 - **Email**: mirrors the `llm/` provider-agnostic pattern exactly —
   `EMAIL_PROVIDER=mock` (default, offline, in-memory outbox for tests) |
   `resend`. Triggers: program-ready email after a successful `/v1/assess`,
-  welcome email on signup.
+  welcome email on signup, data-request confirmation codes.
+- **Data rights** (`docs/DATA_RETENTION.md`): `GET/DELETE /v1/data` are
+  gated behind a purpose-scoped 30-min JWT emailed by `POST
+  /v1/data/request` (possession of the inbox proves ownership; uniform
+  response prevents enumeration; rate-limited). Erasure deletes the account
+  row too, cancelling any active Stripe subscription first — a failed
+  cancel aborts the whole erasure. Data tokens carry `purpose` and no
+  `sub`, so `get_current_user` rejects them as sessions. `create_app()`
+  refuses to boot against Postgres with the default `AUTH_JWT_SECRET`
+  (docker-compose sets its own throwaway dev secret).
 
 ## Local development
 

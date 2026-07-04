@@ -33,12 +33,17 @@ never used for anything except generating and adapting the client's program.
 - **Active clients**: retained while the relationship is active — history is
   the input to adaptive programming, so deleting it degrades the product.
 - **Erasure on request**: `DELETE /v1/data` permanently removes programs,
-  feedback, athlete state, and lead rows for an email — already implemented,
-  GDPR/CCPA right to erasure. **Known gaps (open, tracked below)**: the
-  `users` account row is *not* yet deleted by this endpoint, and the endpoint
-  does not verify the requester owns the email.
-- **Export on request**: `GET /v1/data` returns everything held for an email —
-  already implemented, GDPR right of access. Same ownership-verification gap.
+  feedback, athlete state, lead rows, **and any account** for an email —
+  GDPR/CCPA right to erasure. An active Stripe subscription is cancelled
+  first; if cancellation fails, nothing is deleted (the client is never
+  left silently paying for an erased account).
+- **Export on request**: `GET /v1/data` returns everything held for an
+  email — GDPR right of access.
+- **Ownership verification**: both endpoints require a short-lived (30 min)
+  confirmation code requested via `POST /v1/data/request` and delivered
+  only to the email address itself — possession proves ownership. The
+  request endpoint answers identically whether or not the address has data
+  (no enumeration), and is rate-limited.
 - **Dormant funnel leads** (assessed, never became a client): reviewed for
   deletion after **24 months** of inactivity. *(Owner to confirm the window.)*
 - **Backups**: Neon point-in-time recovery retains deleted rows until its
@@ -53,17 +58,19 @@ never used for anything except generating and adapting the client's program.
 3. Any new data category (e.g. video uploads, if a form-check feature ships)
    gets added to this document **before** the feature ships, not after.
 
-## Open gaps — must close before public launch
+## Gap history
 
-Both found auditing `routes/assess.py` against this policy; neither is a
-drift risk in code review because they are behavioral, not structural:
+Two gaps were found auditing `routes/assess.py` against this policy when it
+was first drafted; **both are closed**:
 
-1. **Erasure skips accounts.** `DELETE /v1/data` predates the `users` table
-   and was never extended — email, password hash, and Stripe IDs survive a
-   "complete" erasure. Extending it must handle an active subscription
-   (cancel via Stripe first, or retain minimal billing records under the
-   legal-obligation exception) — not a blind row delete.
-2. **No ownership verification.** `DELETE /v1/data` and `GET /v1/data`
-   accept any email unauthenticated: anyone who knows a client's address
-   can export or destroy their history. Needs an email-confirmation loop
-   (funnel users have no account) and/or an authenticated session path.
+1. ~~Erasure skips accounts~~ — `DELETE /v1/data` now deletes the `users`
+   row, cancelling any active Stripe subscription first (a cancellation
+   failure aborts the erasure entirely rather than orphaning billing).
+2. ~~No ownership verification~~ — both data endpoints are gated behind a
+   purpose-scoped confirmation token emailed to the address by
+   `POST /v1/data/request`. Export tokens cannot erase and vice versa;
+   data tokens are rejected as session tokens.
+
+Remaining known limitation: there is no web UI for data requests yet — the
+flow is API-only (the emailed code is used against the endpoints directly).
+A `/data` page in `apps/web` is the natural follow-up.

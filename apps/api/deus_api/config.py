@@ -34,8 +34,11 @@ class Settings(BaseSettings):
     max_attempts: int = 3
 
     # Accounts — JWT is stateless; this must be overridden in production.
+    # create_app() refuses to start against Postgres with this default.
     auth_jwt_secret: str = "dev-insecure-secret-change-me-before-any-real-deploy"
     auth_token_ttl_days: int = 30
+    # GDPR data-request confirmation tokens (auth/tokens.issue_data_token).
+    data_token_ttl_minutes: int = 30
 
     # Stripe — subscription checkout/portal/webhook. Empty key => billing
     # routes return a clear "not configured" error instead of an SDK crash.

@@ -17,6 +17,18 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    # Postgres means a real deployment (local dev/tests run sqlite). Refuse
+    # to boot with the dev JWT secret there — every session and GDPR data
+    # token would be forgeable. docker-compose sets its own dev secret.
+    if settings.database_url.startswith("postgresql") and (
+        settings.auth_jwt_secret
+        == "dev-insecure-secret-change-me-before-any-real-deploy"
+    ):
+        raise RuntimeError(
+            "AUTH_JWT_SECRET is still the insecure default while DATABASE_URL "
+            "points at Postgres. Set AUTH_JWT_SECRET in the deployment "
+            "environment (e.g. Railway Variables) before starting the API."
+        )
     app = FastAPI(
         title="Deus Performance Engine API",
         version="0.1.0",

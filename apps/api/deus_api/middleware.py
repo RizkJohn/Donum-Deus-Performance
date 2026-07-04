@@ -13,8 +13,9 @@ from typing import ClassVar
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Endpoints subject to strict rate limiting (LLM / lead-capture operations)
-_RATE_LIMITED_PATHS = {"/v1/assess", "/v1/generate"}
+# Endpoints subject to strict rate limiting (LLM / lead-capture / outbound-
+# email operations — /v1/data/request sends a confirmation email per call)
+_RATE_LIMITED_PATHS = {"/v1/assess", "/v1/generate", "/v1/data/request"}
 
 # Requests per IP per window
 _RATE_LIMIT = 20
