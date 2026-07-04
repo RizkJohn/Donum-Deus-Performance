@@ -16,6 +16,7 @@
 | LLM layer | Provider-agnostic + tiered models | Claude (Anthropic) default; mock provider for key-free dev/tests. Tiered per stage: Opus 4.8 reasons over the assessment, Sonnet 4.6 generates sessions, Haiku 4.5 powers chat — assessment is deterministic by default so Opus only bills on demand |
 | Frontend | Next.js + React + Tailwind | SEO, analytics, funnel A/B testing — parity with top coaching platforms |
 | Repo shape | Monorepo (`apps/`, `packages/`) | One contract, two consumers (API + web) |
+| Production hosting | Vercel (web) + Railway (api) + Neon (Postgres) | Each service on the host built for its shape: Next.js on Vercel's GitHub App, the API's existing Dockerfile on Railway, Postgres on Neon (scale-to-zero, branching, PITR — no bundled Auth/Storage to pay for) |
 
 ## System diagram
 
@@ -218,8 +219,32 @@ Schema changes: edit `db/models.py`, then `make migration m="..."` to
 autogenerate the revision, review the generated `alembic/versions/*.py` by
 hand, and commit it alongside the model change. The Docker image runs
 `alembic upgrade head` before `uvicorn` starts, so any deployed environment
-(docker-compose's Postgres today, whatever hosts production Postgres next)
-picks up new migrations on deploy automatically.
+(docker-compose's Postgres today, production Postgres on Neon) picks up new
+migrations on deploy automatically.
+
+## Production deployment
+
+Three managed services, each connected to this repo via its own GitHub
+App / dashboard — **no deploy step lives in `.github/workflows/ci.yml`**
+(CI stays test-only; the hosts deploy on push independently):
+
+| Service | Host | How it deploys |
+|---|---|---|
+| `apps/web` | Vercel | GitHub App; preview per PR, production on `main` |
+| `apps/api` | Railway | Builds `apps/api/Dockerfile` with **Root Directory `/`** (repo root — the Dockerfile COPYs `engine/` from the root, same as docker-compose's `context: .`) |
+| Postgres | Neon | Not a deploy target — `apps/api` reaches it via `DATABASE_URL` |
+
+Env vars live in each host's dashboard, mirroring `apps/api/.env.example`.
+The Neon `DATABASE_URL` needs two edits from what Neon's console shows:
+scheme `postgresql+asyncpg://` (async driver), and `?ssl=require` instead
+of `?sslmode=require` (asyncpg's parameter name). Use Neon's **direct**
+(non-`-pooler`) hostname — the API is one long-lived process and SQLAlchemy
+already pools; PgBouncer transaction pooling adds prepared-statement
+complications for no benefit at this scale. Cross-wiring: Vercel's
+`NEXT_PUBLIC_API_URL` points at the Railway URL; Railway's `CORS_ORIGINS`
+points back at the Vercel URL. On boot the container runs
+`alembic upgrade head`, so Neon's schema tracks `alembic/versions/`
+automatically on every deploy.
 
 ## Shipped in this milestone
 
