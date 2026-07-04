@@ -24,6 +24,9 @@ services:
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}      # no API key needed by default
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       CORS_ORIGINS: http://localhost:3000
+      # create_app() refuses the baked-in dev default against Postgres;
+      # compose is explicitly local dev, so it declares its own throwaway.
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-local-compose-only-secret-never-production}
     ports:
       - "8000:8000"
     depends_on:

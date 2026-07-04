@@ -2,22 +2,31 @@
 
 POST /v1/assess        — lead capture + persistent-state assessment + program
 GET  /v1/programs/{id} — fetch a stored run (program + coach's read + state)
-DELETE /v1/data        — GDPR/CCPA right to erasure: delete all records for an email
-GET  /v1/data          — GDPR right of access: export all records for an email
+POST /v1/data/request  — email a confirmation token for export or erasure
+GET  /v1/data          — GDPR right of access: export, token-gated
+DELETE /v1/data        — GDPR/CCPA right to erasure: delete all, token-gated
+
+The data endpoints require a purpose-scoped token from /v1/data/request,
+delivered only to the email address itself — possession proves ownership.
 """
 
+from typing import Literal
+
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, EmailStr, TypeAdapter
+from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-_email_adapter = TypeAdapter(EmailStr)
-
-from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun
+from ..auth.tokens import decode_data_token, issue_data_token
+from ..billing import client as billing_client
+from ..billing.gate import require_active_subscription
+from ..config import get_settings
+from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun, User
 from ..db.session import get_db
 from ..deps import get_lib
 from ..email.factory import get_email_provider
-from ..email.templates import program_ready_email
+from ..email.templates import data_request_email, program_ready_email
 from ..engine.athlete_state import load_or_init, update_exposure
 from ..models.athlete_state import AthleteState
 from ..models.input_contract import GenerateRequest
@@ -47,6 +56,14 @@ class AssessRequest(BaseModel):
 @router.post("/v1/assess")
 async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict:
     email = str(req.email)
+
+    # First program is free; a repeat assessment is ongoing adaptation and
+    # requires an active subscription (billing/gate.py — no-op w/o Stripe).
+    prior = (
+        await db.execute(select(Lead).where(Lead.email == email).limit(1))
+    ).scalar_one_or_none()
+    if prior is not None:
+        await require_active_subscription(db, email)
 
     # Load persistent athlete state (or initialise) and fold in this check-in.
     row = await db.get(AthleteStateRow, email)
@@ -104,9 +121,40 @@ async def get_program(run_id: str, db: AsyncSession = Depends(get_db)) -> dict:
     }
 
 
-class DataDeleteRequest(BaseModel):
+class DataAccessRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: EmailStr
+    action: Literal["export", "erase"]
+
+
+@router.post("/v1/data/request")
+async def request_data_access(req: DataAccessRequest) -> dict:
+    """Step 1 of export/erasure: email a purpose-scoped confirmation token to
+    the address. Response is identical whether or not the address has data —
+    the endpoint must not confirm what we hold to someone who only knows an
+    email. Rate-limited (middleware) since it triggers outbound email."""
+    email = str(req.email)
+    token = issue_data_token(email, req.action)
+    subject, html = data_request_email(req.action, token)
+    await get_email_provider().send(to=email, subject=subject, html=html)
+    ttl = get_settings().data_token_ttl_minutes
+    return {
+        "message": (
+            "If this address has data with us, a confirmation code has been "
+            f"emailed to it. The code expires in {ttl} minutes."
+        )
+    }
+
+
+class DataDeleteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    token: str
+
+
+_BAD_TOKEN = HTTPException(
+    status_code=401,
+    detail="Invalid or expired confirmation code. Request a new one via POST /v1/data/request.",
+)
 
 
 @router.delete("/v1/data")
@@ -115,10 +163,36 @@ async def delete_data(
 ) -> dict:
     """GDPR right to erasure / CCPA right to delete.
 
-    Permanently removes all leads, program runs, reinforcement feedback, and
-    persistent athlete state for the given email. Returns deletion counts.
-    """
-    email = str(req.email)
+    Requires an `erase` token from /v1/data/request. Permanently removes all
+    leads, program runs, reinforcement feedback, persistent athlete state,
+    and any account for the token's email. An active Stripe subscription is
+    cancelled first — if that fails, nothing is deleted (rolled back) so an
+    erased client is never left silently paying."""
+    try:
+        email = decode_data_token(req.token, "erase")
+    except jwt.PyJWTError:
+        raise _BAD_TOKEN
+
+    settings = get_settings()
+    user = (
+        await db.execute(select(User).where(User.email == email))
+    ).scalar_one_or_none()
+    if user is not None:
+        if user.stripe_subscription_id and settings.stripe_secret_key:
+            try:
+                billing_client.cancel_subscription(
+                    settings, subscription_id=user.stripe_subscription_id
+                )
+            except Exception:
+                raise HTTPException(
+                    status_code=502,
+                    detail=(
+                        "Could not cancel the active subscription; no data was "
+                        "deleted. Try again shortly or contact support."
+                    ),
+                )
+        await db.delete(user)
+
     leads = (
         await db.execute(select(Lead).where(Lead.email == email))
     ).scalars().all()
@@ -152,33 +226,30 @@ async def delete_data(
         "deleted_programs": len(run_ids),
         "deleted_feedback": len(feedback),
         "deleted_athlete_state": 1 if state_row is not None else 0,
+        "deleted_account": 1 if user is not None else 0,
         "message": "All personal data associated with this email has been permanently deleted.",
     }
 
 
 @router.get("/v1/data")
 async def export_data(
-    email: str = Query(..., description="Email address as submitted in the assessment"),
+    token: str = Query(..., description="Export confirmation code from POST /v1/data/request"),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     """GDPR right of access / CCPA right to know.
 
-    Returns all assessment inputs and program records associated with the
-    given email address in a structured, portable format.
-
-    Note: This endpoint requires only an email address for access. A future
-    improvement will add an email-verification step before disclosure.
-    """
+    Requires an `export` token from /v1/data/request. Returns all assessment
+    inputs and program records for the token's email in a portable format."""
     try:
-        validated = _email_adapter.validate_python(email)
-    except Exception:
-        raise HTTPException(status_code=422, detail="Invalid email address.")
+        email = decode_data_token(token, "export")
+    except jwt.PyJWTError:
+        raise _BAD_TOKEN
 
     rows = (
         await db.execute(
             select(Lead, ProgramRun)
             .join(ProgramRun, Lead.run_id == ProgramRun.id)
-            .where(Lead.email == str(validated))
+            .where(Lead.email == email)
         )
     ).all()
 
@@ -192,10 +263,10 @@ async def export_data(
         for lead, run in rows
     ]
 
-    state_row = await db.get(AthleteStateRow, str(validated))
+    state_row = await db.get(AthleteStateRow, email)
 
     return {
-        "email": str(validated),
+        "email": email,
         "record_count": len(records),
         "records": records,
         "athlete_state": state_row.state if state_row else None,

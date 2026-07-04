@@ -16,6 +16,18 @@ def settings():
     return get_settings()
 
 
+@pytest.fixture(autouse=True)
+def _clean_rate_limit_bucket():
+    """RateLimitMiddleware._store is a ClassVar — one per-IP bucket shared
+    across every app instance in the pytest process. Clear it around each
+    test so rate-limited calls in one test never 429 a later one."""
+    from deus_api.middleware import RateLimitMiddleware
+
+    RateLimitMiddleware._store.clear()
+    yield
+    RateLimitMiddleware._store.clear()
+
+
 @pytest.fixture(scope="session")
 def library():
     return get_lib()

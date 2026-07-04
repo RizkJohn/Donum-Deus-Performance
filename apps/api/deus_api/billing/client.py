@@ -52,6 +52,13 @@ def create_portal_session(settings: Settings, *, customer_id: str, return_url: s
     return stripe.billing_portal.Session.create(customer=customer_id, return_url=return_url)
 
 
+def cancel_subscription(settings: Settings, *, subscription_id: str):
+    """Immediate cancellation — used by GDPR erasure before the account row
+    is deleted, so Stripe never keeps billing an erased client."""
+    stripe.api_key = settings.stripe_secret_key
+    return stripe.Subscription.cancel(subscription_id)
+
+
 def construct_webhook_event(settings: Settings, *, payload: bytes, sig_header: str):
     stripe.api_key = settings.stripe_secret_key
     return stripe.Webhook.construct_event(payload, sig_header, settings.stripe_webhook_secret)

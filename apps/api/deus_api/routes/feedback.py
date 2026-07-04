@@ -7,6 +7,7 @@ next assessment autoregulates on real adherence/effort, not intake alone.
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..billing.gate import require_active_subscription
 from ..db.models import AthleteStateRow, Feedback, ProgramRun
 from ..db.session import get_db
 from ..engine.athlete_state import fold_feedback
@@ -23,6 +24,8 @@ async def submit_feedback(fb: FeedbackIn, db: AsyncSession = Depends(get_db)) ->
         raise HTTPException(status_code=404, detail="program run not found")
 
     email = str(fb.email)
+    # Check-ins feed adaptation — subscription-gated (no-op w/o Stripe).
+    await require_active_subscription(db, email)
     db.add(Feedback(email=email, run_id=fb.run_id, signals=fb.model_dump(mode="json")))
 
     summary = None

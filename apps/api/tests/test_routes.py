@@ -107,12 +107,20 @@ async def test_feedback_unknown_run_404(client):
 
 @pytest.mark.asyncio
 async def test_erasure_removes_state_and_feedback(client):
+    from deus_api.email.factory import get_email_provider
+    from test_data_rights import token_from_outbox
+
     email = "erase@example.com"
     r = await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
     run_id = r.json()["id"]
     await client.post("/v1/feedback", json={"email": email, "run_id": run_id, "completion_pct": 0.5})
 
-    d = await client.request("DELETE", "/v1/data", json={"email": email})
+    # Erasure is token-gated: request the confirmation code first.
+    rq = await client.post("/v1/data/request", json={"email": email, "action": "erase"})
+    assert rq.status_code == 200
+    token = token_from_outbox(get_email_provider().outbox, email)
+
+    d = await client.request("DELETE", "/v1/data", json={"token": token})
     assert d.status_code == 200
     body = d.json()
     assert body["deleted_programs"] >= 1

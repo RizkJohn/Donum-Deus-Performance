@@ -16,6 +16,7 @@
 | LLM layer | Provider-agnostic + tiered models | Claude (Anthropic) default; mock provider for key-free dev/tests. Tiered per stage: Opus 4.8 reasons over the assessment, Sonnet 4.6 generates sessions, Haiku 4.5 powers chat — assessment is deterministic by default so Opus only bills on demand |
 | Frontend | Next.js + React + Tailwind | SEO, analytics, funnel A/B testing — parity with top coaching platforms |
 | Repo shape | Monorepo (`apps/`, `packages/`) | One contract, two consumers (API + web) |
+| Production hosting | Vercel (web) + Railway (api) + Neon (Postgres) | Each service on the host built for its shape: Next.js on Vercel's GitHub App, the API's existing Dockerfile on Railway, Postgres on Neon (scale-to-zero, branching, PITR — no bundled Auth/Storage to pay for) |
 
 ## System diagram
 
@@ -78,6 +79,7 @@ rule regardless of what the model returns.
 │   │   │   ├── billing/  # thin Stripe SDK wrapper (client.py)
 │   │   │   ├── email/    # base (Protocol), mock, resend_provider, factory
 │   │   │   └── db/       # SQLAlchemy models + session (leads, program_runs, users)
+│   │   ├── alembic/      # migrations — env.py reads DATABASE_URL + Base.metadata
 │   │   ├── data/         # exercise_library.json, substitution_rules.json (DERIVED)
 │   │   ├── scripts/      # port_library.py (markdown → JSON generator)
 │   │   └── tests/
@@ -85,7 +87,7 @@ rule regardless of what the model returns.
 ├── packages/schemas/     # Shared JSON Schemas (derived from engine/*.md)
 ├── frontend/             # Legacy static mockups (deus_v2.html = design reference)
 ├── docker-compose.yml    # postgres + api + web
-└── Makefile              # make dev / make test / make seed-library
+└── Makefile              # make dev / make test / make seed-library / make migrate
 ```
 
 ## Engine spec → code mapping
@@ -184,8 +186,10 @@ class LLMProvider(Protocol):
   /v1/me/programs` (`routes/me.py`) joins `Lead.email == current_user.email` —
   the same join `routes/assess.py` already uses for GDPR export — so an
   account sees every program ever generated for its address, including ones
-  from before the account existed. No FK added to `program_runs`/`leads`
-  (`create_all` can't alter already-existing tables; there's no Alembic yet).
+  from before the account existed. No FK added to `program_runs`/`leads` —
+  deliberate, to avoid coupling accounts to the funnel's pre-signup data;
+  Alembic (`apps/api/alembic/`) could add one in a future migration if that
+  changes, but it isn't a tooling limitation anymore.
 - **Billing**: `routes/billing.py` — `POST /v1/billing/checkout {tier}` creates
   a Stripe Checkout Session (tier→price resolved from `STRIPE_PRICE_*` env
   vars); `POST /v1/billing/portal` opens the Billing Portal; `POST
@@ -195,11 +199,23 @@ class LLMProvider(Protocol):
   (not a page) — pricing CTAs link to it with a plain `<a>`, not `next/link`,
   since `Link`'s client-side soft-navigation would issue an RSC prefetch
   instead of following the redirect. Returns a clear 400 instead of an SDK
-  crash when Stripe env vars are unset.
+  crash when Stripe env vars are unset. **Enforcement** (`billing/gate.py`):
+  first program free, adaptation paid — repeat `/v1/assess`, `/v1/feedback`,
+  and the dashboard return 402 without an active/trialing subscription, but
+  only once `STRIPE_SECRET_KEY` is configured.
 - **Email**: mirrors the `llm/` provider-agnostic pattern exactly —
   `EMAIL_PROVIDER=mock` (default, offline, in-memory outbox for tests) |
   `resend`. Triggers: program-ready email after a successful `/v1/assess`,
-  welcome email on signup.
+  welcome email on signup, data-request confirmation codes.
+- **Data rights** (`docs/DATA_RETENTION.md`): `GET/DELETE /v1/data` are
+  gated behind a purpose-scoped 30-min JWT emailed by `POST
+  /v1/data/request` (possession of the inbox proves ownership; uniform
+  response prevents enumeration; rate-limited). Erasure deletes the account
+  row too, cancelling any active Stripe subscription first — a failed
+  cancel aborts the whole erasure. Data tokens carry `purpose` and no
+  `sub`, so `get_current_user` rejects them as sessions. `create_app()`
+  refuses to boot against Postgres with the default `AUTH_JWT_SECRET`
+  (docker-compose sets its own throwaway dev secret).
 
 ## Local development
 
@@ -207,7 +223,40 @@ class LLMProvider(Protocol):
 docker compose up        # postgres + api (mock provider) + web — no API key needed
 make test                # pytest: unit + 100-program contract test (mock provider)
 LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
+make migrate              # apply Alembic migrations to $DATABASE_URL
+make migration m="..."    # autogenerate a new migration from a model change
 ```
+
+Schema changes: edit `db/models.py`, then `make migration m="..."` to
+autogenerate the revision, review the generated `alembic/versions/*.py` by
+hand, and commit it alongside the model change. The Docker image runs
+`alembic upgrade head` before `uvicorn` starts, so any deployed environment
+(docker-compose's Postgres today, production Postgres on Neon) picks up new
+migrations on deploy automatically.
+
+## Production deployment
+
+Three managed services, each connected to this repo via its own GitHub
+App / dashboard — **no deploy step lives in `.github/workflows/ci.yml`**
+(CI stays test-only; the hosts deploy on push independently):
+
+| Service | Host | How it deploys |
+|---|---|---|
+| `apps/web` | Vercel | GitHub App; preview per PR, production on `main` |
+| `apps/api` | Railway | Builds `apps/api/Dockerfile` with **Root Directory `/`** (repo root — the Dockerfile COPYs `engine/` from the root, same as docker-compose's `context: .`) |
+| Postgres | Neon | Not a deploy target — `apps/api` reaches it via `DATABASE_URL` |
+
+Env vars live in each host's dashboard, mirroring `apps/api/.env.example`.
+The Neon `DATABASE_URL` needs two edits from what Neon's console shows:
+scheme `postgresql+asyncpg://` (async driver), and `?ssl=require` instead
+of `?sslmode=require` (asyncpg's parameter name). Use Neon's **direct**
+(non-`-pooler`) hostname — the API is one long-lived process and SQLAlchemy
+already pools; PgBouncer transaction pooling adds prepared-statement
+complications for no benefit at this scale. Cross-wiring: Vercel's
+`NEXT_PUBLIC_API_URL` points at the Railway URL; Railway's `CORS_ORIGINS`
+points back at the Vercel URL. On boot the container runs
+`alembic upgrade head`, so Neon's schema tracks `alembic/versions/`
+automatically on every deploy.
 
 ## Shipped in this milestone
 
@@ -230,10 +279,16 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 
 ## Deferred (documented stubs)
 
-- Gating the PDF/ongoing adaptation behind the subscription status Stripe
-  reports (billing is wired; enforcement is not).
+- ~~Gating ongoing adaptation behind subscription status~~ — shipped
+  (`billing/gate.py`): first program free; repeat `/v1/assess`,
+  `/v1/feedback`, and `/v1/me/programs` require an account whose
+  `subscription_status` is active/trialing. Enforcement activates only when
+  `STRIPE_SECRET_KEY` is set — without Stripe there'd be no way to pay, so
+  everything stays open (dev, preview, pre-Stripe production).
 - Haiku chat-coach surface (model tier configured; UI not built).
-- Password reset / email verification; OAuth/social login.
+- Email verification on signup; OAuth/social login. (Password reset shipped:
+  `POST /v1/auth/reset-request` → emailed purpose-scoped code →
+  `POST /v1/auth/reset`; same token machinery as the GDPR data endpoints.)
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
-- Redis/Qdrant; Alembic migrations (currently `create_all` on fresh DBs).
+- Redis/Qdrant.
