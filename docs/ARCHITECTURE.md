@@ -279,7 +279,9 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 - Gating the PDF/ongoing adaptation behind the subscription status Stripe
   reports (billing is wired; enforcement is not).
 - Haiku chat-coach surface (model tier configured; UI not built).
-- Password reset / email verification; OAuth/social login.
+- Email verification on signup; OAuth/social login. (Password reset shipped:
+  `POST /v1/auth/reset-request` → emailed purpose-scoped code →
+  `POST /v1/auth/reset`; same token machinery as the GDPR data endpoints.)
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
 - Redis/Qdrant.

@@ -62,6 +62,20 @@ def data_request_email(action: str, token: str) -> tuple[str, str]:
     return subject, html
 
 
+def password_reset_email(token: str) -> tuple[str, str]:
+    ttl = get_settings().data_token_ttl_minutes
+    subject = "Reset your Deus Performance password"
+    html = (
+        _WRAP_OPEN
+        + "<p>A password reset was requested for your account. Your reset code:</p>"
+        + f'<p><code data-token style="font-size:15px;letter-spacing:0.02em;">{token}</code></p>'
+        + f"<p>It expires in {ttl} minutes. If you did not make this request, "
+        + "ignore this email — your password is unchanged.</p>"
+        + _WRAP_CLOSE
+    )
+    return subject, html
+
+
 def program_ready_email(program_id: str) -> tuple[str, str]:
     web_url = get_settings().web_url.rstrip("/")
     subject = "Your weekly program is ready"

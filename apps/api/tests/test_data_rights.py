@@ -9,8 +9,6 @@ from sqlalchemy import select
 
 from conftest import make_request
 
-from deus_api.middleware import RateLimitMiddleware
-
 _TOKEN_RE = re.compile(r'<code data-token[^>]*>([^<]+)</code>')
 
 
@@ -22,15 +20,6 @@ def token_from_outbox(outbox: list[dict], email: str) -> str:
             if match:
                 return match.group(1)
     raise AssertionError(f"no data-request email to {email} in outbox")
-
-
-@pytest.fixture(autouse=True)
-def _clean_rate_limit_bucket():
-    """The limiter's per-IP bucket is a ClassVar shared across the whole
-    pytest process; these tests add rate-limited calls, so isolate them."""
-    RateLimitMiddleware._store.clear()
-    yield
-    RateLimitMiddleware._store.clear()
 
 
 async def _request_token(client, email: str, action: str) -> str:
