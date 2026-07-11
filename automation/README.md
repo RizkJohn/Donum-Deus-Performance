@@ -1,8 +1,9 @@
 # Donum Dei Performance — Automation Suite
 
-Nine importable [n8n](https://n8n.io) workflows covering the full operating
-loop of the practice: lead capture, program generation and delivery,
-check-ins and progression, content, newsletters, Q&A, and monitoring.
+Thirteen importable [n8n](https://n8n.io) workflows covering the full
+operating loop of the practice: lead capture and nurture, billing and
+onboarding, program generation and delivery, check-ins and progression,
+content, newsletters, Q&A, monitoring, and an owner business digest.
 
 The design contract: **Postgres (behind the API) is the transactional system
 of record; Notion is the human-facing operations hub; n8n is the courier
@@ -23,10 +24,54 @@ or an explicit human approval status (Q&A, newsletter, content).
 | `07-qa-autoresponder.json` | `POST /webhook/ddp-question` + every 15 min | Claude drafts a reply into the **Q&A Inbox** (`Drafted` / `Needs Human`); dispatcher sends only rows a human flipped to `Approved` |
 | `08-ops-monitor.json` | Every 15 min | `GET /healthz`; on failure emails the owner and writes an `error` row to the **Automation Log** |
 | `09-social-repurpose.json` | Wednesdays 10:00 | Latest Published blog post → platform-native Instagram / TikTok / Threads drafts in the **Content Calendar** |
+| `10-stripe-billing-lifecycle.json` | Stripe Trigger | `checkout.session.completed` → upsert **Clients** (Active + tier + Stripe customer id) → kick onboarding; `invoice.payment_failed` → dunning email; `customer.subscription.deleted` → mark Churned + win-back email |
+| `11-client-onboarding-sequence.json` | `POST /webhook/ddp-onboard` | Day 0 / Day 3 / Day 7 welcome drip (Wait nodes) — called by workflow 10 on conversion |
+| `12-lead-nurture.json` | Daily 11:00 | Leads **Assessed** but not converted for 3+ days → one conversion nudge → mark **Contacted** |
+| `13-owner-weekly-digest.json` | Mondays 07:00 | Emails you a one-screen operating report: new leads, active clients, estimated MRR, check-in rate, avg adherence, flagged check-ins, open Q&A |
+
+Workflow 10 uses n8n's **native Stripe Trigger**, which registers its own
+endpoint and verifies event signatures for you — point a Stripe webhook at
+n8n via the credential, no signing-secret handling in the workflow. This is
+the *ops-side* mirror; the API's own `/v1/billing/webhook` remains Stripe's
+source of truth for subscription state in Postgres. Run both — they do
+different jobs (Postgres truth vs. Notion hub + client comms).
 
 The legacy `apps/content_bot/` container still works and writes to the same
 Content Calendar; run either it **or** workflow 05/09 for social generation,
 not both, or you will get duplicate drafts.
+
+## Costs & vendor choice
+
+**You can launch this entire suite for $0/month.** The stack was chosen so
+the free tier is genuinely production-viable and the paid path is a no-op
+upgrade — no re-platforming, no rebuilding workflows.
+
+| Layer | Launch choice | Cost at launch | When to upgrade | Upgrade cost |
+|---|---|---|---|---|
+| **Email** | Resend | Free — 3,000/mo, 100/day, 1 domain | List > ~100 or nearing 3k/mo | **Resend Pro $20/mo** (50k emails) — same API, zero workflow changes |
+| **Automation** | n8n **self-hosted** (Community Edition) | Free — unlimited executions; ~$5/mo VPS, or $0 co-located with the API | Never for cost; only if you want managed hosting | n8n Cloud ~€20/mo (optional convenience) |
+| **LLM drafting** | Anthropic API (Claude) | Pay-per-use, cents per draft | — | scales linearly, no tier cliff |
+
+**Why not the alternatives:**
+
+- **Zapier / Make** meter every step (task- and operation-based). These
+  workflows are 5–18 nodes each, which burns their quotas fast and pushes
+  you to $20–50+/mo quickly. Self-hosted n8n has **no execution ceiling and
+  no per-task fee**, so it gets *cheaper* relative to them as you scale.
+- **Amazon SES** is cheaper per-email ($0.10/1k) but you would build
+  templates, dashboards, and bounce/unsubscribe handling yourself. Not worth
+  it for a solo operator until email is a major cost centre.
+- **Dedicated newsletter platforms** (Kit — free to 10k subscribers;
+  Beehiiv — free to 2.5k) beat Resend *only for the marketing newsletter* at
+  scale. They are not built in here because splitting transactional from
+  newsletter fragments the hub. If newsletter growth ever becomes a primary
+  channel, move **only** workflow 06 to Kit/Beehiiv and keep Resend for
+  everything transactional — the other twelve workflows are untouched.
+
+**Free-tier watch-out:** Resend's 100 emails/day cap means a single
+newsletter blast to more than ~100 recipients exceeds the free daily limit.
+Workflow 06 already paces sends, but the hard cap is the trigger to move to
+Resend Pro. Verify current pricing at signup — these numbers move.
 
 ## One-time setup
 
@@ -37,6 +82,7 @@ not both, or you will get duplicate drafts.
 | `Notion API` | Notion API | Internal integration secret from notion.so/my-integrations. Share the **Donum Dei Performance — HQ** page (and the Content Calendar) with the integration. |
 | `Anthropic (x-api-key)` | Header Auth | Header name `x-api-key`, value your `sk-ant-...` key |
 | `Resend (Bearer)` | Header Auth | Header name `Authorization`, value `Bearer re_...` |
+| `Stripe API` | Stripe API | Your Stripe secret key (`sk_live_...` / `sk_test_...`). Used only by workflow 10's Stripe Trigger; it registers and verifies its own webhook. |
 
 Workflows reference credentials by these exact names; on import n8n asks you
 to map them once.
@@ -49,9 +95,12 @@ DDP_WEB_URL=https://donumdeiperformance.com
 DDP_EMAIL_FROM=Donum Dei Performance <programs@donumdeiperformance.com>
 DDP_OWNER_EMAIL=johnrizkalla2300@gmail.com
 DDP_CLAUDE_MODEL=claude-sonnet-5                        # optional override
+N8N_WEBHOOK_BASE=https://n8n.donumdeiperformance.com    # how workflow 10 reaches workflow 11's webhook
 ```
 
 Every workflow falls back to a sane default if a variable is unset.
+`N8N_WEBHOOK_BASE` should be your n8n instance's public URL (defaults to
+`http://localhost:5678`, correct for a single self-hosted instance).
 
 ### 3. Import
 
@@ -94,7 +143,7 @@ breaks that workflow silently. Change them together.
 
 ## Where n8n runs
 
-Any of: n8n Cloud (fastest, ~€20/mo), or self-hosted free via Docker on the
+**Recommended: self-host (free, unlimited executions)** via Docker on the
 same host as the API — add to `docker-compose.yml`:
 
 ```yaml
@@ -103,9 +152,16 @@ same host as the API — add to `docker-compose.yml`:
     ports: ["5678:5678"]
     environment:
       - DONUM_DEI_API_URL=http://api:8000
+      - N8N_WEBHOOK_BASE=https://n8n.donumdeiperformance.com
+      - WEBHOOK_URL=https://n8n.donumdeiperformance.com   # required for webhook + Stripe Trigger URLs
     volumes:
       - n8n_data:/home/node/.n8n
 ```
+
+A persistent volume is required — the Wait nodes in the onboarding
+sequence (workflow 11) store their resume state there, so day-3/day-7
+emails survive restarts. n8n Cloud (~€20/mo) is an optional managed
+alternative; you do not need it to launch.
 
 See `docs/DATA_PLATFORM.md` for why Notion is the ops hub and what the
 evaluated alternatives were.

@@ -21,7 +21,7 @@ donum-dei-performance/
 │
 ├── automation/          # n8n workflow suite + ops automation guide
 │   ├── README.md                   # credentials, env vars, import steps, Notion IDs
-│   └── n8n/                        # 9 importable workflows (leads, programs, content, Q&A…)
+│   └── n8n/                        # 13 importable workflows (leads, billing, programs, content, Q&A…)
 │
 ├── engine/              # Core training system brain (SOURCE OF TRUTH)
 │   ├── engine_instructions.md      # System rules & CNS management

@@ -1,0 +1,156 @@
+{
+  "name": "DDP — 13 Owner Weekly Business Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "weeks", "triggerAtDay": [1], "triggerAtHour": 7, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Every Monday 07:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/64097635-af29-43a7-bc79-654d3f6e2bca/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { timestamp: 'created_time', created_time: { after: new Date(Date.now() - 7 * 86400000).toISOString() } }, page_size: 100 }) }}",
+        "options": {}
+      },
+      "id": "n2-leads",
+      "name": "New Leads (7d)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"property\": \"Status\", \"select\": {\"equals\": \"Active\"}}, \"page_size\": 100}",
+        "options": {}
+      },
+      "id": "n3-active",
+      "name": "Active Clients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/878cac7c-3a3b-4379-b7fe-e79a12ca9431/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { property: 'Date', date: { after: new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10) } }, page_size: 100 }) }}",
+        "options": {}
+      },
+      "id": "n4-checkins",
+      "name": "Check-ins (7d)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/878cac7c-3a3b-4379-b7fe-e79a12ca9431/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: 'Date', date: { after: new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10) } }, { property: 'Flag', select: { does_not_equal: 'none' } } ] }, page_size: 100 }) }}",
+        "options": {}
+      },
+      "id": "n5-flags",
+      "name": "Flagged Check-ins (7d)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8646ee02-f6f2-439d-95f7-5d59fd297d2f/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"property\": \"Status\", \"select\": {\"equals\": \"Needs Human\"}}, \"page_size\": 100}",
+        "options": {}
+      },
+      "id": "n6-qa",
+      "name": "Q&A Needs Human",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// All queries have run upstream; read each by name and aggregate.\nconst leadsRes = $('New Leads (7d)').first().json.results || [];\nconst activeRes = $('Active Clients').first().json.results || [];\nconst checkinRes = $('Check-ins (7d)').first().json.results || [];\nconst flagRes = $('Flagged Check-ins (7d)').first().json.results || [];\nconst qaRes = $('Q&A Needs Human').first().json.results || [];\nconst leads = leadsRes.length;\nconst active = activeRes.length;\nconst checkins = checkinRes.length;\nconst flags = flagRes.length;\nconst qaOpen = qaRes.length;\nconst tiers = { Foundation: 20, Practice: 120, Stewardship: 240 };\nlet mrr = 0;\nfor (const r of activeRes) { const t = r.properties?.Tier?.select?.name; if (t && tiers[t]) mrr += tiers[t]; }\nconst adh = checkinRes.map(r => r.properties?.['Adherence %']?.number).filter(v => typeof v === 'number');\nconst avgAdh = adh.length ? Math.round((adh.reduce((a, b) => a + b, 0) / adh.length) * 100) : null;\nconst week = new Date().toISOString().slice(0, 10);\nconst body = [\n  'Donum Dei Performance - weekly operating report (' + week + ')',\n  '',\n  'ACQUISITION',\n  '  New leads (7d):        ' + leads,\n  '',\n  'ROSTER',\n  '  Active clients:        ' + active,\n  '  Estimated MRR:         $' + mrr,\n  '',\n  'ENGAGEMENT',\n  '  Check-ins (7d):        ' + checkins + (active ? '  (' + Math.round((checkins / active) * 100) + '% of roster)' : ''),\n  '  Avg adherence (7d):    ' + (avgAdh === null ? 'n/a' : avgAdh + '%'),\n  '',\n  'NEEDS YOUR ATTENTION',\n  '  Flagged check-ins:     ' + flags + (flags ? '  -> review the Check-ins DB' : ''),\n  '  Q&A awaiting a human:  ' + qaOpen + (qaOpen ? '  -> review the Q&A Inbox' : ''),\n  '',\n  'Open the hub: https://app.notion.com/p/39a21819e2ce8154acc9e34adc4ac721',\n  '',\n  'Donum Dei. The body is a gift. Train it accordingly.'\n].join('\\n');\nreturn [{ json: { body, subject: 'DDP weekly report - ' + leads + ' leads, ' + active + ' active, $' + mrr + ' MRR' } }];"
+      },
+      "id": "n7-compose",
+      "name": "Compose Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: $json.subject, text: $json.body }) }}",
+        "options": {}
+      },
+      "id": "n8-send",
+      "name": "Email Owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    }
+  ],
+  "connections": {
+    "Every Monday 07:00": { "main": [[{ "node": "New Leads (7d)", "type": "main", "index": 0 }]] },
+    "New Leads (7d)": { "main": [[{ "node": "Active Clients", "type": "main", "index": 0 }]] },
+    "Active Clients": { "main": [[{ "node": "Check-ins (7d)", "type": "main", "index": 0 }]] },
+    "Check-ins (7d)": { "main": [[{ "node": "Flagged Check-ins (7d)", "type": "main", "index": 0 }]] },
+    "Flagged Check-ins (7d)": { "main": [[{ "node": "Q&A Needs Human", "type": "main", "index": 0 }]] },
+    "Q&A Needs Human": { "main": [[{ "node": "Compose Digest", "type": "main", "index": 0 }]] },
+    "Compose Digest": { "main": [[{ "node": "Email Owner", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": ["donum-dei"]
+}

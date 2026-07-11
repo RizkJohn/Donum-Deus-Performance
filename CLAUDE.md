@@ -23,8 +23,9 @@ Guidance for AI assistants working in this repository.
 5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
 6. **`business/` + `docs/`** — strategy and reference material;
    `docs/ARCHITECTURE.md` is the system design for the live product.
-7. **`automation/`** — importable n8n workflows (lead intake, program
-   delivery, check-ins, content, newsletter, Q&A, monitoring) wired to the
+7. **`automation/`** — importable n8n workflows (lead intake + nurture,
+   Stripe billing lifecycle, client onboarding, program delivery, check-ins,
+   content, newsletter, Q&A, monitoring, owner digest) wired to the
    Notion operations hub — see `automation/README.md` and
    `docs/DATA_PLATFORM.md`. Status fields in Notion are the human↔machine
    contract; change them and the matching workflow together.
