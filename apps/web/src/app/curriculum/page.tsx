@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { TIERS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
-  title: "Curriculum — Deus Performance",
+  title: "Curriculum — Donum Dei Performance",
   description:
     "Three levels of engagement: Foundation ($20/mo), Practice ($120/mo), Stewardship ($240/mo). The methodology does not vary by level.",
 };

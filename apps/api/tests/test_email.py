@@ -1,9 +1,9 @@
 import pytest
 
-from deus_api.email.factory import build_email_provider
-from deus_api.email.mock import MockEmailProvider
-from deus_api.email.resend_provider import ResendEmailProvider
-from deus_api.email.templates import program_ready_email, welcome_email
+from donum_dei_api.email.factory import build_email_provider
+from donum_dei_api.email.mock import MockEmailProvider
+from donum_dei_api.email.resend_provider import ResendEmailProvider
+from donum_dei_api.email.templates import program_ready_email, welcome_email
 
 
 @pytest.mark.asyncio
@@ -22,14 +22,14 @@ def test_factory_builds_resend_provider(settings):
     settings_dict = settings.model_dump()
     settings_dict["email_provider"] = "resend"
     settings_dict["resend_api_key"] = "re_test"
-    from deus_api.config import Settings
+    from donum_dei_api.config import Settings
 
     provider = build_email_provider(Settings(**settings_dict))
     assert isinstance(provider, ResendEmailProvider)
 
 
 def test_factory_rejects_unknown_provider(settings):
-    from deus_api.config import Settings
+    from donum_dei_api.config import Settings
 
     settings_dict = settings.model_dump()
     settings_dict["email_provider"] = "carrier-pigeon"
@@ -54,7 +54,7 @@ def test_program_ready_email_links_to_program():
 async def test_assess_route_sends_program_ready_email(client):
     from conftest import make_request
 
-    from deus_api.email.factory import get_email_provider
+    from donum_dei_api.email.factory import get_email_provider
 
     email = "delivery@example.com"
     r = await client.post(

@@ -11,4 +11,4 @@ markdown:
   (the markdown is pseudo-JSON, so the strict schema lives here)
 
 When the engine specs change, propagate here, to
-`apps/api/deus_api/models/`, and to `apps/web/src/lib/types.ts`.
+`apps/api/donum_dei_api/models/`, and to `apps/web/src/lib/types.ts`.

@@ -1,7 +1,7 @@
 # Engine — System Files
 
 All files here are canonical. They are loaded directly as LLM prompts at runtime
-by `apps/api/deus_api/engine/spec_loader.py`.
+by `apps/api/donum_dei_api/engine/spec_loader.py`.
 
 ## File Map
 

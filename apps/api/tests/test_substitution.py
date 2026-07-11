@@ -1,4 +1,4 @@
-from deus_api.engine.substitution import blocked_ids_for_injuries, resolve_substitute
+from donum_dei_api.engine.substitution import blocked_ids_for_injuries, resolve_substitute
 
 
 def test_substitute_preserves_pattern_and_cns(library):

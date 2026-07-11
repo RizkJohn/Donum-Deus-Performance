@@ -12,14 +12,14 @@ _WRAP_OPEN = (
 )
 _WRAP_CLOSE = (
     '<p style="font-size:11px;color:#857f6e;margin-top:32px;">'
-    "Deus Performance is a practice of performance education. It does not "
+    "Donum Dei Performance is a practice of performance education. It does not "
     "constitute medical advice, rehabilitation guidance, or clinical counsel "
     "of any kind.</p></div>"
 )
 
 
 def welcome_email() -> tuple[str, str]:
-    subject = "Welcome to Deus Performance"
+    subject = "Welcome to Donum Dei Performance"
     html = (
         _WRAP_OPEN
         + "<h1 style=\"font-size:20px;margin:0 0 12px;\">Your account is ready.</h1>"

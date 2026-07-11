@@ -43,7 +43,7 @@ CONTENT_PILLARS = [
 ]
 
 SYSTEM_PROMPT = """\
-You are the content engine for "Deus Performance" — a faceless elite online coaching brand \
+You are the content engine for "Donum Dei Performance" — a faceless elite online coaching brand \
 for athletic performance, swimming technique, and high-performance mindset.
 
 Brand voice: Bold. Direct. No fluff. Authoritative. Aspirational. Short punchy sentences. \
@@ -93,7 +93,7 @@ def generate_post(client: Anthropic, platform: str, content_type: str) -> dict:
         f"Platform: {platform}\n"
         f"Type: {content_type}\n"
         f"Content pillar: {pillar}\n\n"
-        "Generate a Deus Performance post now. Choose one precise, concrete angle within "
+        "Generate a Donum Dei Performance post now. Choose one precise, concrete angle within "
         "the pillar — avoid generic filler. Make it hit."
     )
 

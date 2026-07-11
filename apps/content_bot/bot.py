@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deus Performance content bot.
+"""Donum Dei Performance content bot.
 
 Single-run (default):
     python bot.py
@@ -28,7 +28,7 @@ from notion import save_post
 
 load_dotenv()
 
-log = logging.getLogger("deus.bot")
+log = logging.getLogger("donum_dei.bot")
 
 
 def _setup_logging(level: str) -> None:
@@ -74,7 +74,7 @@ def run_job(cfg, client: Anthropic) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Deus Performance content bot")
+    parser = argparse.ArgumentParser(description="Donum Dei Performance content bot")
     parser.add_argument(
         "--daemon",
         action="store_true",
@@ -86,7 +86,7 @@ def main() -> None:
     _setup_logging(cfg.log_level)
 
     log.info(
-        "Deus Performance Content Bot | platforms=%s | types=%s | posts_per_run=%d",
+        "Donum Dei Performance Content Bot | platforms=%s | types=%s | posts_per_run=%d",
         cfg.platforms,
         cfg.content_types,
         cfg.posts_per_run,

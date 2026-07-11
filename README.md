@@ -1,17 +1,17 @@
-# Deus Performance
+# Donum Dei Performance
 *by Riz Management LLC*
 
-> *Deus — the body is a gift. Train it accordingly.*
+> *Donum Dei — the body is a gift. Train it accordingly.*
 
 ---
 
 ## Repository Structure
 
 ```
-deus-performance/
+donum-dei-performance/
 ├── apps/
 │   ├── api/             # FastAPI engine pipeline service (Python)
-│   │   ├── deus_api/               # models, engine (decision/QC/retry), llm providers, routes
+│   │   ├── donum_dei_api/               # models, engine (decision/QC/retry), llm providers, routes
 │   │   ├── data/                   # derived JSON (exercise library, substitutions)
 │   │   ├── scripts/port_library.py # markdown → JSON generator
 │   │   └── tests/                  # pytest suite incl. 400+ program contract test
@@ -33,8 +33,8 @@ deus-performance/
 │   └── ARCHITECTURE_SUMMARY.md    # High-level system architecture
 │
 ├── frontend/            # Legacy static mockups (design reference)
-│   ├── deus_v1.html                # Initial landing page / engine interface
-│   └── deus_v2.html                # Redesigned DP site (basis for apps/web)
+│   ├── donum_dei_v1.html                # Initial landing page / engine interface
+│   └── donum_dei_v2.html                # Redesigned DDP site (basis for apps/web)
 │
 ├── business/            # Business strategy & planning
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
@@ -50,7 +50,7 @@ deus-performance/
 
 ## System Overview
 
-Deus Performance (DP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
+Donum Dei Performance (DDP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
 
 1. Joint Integrity
 2. Movement Quality
@@ -110,9 +110,9 @@ fatigue) → LLM exercise-fill → QC gate (one check per hard rule) → retry (
 
 ## Brand
 
-- **Institution**: Deus Performance
+- **Institution**: Donum Dei Performance
 - **Operating entity**: Riz Management LLC
-- **Tagline**: *Deus. The body is a gift. Train it accordingly.*
+- **Tagline**: *Donum Dei. The body is a gift. Train it accordingly.*
 - **Service model**: Fulfillment-as-a-service coaching practice
 
 ---

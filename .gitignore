@@ -12,7 +12,7 @@ dist/
 __pycache__/
 *.egg-info/
 .pytest_cache/
-deus.db
+donum_dei.db
 
 # next.js
 .next/

@@ -1,15 +1,15 @@
 """Persistent athlete-state lifecycle: init → exposure → feedback."""
 
 from conftest import make_request
-from deus_api.engine.assessment import assess
-from deus_api.engine.athlete_state import (
+from donum_dei_api.engine.assessment import assess
+from donum_dei_api.engine.athlete_state import (
     derive_recovery_capacity,
     fold_feedback,
     load_or_init,
     update_exposure,
 )
-from deus_api.engine.variation import prioritize_pool
-from deus_api.models.feedback import FeedbackIn
+from donum_dei_api.engine.variation import prioritize_pool
+from donum_dei_api.models.feedback import FeedbackIn
 
 
 def _program_with(name: str) -> dict:

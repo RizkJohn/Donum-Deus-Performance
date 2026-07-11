@@ -20,7 +20,7 @@ For a performance coaching app where the assessment engine must:
 | High-volume day-to-day program generation | Claude Sonnet 4.6 | Much cheaper/faster while retaining strong reasoning |
 | Lightweight UI interactions/chat | Claude Haiku 4.5 | Cost-efficient conversational layer |
 
-> Implementation note: these tiers are wired in `apps/api/deus_api/config.py`
+> Implementation note: these tiers are wired in `apps/api/donum_dei_api/config.py`
 > (`assessment_model` / `generation_model` / `chat_model`). The Assessment
 > Layer is deterministic by default, so the Opus tier only bills when
 > `LLM_PROVIDER=claude`. The mock provider runs the whole pipeline offline.

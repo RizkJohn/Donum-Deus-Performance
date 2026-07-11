@@ -4,13 +4,13 @@ Guidance for AI assistants working in this repository.
 
 ## What this repository is
 
-**Deus Performance (DP)** — by Riz Management LLC — is a
+**Donum Dei Performance (DDP)** — by Riz Management LLC — is a
 **constraint-driven adaptive training engine**. The repo contains:
 
 1. **`engine/`** — the "brain": markdown spec files defining how an LLM
    generates weekly training programs from a structured client payload. They
    are **loaded as prompts at runtime** by the API (see
-   `engine/prompt_wrapper.md` and `apps/api/deus_api/engine/spec_loader.py`),
+   `engine/prompt_wrapper.md` and `apps/api/donum_dei_api/engine/spec_loader.py`),
    not compiled, and remain the **source of truth** for all training logic.
 2. **`apps/api/`** — FastAPI engine pipeline service (Python 3.11, Pydantic,
    SQLAlchemy). Provider-agnostic LLM layer: `LLM_PROVIDER=mock` (default;
@@ -18,7 +18,7 @@ Guidance for AI assistants working in this repository.
    input validation → deterministic decision engine → LLM exercise-fill →
    QC gate → retry (≤3) → program or `UNSATISFIABLE_CONSTRAINTS`.
 3. **`apps/web/`** — Next.js 15 + Tailwind marketing site + assessment funnel
-   (the live frontend; dark sage design ported from `frontend/deus_v2.html`).
+   (the live frontend; dark sage design ported from `frontend/donum_dei_v2.html`).
 4. **`packages/schemas/`** — shared JSON Schemas derived from `engine/*.md`.
 5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
 6. **`business/` + `docs/`** — strategy and reference material;
@@ -34,7 +34,7 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 .
 ├── engine/        # Training-system spec files — SOURCE OF TRUTH
 ├── apps/
-│   ├── api/       # FastAPI engine pipeline (deus_api/, data/, scripts/, tests/)
+│   ├── api/       # FastAPI engine pipeline (donum_dei_api/, data/, scripts/, tests/)
 │   └── web/       # Next.js marketing site + assessment funnel
 ├── packages/
 │   └── schemas/   # Shared JSON Schemas (derived)
@@ -137,9 +137,9 @@ change** to every file that references it (e.g. a new pattern must appear in
 Three standalone HTML files, each self-contained (inline `<style>`, Google
 Fonts via CDN, no JS framework, no build):
 
-- `deus_v1.html` — initial landing page / engine interface.
-- `deus_v2.html` — redesigned DP site (**current**).
-- `Deus_Performance.html` — largest/full variant.
+- `donum_dei_v1.html` — initial landing page / engine interface.
+- `donum_dei_v2.html` — redesigned DDP site (**current**).
+- `Donum_Dei_Performance.html` — largest/full variant.
 
 To preview, open the file directly in a browser — there is nothing to compile or
 serve. Design uses CSS custom properties (dark sage/green palette defined in
@@ -161,6 +161,6 @@ within a single file and preserve the existing token system.
 
 ## Brand voice (for any user-facing copy)
 
-- Institution: **Deus Performance**; operating entity: **Riz Management LLC**.
-- Tagline: *Deus. The body is a gift. Train it accordingly.*
+- Institution: **Donum Dei Performance**; operating entity: **Riz Management LLC**.
+- Tagline: *Donum Dei. The body is a gift. Train it accordingly.*
 - Tone: precise, disciplined, no hype. Movement-based, constraint-driven.

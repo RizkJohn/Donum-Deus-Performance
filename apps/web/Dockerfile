@@ -1,4 +1,4 @@
-# Deus Performance web — Next.js standalone build
+# Donum Dei Performance web — Next.js standalone build
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./

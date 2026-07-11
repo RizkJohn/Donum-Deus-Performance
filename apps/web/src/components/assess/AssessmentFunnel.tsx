@@ -414,7 +414,7 @@ export default function AssessmentFunnel() {
       {/* Sidebar */}
       <aside className="lg:sticky lg:top-[78px]">
         <p className="font-play text-[18px] font-black uppercase tracking-[0.2em] text-accent">
-          Deus
+          Donum Dei
         </p>
         <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-ink3">
           Free assessment
@@ -980,7 +980,7 @@ export default function AssessmentFunnel() {
                   >
                     Terms of Service
                   </Link>
-                  . I understand that Deus Performance is a practice of
+                  . I understand that Donum Dei Performance is a practice of
                   performance education and this program does not constitute
                   medical or clinical advice.
                 </span>

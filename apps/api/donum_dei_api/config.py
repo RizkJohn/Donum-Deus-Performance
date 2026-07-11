@@ -17,7 +17,7 @@ _REPO_ROOT = _API_ROOT.parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    database_url: str = "sqlite+aiosqlite:///./deus.db"
+    database_url: str = "sqlite+aiosqlite:///./donum_dei.db"
     llm_provider: str = "mock"  # mock | claude
     anthropic_api_key: str = ""
     # Tiered models (docs/RedesignGuide.md): Opus reasons over the assessment,
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     # Email — mirrors LLM_PROVIDER: mock is default, fully offline.
     email_provider: str = "mock"  # mock | resend
     resend_api_key: str = ""
-    email_from: str = "Deus Performance <programs@deusperformance.com>"
+    email_from: str = "Donum Dei Performance <programs@donumdeiperformance.com>"
     web_url: str = "http://localhost:3000"
 
 

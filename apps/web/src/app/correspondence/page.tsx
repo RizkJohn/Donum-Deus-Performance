@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import CorrespondenceForm from "@/components/CorrespondenceForm";
 
 export const metadata: Metadata = {
-  title: "Correspondence — Deus Performance",
+  title: "Correspondence — Donum Dei Performance",
   description:
     "Direct inquiry for level selection, complex presentations, or any matter outside the standard intake process.",
 };

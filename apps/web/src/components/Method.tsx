@@ -38,7 +38,7 @@ export default function Method() {
         Constraints, <em className="font-normal italic text-warm">not content.</em>
       </h2>
       <p className="mb-12 max-w-[660px] font-bask text-[17px] leading-[1.8] text-ink2">
-        Most apps hand you a template. Deus runs every program through hard
+        Most apps hand you a template. Donum Dei runs every program through hard
         rules — the same rules a careful coach holds in their head — and
         rejects anything that violates them.
       </p>

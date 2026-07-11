@@ -1,8 +1,8 @@
 from conftest import make_request
-from deus_api.engine.decision_engine import build_plan
-from deus_api.models.decision import PrecomputedPlan
-from deus_api.models.errors import EngineError
-from deus_api.models.input_contract import DAY_ORDER
+from donum_dei_api.engine.decision_engine import build_plan
+from donum_dei_api.models.decision import PrecomputedPlan
+from donum_dei_api.models.errors import EngineError
+from donum_dei_api.models.input_contract import DAY_ORDER
 
 
 def _idx(day):

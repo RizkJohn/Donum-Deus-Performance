@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { DISPATCHES } from "@/lib/dispatches";
 
 export const metadata: Metadata = {
-  title: "Dispatches — Deus Performance",
+  title: "Dispatches — Donum Dei Performance",
   description:
     "Commentary on mind and practice. The doctrine, worked out one idea at a time — Stoicism, Existentialism, Eastern philosophy, and Greek Virtue Ethics in the training hall.",
 };

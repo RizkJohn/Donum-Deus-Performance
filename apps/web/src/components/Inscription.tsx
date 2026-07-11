@@ -16,7 +16,7 @@ export default function Inscription() {
         </p>
         <div className="flex items-center justify-center gap-[13px] font-mono text-[8px] tracking-[0.22em] uppercase text-ink3">
           <span className="w-[28px] h-px bg-line2" aria-hidden="true" />
-          The Standard · Deus Performance
+          The Standard · Donum Dei Performance
           <span className="w-[28px] h-px bg-line2" aria-hidden="true" />
         </div>
       </div>

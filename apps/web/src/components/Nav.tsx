@@ -53,7 +53,7 @@ export default function Nav() {
           />
         </svg>
         <span className="font-bask text-[14px] tracking-[0.01em] text-ink">
-          <em>Deus</em> <strong>Performance</strong>
+          <em>Donum Dei</em> <strong>Performance</strong>
         </span>
       </Link>
 

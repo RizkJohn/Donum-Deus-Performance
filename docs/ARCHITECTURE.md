@@ -1,4 +1,4 @@
-# Deus Performance — Product Architecture
+# Donum Dei Performance — Product Architecture
 
 > Foundational architecture for the live product. The `engine/` markdown specs
 > remain the **source of truth** for all training logic; this document defines
@@ -68,7 +68,7 @@ rule regardless of what the model returns.
 ├── engine/               # Markdown specs — SOURCE OF TRUTH (loaded as prompts)
 ├── apps/
 │   ├── api/              # FastAPI engine pipeline service
-│   │   ├── deus_api/
+│   │   ├── donum_dei_api/
 │   │   │   ├── models/   # Pydantic contracts (input_contract, program, library)
 │   │   │   ├── engine/   # spec_loader, decision_engine, fatigue, qc/, retry, pipeline
 │   │   │   ├── llm/      # base (Protocol), claude, mock, factory
@@ -83,7 +83,7 @@ rule regardless of what the model returns.
 │   │   └── tests/
 │   └── web/              # Next.js marketing site + assessment funnel
 ├── packages/schemas/     # Shared JSON Schemas (derived from engine/*.md)
-├── frontend/             # Legacy static mockups (deus_v2.html = design reference)
+├── frontend/             # Legacy static mockups (donum_dei_v2.html = design reference)
 ├── docker-compose.yml    # postgres + api + web
 └── Makefile              # make dev / make test / make seed-library
 ```
@@ -177,7 +177,7 @@ class LLMProvider(Protocol):
 - **Accounts**: FastAPI (`routes/auth.py`) issues a stateless JWT on
   signup/login (`bcrypt` hash, `PyJWT` sign, `AUTH_JWT_SECRET` — override in
   any real deployment). Next.js Route Handlers under `app/api/auth/*` are the
-  actual session boundary: they call FastAPI, then set an httpOnly `deus_session`
+  actual session boundary: they call FastAPI, then set an httpOnly `donum_dei_session`
   cookie on the *web* origin, sidestepping cross-origin cookie issues between
   the two separately-deployed services. `proxy.ts` (Next.js 16's file
   convention, formerly `middleware.ts`) protects `/dashboard`. `GET

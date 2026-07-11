@@ -5,7 +5,7 @@ import AssessmentFunnel from "@/components/assess/AssessmentFunnel";
 export const metadata: Metadata = {
   title: "Free Assessment",
   description:
-    "Two minutes of questions — profile, goals, schedule, fatigue — and the Deus engine builds your complete weekly program. Free, no card required.",
+    "Two minutes of questions — profile, goals, schedule, fatigue — and the Donum Dei engine builds your complete weekly program. Free, no card required.",
 };
 
 export default function AssessPage() {

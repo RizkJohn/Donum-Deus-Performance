@@ -4,7 +4,7 @@ dev: ## run the full stack (postgres + api + web), mock provider by default
 	docker compose up --build
 
 api: ## run the API locally (sqlite, mock provider)
-	cd apps/api && uvicorn deus_api.main:app --reload --port 8000
+	cd apps/api && uvicorn donum_dei_api.main:app --reload --port 8000
 
 web: ## run the marketing site locally
 	cd apps/web && npm run dev

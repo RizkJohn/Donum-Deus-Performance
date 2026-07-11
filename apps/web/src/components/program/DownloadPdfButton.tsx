@@ -21,7 +21,7 @@ export default function DownloadPdfButton({ record }: { record: ProgramRecord })
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `deus-program-${record.id.slice(0, 8)}.pdf`;
+      link.download = `donum-dei-program-${record.id.slice(0, 8)}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
