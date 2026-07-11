@@ -104,11 +104,22 @@ Every workflow falls back to a sane default if a variable is unset.
 
 ### 3. Import
 
-n8n → Workflows → Import from File → select each JSON in `automation/n8n/`.
-All workflows import **inactive**; activate them after mapping credentials.
-Point the website funnel at the webhook URLs n8n shows on activation
-(`/webhook/ddp-lead`, `/webhook/ddp-generate`, `/webhook/ddp-checkin`,
-`/webhook/ddp-question`).
+One command imports all 13 (the Compose file mounts `automation/n8n` into the
+container):
+
+```bash
+./automation/import-workflows.sh        # -> "Successfully imported 13 workflows."
+```
+
+Or manually: n8n → Workflows → Import from File → each JSON in
+`automation/n8n/`. Either way they import **inactive**; activate after mapping
+credentials. Point the website funnel at the webhook URLs n8n shows on
+activation (`/webhook/ddp-lead`, `/webhook/ddp-generate`,
+`/webhook/ddp-checkin`, `/webhook/ddp-question`).
+
+**Full server runbook — host, HTTPS, credentials, going live: see
+[`automation/SETUP.md`](./SETUP.md).** The Compose service, env template, and
+import script are tested working against **n8n 2.29.10**.
 
 ### 4. Notion database IDs (already wired in)
 
@@ -143,25 +154,22 @@ breaks that workflow silently. Change them together.
 
 ## Where n8n runs
 
-**Recommended: self-host (free, unlimited executions)** via Docker on the
-same host as the API — add to `docker-compose.yml`:
+**Recommended: self-host (free, unlimited executions).** The n8n service is
+already wired into the repo's root `docker-compose.yml` under the
+`automation` profile — one command brings up the whole stack:
 
-```yaml
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    ports: ["5678:5678"]
-    environment:
-      - DONUM_DEI_API_URL=http://api:8000
-      - N8N_WEBHOOK_BASE=https://n8n.donumdeiperformance.com
-      - WEBHOOK_URL=https://n8n.donumdeiperformance.com   # required for webhook + Stripe Trigger URLs
-    volumes:
-      - n8n_data:/home/node/.n8n
+```bash
+docker compose --profile automation up -d
 ```
 
-A persistent volume is required — the Wait nodes in the onboarding
-sequence (workflow 11) store their resume state there, so day-3/day-7
-emails survive restarts. n8n Cloud (~€20/mo) is an optional managed
-alternative; you do not need it to launch.
+It runs on the same Docker network as the API (reachable at `http://api:8000`),
+persists to the `n8n_data` volume (which holds workflows, credentials, and the
+Wait-node state for the onboarding drip, so day-3/day-7 emails survive
+restarts), and binds IPv4 explicitly to avoid the IPv6 crash-loop in n8n 2.x.
+n8n Cloud (~€20/mo) is an optional managed alternative; you do not need it to
+launch.
 
-See `docs/DATA_PLATFORM.md` for why Notion is the ops hub and what the
-evaluated alternatives were.
+**The step-by-step server runbook is [`automation/SETUP.md`](./SETUP.md)** —
+host, HTTPS reverse proxy, credentials, wiring the website and Stripe, and a
+smoke test. See `docs/DATA_PLATFORM.md` for why Notion is the ops hub and what
+the evaluated alternatives were.

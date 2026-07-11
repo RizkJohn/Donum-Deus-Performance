@@ -40,6 +40,42 @@ services:
     depends_on:
       - api
 
+  # Automation — self-hosted n8n running the Donum Dei Performance workflow suite.
+  # Start the whole stack (postgres + api + web + n8n) with:
+  #   docker compose --profile automation up -d
+  # then import the 13 workflows with:  ./automation/import-workflows.sh
+  # Full runbook: automation/SETUP.md
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    profiles: ["automation"]
+    ports:
+      - "5678:5678"
+    environment:
+      # Encrypts stored credentials. REQUIRED and must stay stable — losing it
+      # makes every saved credential undecryptable. Generate: openssl rand -hex 32
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?set N8N_ENCRYPTION_KEY in your .env (openssl rand -hex 32)}
+      # Public URL — required so webhooks and the Stripe Trigger register correctly.
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      # Bind IPv4 explicitly — n8n 2.x defaults to IPv6 (::) and crash-loops on
+      # IPv4-only hosts. Safe on every host; override only if you need IPv6.
+      N8N_LISTEN_ADDRESS: ${N8N_LISTEN_ADDRESS:-0.0.0.0}
+      WEBHOOK_URL: ${WEBHOOK_URL:-http://localhost:5678/}
+      N8N_SECURE_COOKIE: ${N8N_SECURE_COOKIE:-false}
+      GENERIC_TIMEZONE: ${TZ:-America/New_York}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      # App wiring consumed by the workflows (see automation/README.md).
+      N8N_WEBHOOK_BASE: ${N8N_WEBHOOK_BASE:-http://localhost:5678}
+      DONUM_DEI_API_URL: ${DONUM_DEI_API_URL:-http://api:8000}
+      DDP_WEB_URL: ${DDP_WEB_URL:-http://localhost:3000}
+      DDP_EMAIL_FROM: ${DDP_EMAIL_FROM:-Donum Dei Performance <programs@donumdeiperformance.com>}
+      DDP_OWNER_EMAIL: ${DDP_OWNER_EMAIL:-johnrizkalla2300@gmail.com}
+      DDP_CLAUDE_MODEL: ${DDP_CLAUDE_MODEL:-claude-sonnet-5}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./automation/n8n:/workflows:ro   # the 13 workflow JSONs, for import
+    restart: unless-stopped
+
   # Content bot — generates Donum Dei Performance social posts on a schedule.
   # Start with: docker compose --profile bot up content-bot
   content-bot:
@@ -59,3 +95,4 @@ services:
 
 volumes:
   pgdata:
+  n8n_data:
