@@ -44,6 +44,7 @@ donum-dei-performance/
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
 │
 ├── docs/                # Reference documentation
+│   ├── DEPLOYMENT.md               # One-VPS production deploy (Hetzner + Docker + Caddy)
 │   ├── RedesignGuide.md            # Frontend redesign specifications
 │   ├── DATA_PLATFORM.md            # Centralization: Postgres + Notion HQ decision
 │   └── io-vs-com-org-guide.md      # Domain strategy guide
@@ -97,12 +98,17 @@ Equipment constraints, injury flags, fatigue-adjusted alternatives
 
 ## Running the product
 
-See `docs/ARCHITECTURE.md` for the full system design.
+See `docs/ARCHITECTURE.md` for the full system design. To deploy the entire
+stack (API + site + n8n + auto-HTTPS) on a single VPS, follow
+**`docs/DEPLOYMENT.md`** (`docker-compose.prod.yml`, ~€5/mo on Hetzner).
 
 ```bash
-docker compose up --build   # postgres + api (:8000) + web (:3000) — no API key needed
+docker compose up --build   # local dev: postgres + api (:8000) + web (:3000) — no API key needed
 make test                   # engine test suite (offline, mock provider)
 make seed-library           # regenerate derived JSON after editing engine/*.md
+
+# production, on the VPS (see docs/DEPLOYMENT.md):
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 The API defaults to `LLM_PROVIDER=mock` (deterministic, offline). For real

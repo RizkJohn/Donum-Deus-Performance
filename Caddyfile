@@ -1,0 +1,21 @@
+# Donum Dei Performance — reverse proxy with automatic HTTPS.
+# Caddy fetches and renews Let's Encrypt certificates for all three domains
+# automatically, as long as the DNS A records point at this server and ports
+# 80 + 443 are open. Domains are injected from the .env via docker-compose.prod.yml.
+
+# Marketing site + assessment funnel + client dashboard
+{$WEB_DOMAIN} {
+	encode gzip zstd
+	reverse_proxy web:3000
+}
+
+# Engine API (assessment, generation, feedback, auth, billing, health)
+{$API_DOMAIN} {
+	encode gzip zstd
+	reverse_proxy api:8000
+}
+
+# n8n automation (editor UI + webhooks + Stripe Trigger)
+{$N8N_DOMAIN} {
+	reverse_proxy n8n:5678
+}
