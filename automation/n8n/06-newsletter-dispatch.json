@@ -1,0 +1,277 @@
+{
+  "name": "DDP — 06 Newsletter Draft & Dispatch",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "days", "triggerAtHour": 9, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Daily 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/9ea17487-0cd3-4864-9726-73f10c978eaf/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: 'Status', select: { equals: 'Planned' } }, { property: 'Send Date', date: { on_or_before: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10) } } ] }, page_size: 1 }) }}",
+        "options": {}
+      },
+      "id": "n2-plandue",
+      "name": "Planned Issue Due Soon?",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, -160],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nreturn results.map(r => ({ json: {\n  pageId: r.id,\n  issueTitle: r.properties?.Issue?.title?.[0]?.plain_text || 'Untitled issue',\n  audience: r.properties?.Audience?.select?.name || 'All Subscribers',\n  notes: r.properties?.Notes?.rich_text?.map(t => t.plain_text).join('') || ''\n} }));"
+      },
+      "id": "n3-splitplan",
+      "name": "Each Planned Issue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, -160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $env.DDP_CLAUDE_MODEL || 'claude-sonnet-5', max_tokens: 3000, system: 'You write the Donum Dei Performance newsletter. Voice: precise, disciplined, no hype, no exclamation marks, no emojis. The practice: constraint-driven adaptive training — joint integrity first, CNS load management, movement quality, long-horizon development, with Stoic and virtue-ethics framing. Tagline: Donum Dei. The body is a gift. Train it accordingly. No medical advice. Output strict JSON only.', messages: [{ role: 'user', content: 'Compose newsletter issue \"' + $json.issueTitle + '\".\\nEditor notes: ' + ($json.notes || 'none') + '\\n\\nRespond with STRICT JSON only: {\"subject\": \"subject line under 65 chars\", \"body\": \"plain-text email, 350-550 words, one core idea, one practical directive, sign off as Donum Dei Performance\"}' }] }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "n4-compose",
+      "name": "Claude: Compose Issue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, -160],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_ANTHROPIC", "name": "Anthropic (x-api-key)" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = ($input.first().json.content?.[0]?.text) || '{}';\nconst match = text.match(/\\{[\\s\\S]*\\}/);\nlet out = {};\ntry { out = JSON.parse(match ? match[0] : text); } catch (e) { throw new Error('Could not parse issue JSON'); }\nconst body = String(out.body || '');\nconst chunks = [];\nfor (let i = 0; i < body.length && chunks.length < 90; i += 1900) { chunks.push({ text: { content: body.slice(i, i + 1900) } }); }\nreturn [{ json: { pageId: $('Each Planned Issue').item.json.pageId, subject: String(out.subject || '').slice(0, 200), chunks } }];"
+      },
+      "id": "n5-parse",
+      "name": "Parse Issue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, -160]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { 'Subject Line': { rich_text: [{ text: { content: $json.subject } }] }, 'Body': { rich_text: $json.chunks }, 'Status': { select: { name: 'Review' } } } }) }}",
+        "options": {}
+      },
+      "id": "n6-toreview",
+      "name": "Set Issue to Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, -160],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: 'Newsletter draft ready: ' + $('Parse Issue').item.json.subject, text: 'A newsletter issue has been drafted and set to Status = Review in Notion.\\n\\nRead it, edit it, then set Status = Scheduled. The dispatcher sends anything Scheduled whose Send Date has arrived — nothing sends while it sits in Review.' }) }}",
+        "options": {}
+      },
+      "id": "n7-notify",
+      "name": "Notify Editor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -160],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/9ea17487-0cd3-4864-9726-73f10c978eaf/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: 'Status', select: { equals: 'Scheduled' } }, { property: 'Send Date', date: { on_or_before: new Date().toISOString().slice(0, 10) } } ] }, page_size: 5 }) }}",
+        "options": {}
+      },
+      "id": "n8-senddue",
+      "name": "Scheduled Issues Due",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 160],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nreturn results.map(r => ({ json: {\n  pageId: r.id,\n  subject: r.properties?.['Subject Line']?.rich_text?.map(t => t.plain_text).join('') || (r.properties?.Issue?.title?.[0]?.plain_text || 'Donum Dei Performance'),\n  body: r.properties?.Body?.rich_text?.map(t => t.plain_text).join('') || '',\n  audience: r.properties?.Audience?.select?.name || 'All Subscribers'\n} })).filter(i => i.json.body.length > 50);"
+      },
+      "id": "n9-splitsend",
+      "name": "Each Due Issue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"property\": \"Status\", \"select\": {\"equals\": \"Active\"}}, \"page_size\": 100}",
+        "options": {}
+      },
+      "id": "n10-clients",
+      "name": "Fetch Clients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 100],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/64097635-af29-43a7-bc79-654d3f6e2bca/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"and\": [{\"property\": \"Status\", \"select\": {\"does_not_equal\": \"Lost\"}}, {\"property\": \"Status\", \"select\": {\"does_not_equal\": \"Converted\"}}]}, \"page_size\": 100}",
+        "options": {}
+      },
+      "id": "n11-leads",
+      "name": "Fetch Leads",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 220],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build one item per recipient for the audience of each due issue.\nconst issue = $('Each Due Issue').item.json;\nconst clients = ($('Fetch Clients').first().json.results || []).map(r => r.properties?.Email?.email).filter(Boolean);\nconst leads = ($('Fetch Leads').first().json.results || []).map(r => r.properties?.Email?.email).filter(Boolean);\nlet recipients = [];\nif (issue.audience === 'Clients Only') { recipients = clients; }\nelse if (issue.audience === 'Leads') { recipients = leads; }\nelse { recipients = [...new Set([...clients, ...leads])]; }\nreturn recipients.map(email => ({ json: { email, subject: issue.subject, body: issue.body, pageId: issue.pageId } }));"
+      },
+      "id": "n12-audience",
+      "name": "Resolve Audience",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: $json.subject, text: $json.body + '\\n\\n—\\nDonum Dei Performance · Riz Management LLC\\nYou receive this because you assessed with or train with the practice. Reply STOP to unsubscribe.' }) }}",
+        "options": { "batching": { "batch": { "batchSize": 1, "batchInterval": 600 } } }
+      },
+      "id": "n13-send",
+      "name": "Send to Recipient",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 160],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"properties\": {\"Status\": {\"select\": {\"name\": \"Sent\"}}}}",
+        "options": {}
+      },
+      "id": "n14-marksent",
+      "name": "Mark Issue Sent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 160],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Newsletter sent: ' + $('Each Due Issue').item.json.subject + ' (' + $items().length + ' recipients)' } }] }, 'Workflow': { select: { name: 'newsletter' } }, 'Status': { select: { name: 'success' } } } }) }}",
+        "options": {}
+      },
+      "id": "n15-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 160],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Daily 09:00": {
+      "main": [[
+        { "node": "Planned Issue Due Soon?", "type": "main", "index": 0 },
+        { "node": "Scheduled Issues Due", "type": "main", "index": 0 }
+      ]]
+    },
+    "Planned Issue Due Soon?": { "main": [[{ "node": "Each Planned Issue", "type": "main", "index": 0 }]] },
+    "Each Planned Issue": { "main": [[{ "node": "Claude: Compose Issue", "type": "main", "index": 0 }]] },
+    "Claude: Compose Issue": { "main": [[{ "node": "Parse Issue", "type": "main", "index": 0 }]] },
+    "Parse Issue": { "main": [[{ "node": "Set Issue to Review", "type": "main", "index": 0 }]] },
+    "Set Issue to Review": { "main": [[{ "node": "Notify Editor", "type": "main", "index": 0 }]] },
+    "Scheduled Issues Due": { "main": [[{ "node": "Each Due Issue", "type": "main", "index": 0 }]] },
+    "Each Due Issue": { "main": [[{ "node": "Fetch Clients", "type": "main", "index": 0 }, { "node": "Fetch Leads", "type": "main", "index": 0 }]] },
+    "Fetch Clients": { "main": [[{ "node": "Resolve Audience", "type": "main", "index": 0 }]] },
+    "Fetch Leads": { "main": [[{ "node": "Resolve Audience", "type": "main", "index": 0 }]] },
+    "Resolve Audience": { "main": [[{ "node": "Send to Recipient", "type": "main", "index": 0 }]] },
+    "Send to Recipient": { "main": [[{ "node": "Mark Issue Sent", "type": "main", "index": 0 }]] },
+    "Mark Issue Sent": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": ["donum-dei"]
+}

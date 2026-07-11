@@ -1,0 +1,115 @@
+{
+  "name": "DDP — 03 Weekly Check-in Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "weeks", "triggerAtDay": [0], "triggerAtHour": 17, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Every Sunday 17:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"property\": \"Status\", \"select\": {\"equals\": \"Active\"}}, \"page_size\": 100}",
+        "options": {}
+      },
+      "id": "n2-clients",
+      "name": "Fetch Active Clients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// One item per active client with an email.\nconst results = $input.first().json.results || [];\nreturn results\n  .map(r => ({ json: {\n    pageId: r.id,\n    email: r.properties?.Email?.email || null,\n    name: (r.properties?.Name?.title?.[0]?.plain_text) || 'Practitioner'\n  } }))\n  .filter(i => i.json.email);"
+      },
+      "id": "n3-split",
+      "name": "Split Clients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'Weekly check-in — 60 seconds, then next week is built', text: $json.name + ',\\n\\nThe week closes tonight. Report in before your next program is generated:\\n\\n' + ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/assess?mode=checkin\\n\\nThree things only — fatigue (0–5), sessions completed, anything that hurt. The engine adjusts next week from exactly this: progress, maintain, or deload.\\n\\nSkipping the check-in does not pause anything; it only makes next week less precise.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n4-remind",
+      "name": "Send Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { 'Next Check-in': { date: { start: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10) } } } }) }}",
+        "options": {}
+      },
+      "id": "n5-nextdate",
+      "name": "Set Next Check-in Date",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Check-in reminders sent: ' + $items().length + ' clients' } }] }, 'Workflow': { select: { name: 'checkin-reminder' } }, 'Status': { select: { name: 'success' } } } }) }}",
+        "options": {}
+      },
+      "id": "n6-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Every Sunday 17:00": { "main": [[{ "node": "Fetch Active Clients", "type": "main", "index": 0 }]] },
+    "Fetch Active Clients": { "main": [[{ "node": "Split Clients", "type": "main", "index": 0 }]] },
+    "Split Clients": { "main": [[{ "node": "Send Reminder", "type": "main", "index": 0 }]] },
+    "Send Reminder": { "main": [[{ "node": "Set Next Check-in Date", "type": "main", "index": 0 }]] },
+    "Set Next Check-in Date": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": ["donum-dei"]
+}

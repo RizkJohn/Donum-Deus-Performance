@@ -1,0 +1,128 @@
+{
+  "name": "DDP — 09 Social Repurpose (blog → platforms)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "weeks", "triggerAtDay": [3], "triggerAtHour": 10, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Every Wednesday 10:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/88bf899d-a0aa-4c8a-9d24-c243a87008f3/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"and\": [{\"property\": \"Platform\", \"select\": {\"equals\": \"Blog\"}}, {\"property\": \"Status\", \"select\": {\"equals\": \"Published\"}}]}, \"sorts\": [{\"timestamp\": \"last_edited_time\", \"direction\": \"descending\"}], \"page_size\": 1}",
+        "options": {}
+      },
+      "id": "n2-latest",
+      "name": "Latest Published Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nif (results.length === 0) { return []; } // nothing published yet — end quietly\nconst r = results[0];\nreturn [{ json: {\n  title: r.properties?.Title?.title?.[0]?.plain_text || 'Untitled',\n  body: (r.properties?.Body?.rich_text || []).map(t => t.plain_text).join('').slice(0, 6000)\n} }];"
+      },
+      "id": "n3-extract",
+      "name": "Extract Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $env.DDP_CLAUDE_MODEL || 'claude-sonnet-5', max_tokens: 2500, system: 'You repurpose Donum Dei Performance blog posts into platform-native social content. Voice: precise, disciplined, no hype, minimal emojis (none for Threads, at most one for Instagram). Never give medical advice. Output strict JSON only.', messages: [{ role: 'user', content: 'Blog post title: ' + $json.title + '\\n\\nBlog post:\\n' + $json.body + '\\n\\nCreate one post per platform. Respond with STRICT JSON only: [{\"platform\": \"Instagram\", \"hook\": \"first line\", \"body\": \"caption\", \"cta\": \"one line\", \"hashtags\": \"5-8 tags\"}, {\"platform\": \"TikTok\", \"hook\": \"on-screen hook\", \"body\": \"30-second script\", \"cta\": \"one line\", \"hashtags\": \"4-6 tags\"}, {\"platform\": \"Threads\", \"hook\": \"opening line\", \"body\": \"under 500 chars\", \"cta\": \"one line\", \"hashtags\": \"\"}]' }] }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "n4-claude",
+      "name": "Claude: Repurpose",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_ANTHROPIC", "name": "Anthropic (x-api-key)" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('Extract Post').first().json;\nconst text = ($input.first().json.content?.[0]?.text) || '[]';\nconst match = text.match(/\\[[\\s\\S]*\\]/);\nlet posts = [];\ntry { posts = JSON.parse(match ? match[0] : text); } catch (e) { throw new Error('Could not parse social JSON'); }\nconst allowed = ['Instagram', 'TikTok', 'Threads'];\nreturn posts.filter(p => allowed.includes(p.platform)).map(p => ({ json: {\n  title: (src.title + ' — ' + p.platform).slice(0, 200),\n  platform: p.platform,\n  hook: String(p.hook || '').slice(0, 1900),\n  body: String(p.body || '').slice(0, 1900),\n  cta: String(p.cta || '').slice(0, 1900),\n  hashtags: String(p.hashtags || '').slice(0, 1900)\n} }));"
+      },
+      "id": "n5-parse",
+      "name": "Parse Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '88bf899d-a0aa-4c8a-9d24-c243a87008f3' }, properties: { 'Title': { title: [{ text: { content: $json.title } }] }, 'Platform': { select: { name: $json.platform } }, 'Type': { select: { name: 'Educational' } }, 'Status': { select: { name: 'Drafted' } }, 'Hook': { rich_text: [{ text: { content: $json.hook } }] }, 'Body': { rich_text: [{ text: { content: $json.body } }] }, 'CTA': { rich_text: [{ text: { content: $json.cta } }] }, 'Hashtags': { rich_text: [{ text: { content: $json.hashtags } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n6-queue",
+      "name": "Queue Social Drafts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Social drafts queued from: ' + $('Extract Post').first().json.title } }] }, 'Workflow': { select: { name: 'social-repurpose' } }, 'Status': { select: { name: 'success' } } } }) }}",
+        "options": {}
+      },
+      "id": "n7-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 0],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Every Wednesday 10:00": { "main": [[{ "node": "Latest Published Post", "type": "main", "index": 0 }]] },
+    "Latest Published Post": { "main": [[{ "node": "Extract Post", "type": "main", "index": 0 }]] },
+    "Extract Post": { "main": [[{ "node": "Claude: Repurpose", "type": "main", "index": 0 }]] },
+    "Claude: Repurpose": { "main": [[{ "node": "Parse Posts", "type": "main", "index": 0 }]] },
+    "Parse Posts": { "main": [[{ "node": "Queue Social Drafts", "type": "main", "index": 0 }]] },
+    "Queue Social Drafts": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": ["donum-dei"]
+}

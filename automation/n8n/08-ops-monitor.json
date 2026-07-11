@@ -1,0 +1,95 @@
+{
+  "name": "DDP — 08 Ops Monitor (API health)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "minutes", "minutesInterval": 15 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "={{ ($env.DONUM_DEI_API_URL || 'http://localhost:8000') + '/healthz' }}",
+        "options": { "response": { "response": { "neverError": true, "fullResponse": true } }, "timeout": 10000 }
+      },
+      "id": "n2-health",
+      "name": "GET /healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "leftValue": "={{ $json.statusCode }}", "rightValue": 200, "operator": { "type": "number", "operation": "notEquals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n3-if",
+      "name": "Unhealthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: 'ALERT: Donum Dei API unhealthy (' + ($('GET /healthz').item.json.statusCode || 'no response') + ')', text: 'The engine API health check failed at ' + new Date().toISOString() + '.\\n\\nEndpoint: ' + ($env.DONUM_DEI_API_URL || 'http://localhost:8000') + '/healthz\\nStatus: ' + ($('GET /healthz').item.json.statusCode || 'timeout / connection refused') + '\\n\\nAssessment funnel and program generation are degraded until this recovers.' }) }}",
+        "options": {}
+      },
+      "id": "n4-alert",
+      "name": "Alert Owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, -100],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'API health check failed (' + ($('GET /healthz').item.json.statusCode || 'no response') + ')' } }] }, 'Workflow': { select: { name: 'ops-monitor' } }, 'Status': { select: { name: 'error' } } } }) }}",
+        "options": {}
+      },
+      "id": "n5-log",
+      "name": "Log Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 100],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": { "main": [[{ "node": "GET /healthz", "type": "main", "index": 0 }]] },
+    "GET /healthz": { "main": [[{ "node": "Unhealthy?", "type": "main", "index": 0 }]] },
+    "Unhealthy?": {
+      "main": [
+        [{ "node": "Alert Owner", "type": "main", "index": 0 }, { "node": "Log Failure", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": ["donum-dei"]
+}

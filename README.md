@@ -19,6 +19,10 @@ donum-dei-performance/
 │
 ├── packages/schemas/    # Shared JSON Schemas (derived from engine/*.md)
 │
+├── automation/          # n8n workflow suite + ops automation guide
+│   ├── README.md                   # credentials, env vars, import steps, Notion IDs
+│   └── n8n/                        # 9 importable workflows (leads, programs, content, Q&A…)
+│
 ├── engine/              # Core training system brain (SOURCE OF TRUTH)
 │   ├── engine_instructions.md      # System rules & CNS management
 │   ├── exercise_library.md         # Approved exercise pool
@@ -41,6 +45,7 @@ donum-dei-performance/
 │
 ├── docs/                # Reference documentation
 │   ├── RedesignGuide.md            # Frontend redesign specifications
+│   ├── DATA_PLATFORM.md            # Centralization: Postgres + Notion HQ decision
 │   └── io-vs-com-org-guide.md      # Domain strategy guide
 │
 └── README.md

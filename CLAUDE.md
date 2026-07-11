@@ -23,6 +23,11 @@ Guidance for AI assistants working in this repository.
 5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
 6. **`business/` + `docs/`** — strategy and reference material;
    `docs/ARCHITECTURE.md` is the system design for the live product.
+7. **`automation/`** — importable n8n workflows (lead intake, program
+   delivery, check-ins, content, newsletter, Q&A, monitoring) wired to the
+   Notion operations hub — see `automation/README.md` and
+   `docs/DATA_PLATFORM.md`. Status fields in Notion are the human↔machine
+   contract; change them and the matching workflow together.
 
 **Derived-data discipline:** `apps/api/data/*.json` is generated from the
 engine markdown by `make seed-library` — never hand-edit the JSON;
@@ -38,6 +43,7 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 │   └── web/       # Next.js marketing site + assessment funnel
 ├── packages/
 │   └── schemas/   # Shared JSON Schemas (derived)
+├── automation/    # n8n workflow suite + README (ops automation)
 ├── frontend/      # Legacy static HTML mockups (design reference)
 ├── business/      # Business plan / strategy
 ├── docs/          # ARCHITECTURE.md + reference guides
