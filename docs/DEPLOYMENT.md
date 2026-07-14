@@ -1,180 +1,172 @@
-# Deployment — Everything on One VPS
+# Deployment — Netlify Website + One Cheap VPS Backend
 
-The whole product — Postgres, the engine API, the Next.js site, n8n, and an
-auto-HTTPS reverse proxy — runs on a **single VPS** with one command via
-`docker-compose.prod.yml`. This guide takes you from "no server" to "live at
-your domain."
+The cost-optimal, low-ops production setup for a pre-revenue brand:
 
-The Compose file, Caddy config, and the web build-arg wiring are **validated**
-(compose config, Caddy config, and the browser bundle's API URL were all
-checked against Docker Compose v5 / Caddy 2 / n8n 2.29.10).
+```
+                    donumdeiperformance.com
+                             │
+         ┌───────────────────┴───────────────────┐
+         │                                        │
+   ┌─────▼──────┐                      ┌──────────▼───────────┐
+   │  NETLIFY   │  apex + www          │   VPS (Hetzner CX22)  │
+   │  (free)    │                      │   ~€4.50/mo           │
+   │  Next.js   │  browser calls ───▶  │   api.<domain>  → API │
+   │  website   │  api.<domain>        │   n8n.<domain>  → n8n │
+   └────────────┘                      │   + Postgres + Caddy  │
+                                       └───────────┬───────────┘
+   Managed free tiers:                             │
+   Notion (ops hub) · Resend (email) ◀── n8n ──────┘
+   Anthropic (generation, usage-based)
+```
 
----
+- **Website** → Netlify's free tier (commercial use allowed, unlike Vercel's
+  Hobby plan). Zero ops, global CDN, auto-HTTPS, deploy on `git push`.
+- **Backend** (engine API + Postgres + the 13 n8n automations) → one small
+  VPS, because n8n must be always-on. Caddy gives it automatic HTTPS.
+- **Everything else** → free managed tiers (Notion, Resend) or usage-based
+  (Anthropic, Stripe).
 
-## Which VPS
-
-**Recommended: Hetzner Cloud CX22** — 2 vCPU, 4 GB RAM, 40 GB SSD, ~€4.5/mo.
-Best price-to-performance in the market, and 4 GB comfortably runs the whole
-stack (the Next.js build is the only memory-hungry step, and 4 GB clears it).
-
-| Provider / plan | vCPU / RAM / disk | ~ Price | Notes |
-|---|---|---|---|
-| **Hetzner CX22** ✅ | 2 / 4 GB / 40 GB | **~€4.5/mo** | Best value. EU + US (Ashburn, Hillsboro) regions. Recommended. |
-| DigitalOcean Basic | 2 / 4 GB / 80 GB | ~$24/mo | Friendliest UI, superb docs, 1-click Docker droplet. Pay ~5× for the polish. |
-| Vultr / Linode | 2 / 4 GB / 80 GB | ~$24/mo | Comparable to DigitalOcean. |
-| Hetzner CX11 / 2 GB | 1 / 2 GB / 20 GB | ~€3.3/mo | Works only if you build the web image with swap enabled (step 7). Tight. |
-| Contabo | big specs, low price | ~$6/mo | Oversold and slower; avoid for production. |
-
-Pick a region near your customers. If unsure: Hetzner **Ashburn, VA** (US-East)
-or **Nuremberg** (EU). The rest of this guide is provider-agnostic once you
-have an Ubuntu 24.04 server and its IP.
-
-**Minimum:** 2 GB RAM works with a swap file (step 7). **Comfortable:** 4 GB.
-
----
-
-## Before you start — gather these
-
-- A **domain** (`donumdeiperformance.com`) with access to its DNS settings.
-- **Anthropic API key** (`sk-ant-…`) — for real program generation + the
-  Claude-drafting workflows.
-- **Resend API key** (`re_…`) + your sending domain added in Resend.
-- **Stripe** secret key + price IDs (only when you switch billing on — you can
-  launch without).
+All config here is **validated** (backend compose config, Caddy config, and
+`netlify.toml` were checked against Docker Compose v5 / Caddy 2 / n8n 2.29.10).
+First-year cost breakdown: `docs/BUDGET.md`.
 
 ---
 
-## Step 1 — Create the server
+## Before you start
 
-On Hetzner Cloud (console.hetzner.cloud): **New Project → Add Server**:
-- Image: **Ubuntu 24.04**
-- Type: **CX22** (shared vCPU)
-- Add your **SSH key** (paste your public key; on your laptop it's
-  `~/.ssh/id_ed25519.pub`, or create one with `ssh-keygen -t ed25519`)
-- Create, then copy the server's **public IPv4**.
+- A **domain** (`donumdeiperformance.com`) with DNS access.
+- **Anthropic** API key (`sk-ant-…`), **Resend** API key (`re_…`) + verified
+  sending domain. **Stripe** keys only when you switch billing on.
+- A **GitHub** repo for this code (Netlify deploys from it).
 
-## Step 2 — Point DNS at the server
+---
 
-At your domain registrar, create three **A records** → the server IP:
+# Part 1 — The VPS backend (API + Postgres + n8n)
+
+## 1.1 Create the server
+
+Recommended: **Hetzner Cloud CX22** (2 vCPU / 4 GB / 40 GB, ~€4.50/mo). At
+console.hetzner.cloud → **Add Server**: Ubuntu 24.04, type CX22, add your SSH
+key, create, and copy the public IPv4.
+
+*(Cheaper: Oracle Always-Free ARM = $0 but less reliable; see BUDGET.md.)*
+
+## 1.2 DNS — two records to the VPS
+
+At your registrar, point the two **backend** subdomains at the server IP:
 
 | Type | Name | Value |
 |---|---|---|
-| A | `@`   (apex → donumdeiperformance.com) | `SERVER_IP` |
 | A | `api` | `SERVER_IP` |
 | A | `n8n` | `SERVER_IP` |
 
-DNS can take 5–60 minutes to propagate. Caddy will not get certificates until
-these resolve, so do this now.
+(The apex `donumdeiperformance.com` is pointed at Netlify in Part 2 — leave it
+for now.)
 
-## Step 3 — First login and basic hardening
+## 1.3 Harden and install Docker
 
 ```bash
 ssh root@SERVER_IP
-
-# create a non-root user and give it sudo
 adduser ddp && usermod -aG sudo ddp
-rsync --archive --chown=ddp:ddp ~/.ssh /home/ddp   # copy your SSH key over
-
-# firewall: allow SSH + web only
+rsync --archive --chown=ddp:ddp ~/.ssh /home/ddp
 ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
-```
-
-Log back in as the new user: `ssh ddp@SERVER_IP`.
-
-## Step 4 — Install Docker
-
-```bash
+# log back in as ddp, then:
 curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER && newgrp docker   # run docker without sudo
-docker --version && docker compose version        # confirm both
+sudo usermod -aG docker $USER && newgrp docker
 ```
 
-## Step 5 — Get the code
+## 1.4 Clone and configure
 
 ```bash
 git clone https://github.com/<your-org>/donum-dei-performance.git
 cd donum-dei-performance
-```
-
-## Step 6 — Configure the environment
-
-```bash
 cp .env.prod.example .env
-# generate the three secrets and paste them in:
-openssl rand -hex 32        # -> AUTH_JWT_SECRET
-openssl rand -hex 32        # -> N8N_ENCRYPTION_KEY
-openssl rand -base64 24     # -> POSTGRES_PASSWORD
-nano .env
+openssl rand -hex 32     # -> AUTH_JWT_SECRET
+openssl rand -hex 32     # -> N8N_ENCRYPTION_KEY
+openssl rand -base64 24  # -> POSTGRES_PASSWORD
+nano .env                # domains, the 3 secrets, Anthropic + Resend keys
 ```
 
-Fill in the domains, the three generated secrets, and your Anthropic + Resend
-keys. Leave the Stripe block blank for now if you're launching before billing.
-`.env` is gitignored — it never leaves the server.
-
-## Step 7 — (2 GB servers only) add swap
-
-Skip on 4 GB. On a 2 GB box, give the Next.js build headroom:
-
-```bash
-sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
-sudo mkswap /swapfile && sudo swapon /swapfile
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
-
-## Step 8 — Launch the whole stack
+## 1.5 Launch the backend
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-First run builds the API and web images and pulls postgres, n8n, and Caddy
-(3–6 minutes). Caddy then fetches Let's Encrypt certificates for all three
-domains automatically. Watch it happen:
+Builds the API image, pulls postgres + n8n + Caddy, and Caddy auto-issues
+certificates for `api.<domain>` and `n8n.<domain>`. Verify:
 
 ```bash
-docker compose -f docker-compose.prod.yml logs -f caddy
+curl -s https://api.donumdeiperformance.com/healthz     # engine up
+curl -s https://n8n.donumdeiperformance.com/healthz      # -> {"status":"ok"}
 ```
 
-## Step 9 — Verify it's live
-
-```bash
-curl -I https://donumdeiperformance.com          # site      -> 200
-curl -s https://api.donumdeiperformance.com/healthz   # engine -> {"status":"ok"} equivalent
-curl -s https://n8n.donumdeiperformance.com/healthz   # n8n     -> {"status":"ok"}
-```
-
-Open `https://donumdeiperformance.com` in a browser — the site loads over
-HTTPS and the assessment funnel talks to the API.
-
-## Step 10 — Bring the automations online
+## 1.6 Import the automations
 
 ```bash
 ./automation/import-workflows.sh n8n     # -> "Successfully imported 13 workflows."
 ```
 
-Then open `https://n8n.donumdeiperformance.com`:
-1. Create the **owner login** (first visit).
-2. **Credentials → Add** — with these exact names: `Notion API`,
-   `Anthropic (x-api-key)`, `Resend (Bearer)`, `Stripe API`
-   (values + types in `automation/SETUP.md` step 7).
-3. **Share the Notion HQ page** with your Notion integration so the workflows
-   can read/write the databases.
-4. Open each workflow → map its credential(s) → toggle **Active**.
+Then open `https://n8n.donumdeiperformance.com`, create the owner login, add
+the four credentials (`Notion API`, `Anthropic (x-api-key)`, `Resend (Bearer)`,
+`Stripe API`), share the Notion HQ page with your integration, and toggle each
+workflow **Active**. Details: `automation/SETUP.md`.
 
-## Step 11 — Wire the outside world
+---
 
-- **Website forms** → point the assessment funnel and correspondence form at
-  the n8n webhook URLs (`https://n8n.donumdeiperformance.com/webhook/ddp-lead`,
-  `…/ddp-generate`, `…/ddp-checkin`, `…/ddp-question`).
-- **Resend** → confirm your sending domain is **Verified** in the Resend
-  dashboard (DKIM/SPF records at your registrar), or delivery will be poor.
-- **Stripe** (when going paid) → put the real keys/price IDs in `.env`, run
-  `docker compose -f docker-compose.prod.yml up -d api` to reload, and confirm
-  the Stripe Trigger in workflow 10 registered its webhook. The API's own
-  `/v1/billing/webhook` at `https://api.donumdeiperformance.com/v1/billing/webhook`
-  stays Stripe's source of truth — add it as a second Stripe webhook endpoint.
+# Part 2 — The website on Netlify
 
-## Step 12 — Smoke test the loop
+No code changes needed — `netlify.toml` (already in the repo) points Netlify at
+`apps/web` and pins the Next.js runtime.
+
+## 2.1 Connect the repo
+
+netlify.com → **Add new site → Import an existing project** → pick your GitHub
+repo. Netlify reads `netlify.toml` and pre-fills the build settings
+(base `apps/web`, `npm run build`, Next.js runtime).
+
+## 2.2 Set the API URL
+
+In **Site settings → Environment variables**, confirm/set:
+
+```
+NEXT_PUBLIC_API_URL = https://api.donumdeiperformance.com
+```
+
+(It's also in `netlify.toml`; the UI value wins if you ever need to change it
+without a commit.) This is baked into the browser bundle at build time, so it
+must be your live API domain. Trigger a deploy.
+
+## 2.3 Point the domain at Netlify
+
+**Site settings → Domain management → Add custom domain** →
+`donumdeiperformance.com`. Follow Netlify's instructions to either use Netlify
+DNS or add their `A`/`CNAME` records at your registrar for the apex + `www`.
+Netlify provisions HTTPS automatically.
+
+## 2.4 Verify end to end
+
+Open `https://donumdeiperformance.com` — the site loads over HTTPS, and the
+assessment funnel (which calls `https://api.donumdeiperformance.com`) returns a
+program. If the browser console shows CORS or `localhost:8000` calls, see
+Troubleshooting.
+
+---
+
+# Part 3 — Wire the outside world
+
+- **Website forms → n8n webhooks**: point the funnel and correspondence form at
+  `https://n8n.donumdeiperformance.com/webhook/ddp-lead`, `…/ddp-generate`,
+  `…/ddp-checkin`, `…/ddp-question`.
+- **Resend**: verify your sending domain (DKIM/SPF at your registrar) or
+  deliverability suffers.
+- **Stripe** (when going paid): put real keys/price IDs in `.env`,
+  `docker compose -f docker-compose.prod.yml up -d api` to reload, confirm the
+  Stripe Trigger in workflow 10 registered, and add the API's own
+  `https://api.donumdeiperformance.com/v1/billing/webhook` as a second Stripe
+  webhook endpoint (it's Stripe's source of truth for Postgres).
+
+## Smoke test
 
 ```bash
 curl -X POST https://n8n.donumdeiperformance.com/webhook/ddp-lead \
@@ -182,68 +174,49 @@ curl -X POST https://n8n.donumdeiperformance.com/webhook/ddp-lead \
   -d '{"name":"Test","email":"test@example.com","source":"Website Assessment"}'
 ```
 
-→ a row appears in the Notion **Leads (CRM)** database, a welcome email sends,
-and the **Automation Log** database gets a success row.
+→ a row in Notion **Leads (CRM)**, a welcome email, and a success row in the
+**Automation Log**.
 
 ---
 
 ## Operating it
 
 ```bash
-# update to the latest code
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
-
-# logs
+# backend updates (on the VPS)
+git pull && docker compose -f docker-compose.prod.yml up -d --build
 docker compose -f docker-compose.prod.yml logs -f api
-docker compose -f docker-compose.prod.yml ps
-
-# restart one service
-docker compose -f docker-compose.prod.yml restart n8n
+# website updates: just `git push` — Netlify rebuilds automatically.
 ```
 
-**Backups (do this weekly / before updates):**
+**Backups (weekly / before updates):**
 
 ```bash
-# postgres (accounts, programs, billing state)
 docker compose -f docker-compose.prod.yml exec -T postgres \
   pg_dump -U donum_dei donum_dei | gzip > ddp-db-$(date +%F).sql.gz
-
-# n8n volume (workflows, credentials, onboarding Wait-state) — copy it out
 docker run --rm -v donum-dei-performance_n8n_data:/data -v $PWD:/backup alpine \
   tar czf /backup/n8n-data-$(date +%F).tar.gz -C /data .
 ```
 
-Also keep a copy of `.env` somewhere safe — losing `N8N_ENCRYPTION_KEY` makes
-saved n8n credentials undecryptable.
-
-## Costs
-
-| Item | Monthly |
-|---|---|
-| Hetzner CX22 VPS (runs everything) | ~€4.5 |
-| Domain | ~$1 (amortised annual) |
-| Resend | $0 free tier → $20 Pro when list > ~100 |
-| Anthropic API | pay-per-use (cents per program/draft) |
-| **Fixed baseline** | **~€5/mo** |
+Keep `.env` safe — losing `N8N_ENCRYPTION_KEY` makes saved n8n credentials
+undecryptable.
 
 ## Troubleshooting
 
-- **Caddy cert errors / site not HTTPS** — DNS A records must resolve to the
-  server *before* Caddy can issue certs. Check `dig donumdeiperformance.com`,
-  then `docker compose -f docker-compose.prod.yml restart caddy`.
-- **Frontend calls `localhost:8000`** — the web image was built with the wrong
-  API URL. It's a build arg: rebuild with `docker compose -f
-  docker-compose.prod.yml up -d --build web` after `API_DOMAIN` is correct in
-  `.env`.
-- **Web build killed / OOM on a 2 GB box** — add the swap file (step 7).
-- **CORS errors in the browser** — `WEB_DOMAIN` in `.env` must match the domain
-  you're visiting; the API sets `CORS_ORIGINS` from it. Rebuild `api` after
-  changing.
-- **n8n webhooks unreachable / Stripe can't reach it** — `N8N_DOMAIN` must
-  resolve and Caddy must be up; n8n is behind one proxy hop (`N8N_PROXY_HOPS=1`
-  is already set).
+- **Frontend calls `localhost:8000`** — Netlify built with the wrong API URL.
+  Fix `NEXT_PUBLIC_API_URL` in Netlify env and redeploy (it's a build-time
+  value).
+- **CORS errors** — `WEB_DOMAIN` in the VPS `.env` must equal the domain you
+  visit; the API sets `CORS_ORIGINS` from it. `docker compose -f
+  docker-compose.prod.yml up -d api` after changing.
+- **Caddy cert errors** — `api`/`n8n` A records must resolve to the VPS before
+  Caddy can issue certs; `docker compose -f docker-compose.prod.yml restart caddy`.
+- **n8n webhooks unreachable** — `N8N_DOMAIN` must resolve and Caddy be up;
+  n8n already runs behind one proxy hop (`N8N_PROXY_HOPS=1`).
 
-The n8n-specific runbook (credentials, workflow activation) is
-`automation/SETUP.md`; the workflow reference and Notion IDs are
-`automation/README.md`.
+Want the whole backend on one box *including* the site instead (no Netlify)?
+The base `docker-compose.yml` has a `web` service and the `automation` profile
+for exactly that — but Netlify keeps the site up independently of the VPS and
+costs nothing, which is why it's the default here.
+
+Cost breakdown: `docs/BUDGET.md`. Workflow reference + Notion IDs:
+`automation/README.md`. n8n credential setup: `automation/SETUP.md`.

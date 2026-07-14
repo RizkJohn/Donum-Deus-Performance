@@ -44,7 +44,8 @@ donum-dei-performance/
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
 │
 ├── docs/                # Reference documentation
-│   ├── DEPLOYMENT.md               # One-VPS production deploy (Hetzner + Docker + Caddy)
+│   ├── DEPLOYMENT.md               # Prod deploy: Netlify web + cheap VPS backend
+│   ├── BUDGET.md                   # First-year cost + spending plan (~$5/mo floor)
 │   ├── RedesignGuide.md            # Frontend redesign specifications
 │   ├── DATA_PLATFORM.md            # Centralization: Postgres + Notion HQ decision
 │   └── io-vs-com-org-guide.md      # Domain strategy guide
@@ -98,17 +99,18 @@ Equipment constraints, injury flags, fatigue-adjusted alternatives
 
 ## Running the product
 
-See `docs/ARCHITECTURE.md` for the full system design. To deploy the entire
-stack (API + site + n8n + auto-HTTPS) on a single VPS, follow
-**`docs/DEPLOYMENT.md`** (`docker-compose.prod.yml`, ~€5/mo on Hetzner).
+See `docs/ARCHITECTURE.md` for the full system design. For production, the
+site deploys to **Netlify** (free) and the backend (API + Postgres + n8n) runs
+on **one ~$5/mo VPS** — full runbook in **`docs/DEPLOYMENT.md`**, costs in
+**`docs/BUDGET.md`**.
 
 ```bash
 docker compose up --build   # local dev: postgres + api (:8000) + web (:3000) — no API key needed
 make test                   # engine test suite (offline, mock provider)
 make seed-library           # regenerate derived JSON after editing engine/*.md
 
-# production, on the VPS (see docs/DEPLOYMENT.md):
-docker compose -f docker-compose.prod.yml up -d --build
+# production backend, on the VPS (see docs/DEPLOYMENT.md):
+docker compose -f docker-compose.prod.yml up -d --build   # postgres + api + n8n + caddy
 ```
 
 The API defaults to `LLM_PROVIDER=mock` (deterministic, offline). For real
