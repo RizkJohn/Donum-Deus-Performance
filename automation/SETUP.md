@@ -193,6 +193,12 @@ key). Lose the key and saved credentials can't be decrypted.
   removed it, put it back.
 - **Import fails with `workflows_tags.tagId` NOT NULL** — a workflow JSON has
   a bare-string tag. All shipped files use `"tags": []`; keep it that way.
+- **Emails/URLs use the hardcoded fallback instead of your configured
+  `DDP_EMAIL_FROM` / `DDP_OWNER_EMAIL` / etc.** — n8n blocks `$env` access
+  inside node expressions by default; the Compose files already set
+  `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` to allow it (every workflow reads
+  these via `$env.DDP_X || 'fallback'`, so it fails soft, not hard, if this
+  is ever unset — but your real values won't come through).
 - **Webhooks don't fire / Stripe can't reach n8n** — `WEBHOOK_URL` and
   `N8N_HOST` must match your real HTTPS domain, and the reverse proxy must be
   terminating TLS in front of port 5678.

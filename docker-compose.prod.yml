@@ -79,6 +79,10 @@ services:
       N8N_SECURE_COOKIE: "true"
       GENERIC_TIMEZONE: ${TZ:-America/New_York}
       N8N_DIAGNOSTICS_ENABLED: "false"
+      # n8n blocks $env access inside node expressions by default. The
+      # workflows read every DDP_* var below via $env (with hardcoded
+      # fallbacks) — without this, configured values are silently ignored.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       DONUM_DEI_API_URL: http://api:8000
       DDP_WEB_URL: https://${WEB_DOMAIN}
       DDP_EMAIL_FROM: ${DDP_EMAIL_FROM:-Donum Dei Performance <programs@donumdeiperformance.com>}

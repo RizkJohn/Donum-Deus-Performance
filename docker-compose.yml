@@ -64,6 +64,11 @@ services:
       N8N_SECURE_COOKIE: ${N8N_SECURE_COOKIE:-false}
       GENERIC_TIMEZONE: ${TZ:-America/New_York}
       N8N_DIAGNOSTICS_ENABLED: "false"
+      # n8n blocks $env access inside node expressions by default. Every DDP_*
+      # variable below is read via $env in the workflows (with hardcoded
+      # fallbacks so they don't hard-fail) — without this, your configured
+      # values are silently ignored in favor of those fallbacks.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       # App wiring consumed by the workflows (see automation/README.md).
       N8N_WEBHOOK_BASE: ${N8N_WEBHOOK_BASE:-http://localhost:5678}
       DONUM_DEI_API_URL: ${DONUM_DEI_API_URL:-http://api:8000}
