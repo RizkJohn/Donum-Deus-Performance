@@ -44,14 +44,35 @@ donum-dei-performance/
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
 │
 ├── docs/                # Reference documentation
+│   ├── ARCHITECTURE.md              # Full system design for the live product
 │   ├── DEPLOYMENT.md               # Prod deploy: Netlify web + cheap VPS backend
 │   ├── BUDGET.md                   # First-year cost + spending plan (~$5/mo floor)
 │   ├── RedesignGuide.md            # Frontend redesign specifications
 │   ├── DATA_PLATFORM.md            # Centralization: Postgres + Notion HQ decision
 │   └── io-vs-com-org-guide.md      # Domain strategy guide
 │
+├── docker-compose.yml       # Local dev stack (+ `automation` profile: self-hosted n8n)
+├── docker-compose.prod.yml  # VPS backend: postgres + api + n8n + Caddy (auto-HTTPS)
+├── Caddyfile                 # Reverse proxy for the VPS backend
+├── netlify.toml               # Website deploy config (apps/web → Netlify)
+├── .env.prod.example          # VPS backend environment template
 └── README.md
 ```
+
+## Status
+
+- **Rebrand** — complete across code, specs, business docs, and legacy
+  mockups; verified with the full API test suite (489 passing) and a clean
+  web production build.
+- **Automation** — 13 n8n workflows covering the full lifecycle (leads →
+  conversion → onboarding → programs → check-ins → content → newsletter →
+  Q&A → billing → monitoring → owner digest), verified end-to-end in Docker.
+- **Operations hub** — Notion HQ live with all 8 databases wired to the
+  workflows (`automation/README.md` has every database ID).
+- **Deployment** — architecture decided and built: Netlify (site, free) +
+  one ~$5/mo VPS (API + Postgres + n8n behind Caddy). Not yet live — domain
+  purchase, VPS provisioning, and credentials are the remaining launch steps
+  (`docs/DEPLOYMENT.md`, `docs/BUDGET.md`).
 
 ---
 

@@ -23,12 +23,24 @@ Guidance for AI assistants working in this repository.
 5. **`frontend/`** — legacy standalone HTML mockups (design reference only).
 6. **`business/` + `docs/`** — strategy and reference material;
    `docs/ARCHITECTURE.md` is the system design for the live product.
-7. **`automation/`** — importable n8n workflows (lead intake + nurture,
+7. **`automation/`** — 13 importable n8n workflows (lead intake + nurture,
    Stripe billing lifecycle, client onboarding, program delivery, check-ins,
    content, newsletter, Q&A, monitoring, owner digest) wired to the
    Notion operations hub — see `automation/README.md` and
    `docs/DATA_PLATFORM.md`. Status fields in Notion are the human↔machine
-   contract; change them and the matching workflow together.
+   contract; change them and the matching workflow together. Verified
+   end-to-end in Docker (build, import, activate, live webhook round-trip);
+   12/13 activate immediately, the Stripe workflow activates once a real
+   Stripe credential is added (its native Stripe Trigger must register a
+   webhook subscription via Stripe's API).
+8. **Production deployment** — the website deploys to **Netlify** (free,
+   commercial-use-allowed); the always-on backend (API + Postgres + the n8n
+   suite) runs on **one cheap VPS** behind Caddy for automatic HTTPS. See
+   `docs/DEPLOYMENT.md` for the runbook and `docs/BUDGET.md` for the
+   first-year cost plan (~$5/mo fixed floor). `docker-compose.yml` is local
+   dev (+ an `automation` profile for self-hosting n8n locally);
+   `docker-compose.prod.yml` + `Caddyfile` + `.env.prod.example` are the VPS
+   backend; `netlify.toml` configures the website deploy.
 
 **Derived-data discipline:** `apps/api/data/*.json` is generated from the
 engine markdown by `make seed-library` — never hand-edit the JSON;
@@ -44,11 +56,15 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 │   └── web/       # Next.js marketing site + assessment funnel
 ├── packages/
 │   └── schemas/   # Shared JSON Schemas (derived)
-├── automation/    # n8n workflow suite + README (ops automation)
+├── automation/    # 13 n8n workflows + README/SETUP + import script (ops automation)
 ├── frontend/      # Legacy static HTML mockups (design reference)
 ├── business/      # Business plan / strategy
-├── docs/          # ARCHITECTURE.md + reference guides
-├── docker-compose.yml   # postgres + api (:8000) + web (:3000)
+├── docs/          # ARCHITECTURE.md, DEPLOYMENT.md, BUDGET.md, DATA_PLATFORM.md + reference guides
+├── docker-compose.yml       # local dev: postgres + api (:8000) + web (:3000); `automation` profile adds n8n (:5678)
+├── docker-compose.prod.yml  # VPS backend: postgres + api + n8n + Caddy (auto-HTTPS)
+├── Caddyfile                # reverse proxy for the prod backend (api./n8n. subdomains)
+├── netlify.toml              # website deploy config (apps/web on Netlify)
+├── .env.prod.example         # VPS backend env template
 ├── Makefile             # make dev / test / seed-library / api / web
 └── README.md      # Top-level overview
 ```
@@ -56,11 +72,25 @@ engine markdown by `make seed-library` — never hand-edit the JSON;
 ## Running & testing
 
 - `docker compose up --build` — full stack, no API key needed (mock provider).
+- `docker compose --profile automation up -d` — adds self-hosted n8n
+  (`automation/import-workflows.sh` loads the 13 workflows).
 - `make test` — pytest suite in `apps/api/tests/` (offline; includes a 400+
   case program contract test). Run after any engine or API change.
 - `make seed-library` — regenerate `apps/api/data/*.json` after editing
   `engine/exercise_library.md` or `engine/substitution_rules.md`.
 - Web: `cd apps/web && npm install && npm run dev` (or `npm run build`).
+- Production: `docs/DEPLOYMENT.md` (Netlify + one VPS via `docker-compose.prod.yml`).
+
+### n8n gotcha — `$env` access in expressions
+
+n8n blocks `$env.*` reads inside node expressions by default. Every workflow
+in `automation/n8n/` reads `DDP_EMAIL_FROM` / `DDP_OWNER_EMAIL` / `DDP_WEB_URL`
+/ `DONUM_DEI_API_URL` / `DDP_CLAUDE_MODEL` this way (with a hardcoded
+`|| 'fallback'`), so without `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` (set in both
+Compose files) it fails **soft** — your configured value is silently replaced
+by the fallback, no error. If you add a new workflow or a new `$env.X` read,
+verify it against a real `docker compose --profile automation up` run, not
+just JSON validation.
 
 ## The engine (`engine/`)
 

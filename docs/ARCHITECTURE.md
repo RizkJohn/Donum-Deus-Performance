@@ -83,8 +83,10 @@ rule regardless of what the model returns.
 │   │   └── tests/
 │   └── web/              # Next.js marketing site + assessment funnel
 ├── packages/schemas/     # Shared JSON Schemas (derived from engine/*.md)
+├── automation/           # 13 n8n workflows + Notion ops hub wiring (see below)
 ├── frontend/             # Legacy static mockups (donum_dei_v2.html = design reference)
-├── docker-compose.yml    # postgres + api + web
+├── docker-compose.yml    # local dev: postgres + api + web (+ `automation` profile: n8n)
+├── docker-compose.prod.yml  # VPS backend: postgres + api + n8n + Caddy
 └── Makefile              # make dev / make test / make seed-library
 ```
 
@@ -201,6 +203,62 @@ class LLMProvider(Protocol):
   `resend`. Triggers: program-ready email after a successful `/v1/assess`,
   welcome email on signup.
 
+## Operations & automation layer
+
+The API and web app are the product; the operations layer is how the practice
+actually runs day to day. **Postgres stays the system of record** (accounts,
+programs, billing state — everything above); **Notion is the human-facing ops
+hub** (CRM, content calendar, Q&A queue, newsletter pipeline, automation log);
+**n8n is the courier between them**, running 13 workflows that cover the full
+lifecycle:
+
+```
+lead capture → nurture → conversion (Stripe) → onboarding drip → weekly
+program generation/delivery → check-in ingest → progression → content/blog
+→ social repurpose → newsletter → Q&A autoresponder → ops health monitor
+→ owner weekly digest
+```
+
+Design contract: nothing client-facing sends without either the engine's hard
+QC gate (programs) or an explicit human-set Notion status (`Approved` /
+`Scheduled` for Q&A and the newsletter) — Claude drafts, a human approves,
+Resend delivers. Full workflow-by-workflow reference, Notion database IDs, and
+the credential/status contract: `automation/README.md`. Server setup:
+`automation/SETUP.md`. Why Notion (and not Airtable/Baserow/Sheets):
+`docs/DATA_PLATFORM.md`.
+
+Verified end-to-end in Docker: all 13 import and 12 activate immediately; the
+Stripe billing workflow activates once a real Stripe credential is added
+(its native Stripe Trigger registers a webhook subscription via the Stripe
+API on activation, so a placeholder can't satisfy it). n8n blocks `$env`
+access inside node expressions by default — `N8N_BLOCK_ENV_ACCESS_IN_NODE=false`
+is set in both Compose files; without it every `DDP_*` variable the workflows
+read silently falls back to its hardcoded default instead of your configured
+value.
+
+## Deployment topology
+
+Production splits the site from the always-on backend rather than running
+everything on one box — driven by cost (see `docs/BUDGET.md`) and by Vercel's
+free tier prohibiting commercial use:
+
+```
+Netlify (free, commercial-OK)          VPS (~$5/mo, e.g. Hetzner CX22)
+┌────────────────────────┐             ┌──────────────────────────────┐
+│ apps/web (Next.js)     │  fetch()    │ Caddy (auto-HTTPS reverse    │
+│ donumdeiperformance.com│ ──────────▶ │  proxy)                       │
+└────────────────────────┘  /v1/*      │   ├─ api.<domain>  → FastAPI │
+                                        │   └─ n8n.<domain>  → n8n     │
+                                        │ + Postgres (data volume)     │
+                                        └──────────────────────────────┘
+```
+
+`netlify.toml` builds `apps/web` with `NEXT_PUBLIC_API_URL` set to the VPS's
+public API domain — that value is baked into the browser bundle at build
+time, so it must be the real domain, not a runtime env var. Full runbook
+(DNS, server hardening, Docker, Netlify import, Stripe/Resend wiring, smoke
+tests, backups, troubleshooting): `docs/DEPLOYMENT.md`.
+
 ## Local development
 
 ```
@@ -216,6 +274,12 @@ LLM_PROVIDER=claude ANTHROPIC_API_KEY=... # switch to real generation
   tiered models, and a client-rendered program PDF.
 - Accounts (signup/login/dashboard), Stripe billing (checkout/portal/webhook),
   and provider-agnostic email delivery (program-ready + welcome).
+- Full rebrand to Donum Dei Performance (code, specs, business docs, legacy
+  mockups); 489 API tests passing, clean production web build.
+- The operations & automation layer: Notion HQ (8 databases) + 13 n8n
+  workflows covering the full lifecycle, verified end-to-end in Docker.
+- The production deployment topology (Netlify + one VPS behind Caddy) and
+  first-year budget plan — built and validated, not yet live.
 
 ## Known gotcha — CSP vs. dev-mode hydration
 
@@ -237,3 +301,7 @@ nonce for dev builds only, or accept dev-mode's reduced HMR fidelity).
 - Long-horizon mesocycle planning beyond per-cycle exposure/compliance
   (deload-every-6–8-weeks); program_runs + athlete_states are the seed.
 - Redis/Qdrant; Alembic migrations (currently `create_all` on fresh DBs).
+- Actual launch: domain purchase, VPS provisioning, Netlify project connect,
+  Notion integration share, DNS, Resend domain verification, and real
+  Anthropic/Resend/Stripe/Notion credentials in n8n. Infrastructure is built
+  and validated; nothing is live yet.
