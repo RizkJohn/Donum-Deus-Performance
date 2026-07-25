@@ -106,18 +106,48 @@ async def test_feedback_unknown_run_404(client):
 
 
 @pytest.mark.asyncio
+async def test_data_endpoints_require_auth(client):
+    # Erasure and access are privacy-sensitive: an unauthenticated caller must
+    # never be able to export or delete data for an arbitrary email.
+    d = await client.request("DELETE", "/v1/data")
+    assert d.status_code == 401
+    g = await client.get("/v1/data")
+    assert g.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_erasure_removes_state_and_feedback(client):
     email = "erase@example.com"
     r = await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
     run_id = r.json()["id"]
     await client.post("/v1/feedback", json={"email": email, "run_id": run_id, "completion_pct": 0.5})
 
-    d = await client.request("DELETE", "/v1/data", json={"email": email})
+    # Only the account owner (verified via session token) may erase their data.
+    signup = await client.post("/v1/auth/signup", json={"email": email, "password": "correcthorse"})
+    token = signup.json()["token"]
+
+    d = await client.request(
+        "DELETE", "/v1/data", headers={"Authorization": f"Bearer {token}"}
+    )
     assert d.status_code == 200
     body = d.json()
     assert body["deleted_programs"] >= 1
     assert body["deleted_feedback"] >= 1
     assert body["deleted_athlete_state"] == 1
+
+
+@pytest.mark.asyncio
+async def test_export_returns_only_own_records(client):
+    email = "export@example.com"
+    await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
+    signup = await client.post("/v1/auth/signup", json={"email": email, "password": "correcthorse"})
+    token = signup.json()["token"]
+
+    r = await client.get("/v1/data", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["email"] == email
+    assert body["record_count"] >= 1
 
 
 @pytest.mark.asyncio
