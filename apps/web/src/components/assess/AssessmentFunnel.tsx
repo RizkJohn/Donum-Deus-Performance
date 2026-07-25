@@ -982,7 +982,8 @@ export default function AssessmentFunnel() {
                   </Link>
                   . I understand that Deus Performance is a practice of
                   performance education and this program does not constitute
-                  medical or clinical advice.
+                  medical or clinical advice, and I acknowledge and voluntarily
+                  assume the inherent risks of exercise.
                 </span>
               </label>
 

@@ -38,7 +38,9 @@ export default function TermsPage() {
               {" "}<strong className="text-ink">not</strong> a medical provider
               and does not offer medical advice, diagnosis, or clinical
               treatment of any kind. Consult a licensed clinician before
-              beginning any new training program.
+              beginning any new training program. Exercise carries inherent
+              risk, and by using the Service you voluntarily assume that risk —
+              see Sections 4 and 5.
             </p>
           </div>
 
@@ -55,15 +57,20 @@ export default function TermsPage() {
                 ["#agreement", "Agreement to These Terms"],
                 ["#eligibility", "Eligibility"],
                 ["#not-medical", "Not Medical Advice"],
+                ["#assumption-of-risk", "Assumption of Risk & Release of Liability"],
+                ["#medical-clearance", "Medical Clearance & Health Representations"],
                 ["#service", "Description of the Service"],
                 ["#responsibilities", "Your Responsibilities"],
                 ["#ip", "Intellectual Property"],
                 ["#disclaimer", "Disclaimer of Warranties"],
                 ["#liability", "Limitation of Liability"],
                 ["#indemnification", "Indemnification"],
+                ["#time-limit", "Time Limit for Bringing Claims"],
                 ["#disputes", "Governing Law and Dispute Resolution"],
                 ["#consumer-rights", "Preservation of Consumer Rights"],
                 ["#termination", "Termination"],
+                ["#severability", "Severability"],
+                ["#general", "Entire Agreement, Waiver, and Assignment"],
                 ["#changes", "Changes to These Terms"],
                 ["#contact", "Contact"],
               ].map(([href, label], i) => (
@@ -96,8 +103,10 @@ export default function TermsPage() {
               <P>
                 By accessing the Service, submitting the assessment, or
                 generating a training program, you confirm that you have read,
-                understood, and agreed to these Terms. If you do not agree, do
-                not use the Service.
+                understood, and agreed to these Terms — including the assumption
+                of risk and release in Section 4, the disclaimers in Section 9,
+                and the binding arbitration and class-action waiver in Section
+                13. If you do not agree, do not use the Service.
               </P>
             </section>
 
@@ -113,9 +122,10 @@ export default function TermsPage() {
               </P>
               <P>
                 Users between 13 and 17 should use the Service with the
-                knowledge and consent of a parent or legal guardian. If you are
-                a parent or guardian who becomes aware that your minor child has
-                submitted personal information without your consent, contact us
+                knowledge and consent of a parent or legal guardian, who accepts
+                these Terms on the minor&rsquo;s behalf. If you are a parent or
+                guardian who becomes aware that your minor child has submitted
+                personal information without your consent, contact us
                 immediately for deletion.
               </P>
             </section>
@@ -147,8 +157,84 @@ export default function TermsPage() {
             </section>
 
             {/* 4 */}
-            <section id="service">
+            <section id="assumption-of-risk">
               <SN n={4} />
+              <h2 className="section-head">
+                Assumption of Risk &amp; Release of Liability
+              </h2>
+              <P>
+                Physical exercise carries inherent and unavoidable risks. You
+                understand and acknowledge that participating in any training
+                program obtained through the Service is voluntary and that you
+                do so entirely at your own risk. These risks exist even when a
+                program is followed correctly and include, without limitation:
+              </P>
+              <ul className="flex flex-col gap-[8px] border border-[rgba(184,68,68,0.3)] bg-[rgba(184,68,68,0.04)] px-[20px] py-[18px]">
+                {[
+                  "Muscle, joint, ligament, tendon, or connective-tissue strains, sprains, tears, and other musculoskeletal injuries.",
+                  "Cardiovascular events, fainting, heat illness, dehydration, or, in rare cases, serious injury or death.",
+                  "Aggravation of pre-existing conditions, injuries, or vulnerabilities, whether or not disclosed.",
+                  "Injury arising from improper form, overexertion, fatigue, inadequate recovery, unsafe equipment, or your training environment.",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-[10px]">
+                    <span aria-hidden="true" className="shrink-0 text-danger mt-[1px] font-mono text-[10px]">—</span>
+                    <span className="font-bask text-[13px] text-ink2 leading-[1.75]">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <P className="mt-[12px]">
+                TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU KNOWINGLY
+                AND VOLUNTARILY ASSUME ALL RISKS ASSOCIATED WITH YOUR USE OF THE
+                SERVICE AND ANY TRAINING PROGRAM, AND YOU RELEASE, WAIVE, AND
+                DISCHARGE RIZ MANAGEMENT LLC AND ITS OFFICERS, DIRECTORS,
+                EMPLOYEES, AND AGENTS FROM ANY AND ALL CLAIMS, DEMANDS, OR CAUSES
+                OF ACTION FOR PERSONAL INJURY, ILLNESS, DEATH, OR PROPERTY DAMAGE
+                ARISING OUT OF OR RELATED TO YOUR PARTICIPATION IN ANY PROGRAM
+                OBTAINED THROUGH THE SERVICE, WHETHER CAUSED BY ORDINARY
+                NEGLIGENCE OR OTHERWISE.
+              </P>
+              <P>
+                This release does not apply to gross negligence, recklessness,
+                willful misconduct, fraud, or any liability that cannot be waived
+                or released under the mandatory law of your jurisdiction. Where a
+                full release is not permitted, it applies to the maximum extent
+                the law allows. This assumption of risk and release is a material
+                inducement for us to provide the assessment tier at no charge and
+                survives termination of these Terms.
+              </P>
+            </section>
+
+            {/* 5 */}
+            <section id="medical-clearance">
+              <SN n={5} />
+              <h2 className="section-head">
+                Medical Clearance &amp; Health Representations
+              </h2>
+              <P>
+                By using the Service you represent and warrant that you are in
+                good general health and have no medical condition, injury, or
+                impairment that would make exercise unsafe — or, if you do, that
+                you have obtained clearance from a licensed physician before
+                using any program generated by the Service.
+              </P>
+              <ul className="flex flex-col gap-[8px] border border-line bg-bg1 px-[20px] py-[18px]">
+                {[
+                  "You have provided accurate and complete information about your injuries, health state, and physical condition in the assessment.",
+                  "You will stop exercising immediately and seek medical attention if you experience pain, dizziness, chest discomfort, shortness of breath, faintness, or any other warning sign.",
+                  "You will not exceed your own capabilities and will scale, modify, or discontinue any exercise based on how your body responds.",
+                  "You understand the Service is not a substitute for professional medical care, diagnosis, or physical therapy, and that you remain solely responsible for deciding whether a program is appropriate for you.",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-[10px]">
+                    <span aria-hidden="true" className="shrink-0 text-accent mt-[1px] font-mono text-[10px]">—</span>
+                    <span className="font-bask text-[13px] text-ink2 leading-[1.75]">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* 6 */}
+            <section id="service">
+              <SN n={6} />
               <h2 className="section-head">Description of the Service</h2>
               <P>
                 Deus Performance provides a free automated assessment that collects
@@ -165,9 +251,9 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 5 */}
+            {/* 7 */}
             <section id="responsibilities">
-              <SN n={5} />
+              <SN n={7} />
               <h2 className="section-head">Your Responsibilities</h2>
               <P>You agree to:</P>
               <ul className="flex flex-col gap-[8px] border border-line bg-bg1 px-[20px] py-[18px]">
@@ -187,9 +273,9 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            {/* 6 */}
+            {/* 8 */}
             <section id="ip">
-              <SN n={6} />
+              <SN n={8} />
               <h2 className="section-head">Intellectual Property</h2>
               <P>
                 All content on the Deus Performance website — including the engine
@@ -214,9 +300,9 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 7 */}
+            {/* 9 */}
             <section id="disclaimer">
-              <SN n={7} />
+              <SN n={9} />
               <h2 className="section-head">Disclaimer of Warranties</h2>
               <P>
                 THE SERVICE IS PROVIDED ON AN AS-IS AND AS-AVAILABLE BASIS
@@ -244,9 +330,9 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 8 */}
+            {/* 10 */}
             <section id="liability">
-              <SN n={8} />
+              <SN n={10} />
               <h2 className="section-head">Limitation of Liability</h2>
               <P>
                 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT
@@ -276,9 +362,9 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 9 */}
+            {/* 11 */}
             <section id="indemnification">
-              <SN n={9} />
+              <SN n={11} />
               <h2 className="section-head">Indemnification</h2>
               <P>
                 You agree to indemnify, defend, and hold harmless Riz Management
@@ -286,13 +372,30 @@ export default function TermsPage() {
                 against any claims, liabilities, damages, losses, and expenses
                 (including reasonable legal fees) arising out of or connected with
                 your access to or use of the Service, your violation of these
-                Terms, or your violation of any third-party rights.
+                Terms, your submission of inaccurate health information, or your
+                violation of any third-party rights.
               </P>
             </section>
 
-            {/* 10 */}
+            {/* 12 */}
+            <section id="time-limit">
+              <SN n={12} />
+              <h2 className="section-head">Time Limit for Bringing Claims</h2>
+              <P>
+                To the extent permitted by applicable law, any claim or cause of
+                action arising out of or related to the Service or these Terms
+                must be commenced within one (1) year after the claim accrued.
+                After that period, the claim is permanently barred. Where a
+                one-year period is shorter than the minimum your jurisdiction
+                allows, the shortest period permitted by that law applies
+                instead. This Section does not apply where it is prohibited by
+                mandatory consumer-protection law.
+              </P>
+            </section>
+
+            {/* 13 */}
             <section id="disputes">
-              <SN n={10} />
+              <SN n={13} />
               <h2 className="section-head">Governing Law and Dispute Resolution</h2>
               <P>
                 These Terms are governed by the laws of the State of Delaware,
@@ -323,15 +426,19 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 11 */}
+            {/* 14 */}
             <section id="consumer-rights">
-              <SN n={11} />
+              <SN n={14} />
               <h2 className="section-head">Preservation of Consumer Rights</h2>
               <P>
                 Nothing in these Terms is intended to waive or limit any rights
                 you hold under mandatory consumer protection or data protection
                 law in your jurisdiction that cannot be excluded by contract.
-                This includes rights under:
+                Where any provision of these Terms — including the assumption of
+                risk, release, disclaimers, liability cap, arbitration clause, or
+                class-action waiver — conflicts with a non-waivable right you
+                hold, that right prevails and the remainder of these Terms stays
+                in effect. Non-waivable rights include those under:
               </P>
               <ul className="flex flex-col gap-[8px] border border-line bg-bg1 px-[20px] py-[18px]">
                 {[
@@ -350,9 +457,9 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            {/* 12 */}
+            {/* 15 */}
             <section id="termination">
-              <SN n={12} />
+              <SN n={15} />
               <h2 className="section-head">Termination</h2>
               <P>
                 We reserve the right to suspend or terminate your access to the
@@ -362,16 +469,66 @@ export default function TermsPage() {
               </P>
               <P>
                 You may stop using the Service at any time. Sections that by their
-                nature should survive termination — including Sections 6
-                (Intellectual Property), 7 (Disclaimer of Warranties), 8
-                (Limitation of Liability), and 9 (Indemnification) — shall
-                survive.
+                nature should survive termination — including Intellectual
+                Property, Assumption of Risk &amp; Release of Liability, Disclaimer
+                of Warranties, Limitation of Liability, Indemnification, Time Limit
+                for Bringing Claims, Governing Law and Dispute Resolution, and
+                Severability — shall survive.
               </P>
             </section>
 
-            {/* 13 */}
+            {/* 16 */}
+            <section id="severability">
+              <SN n={16} />
+              <h2 className="section-head">Severability</h2>
+              <P>
+                If any provision of these Terms is held invalid, illegal, or
+                unenforceable by a court or arbitrator of competent jurisdiction,
+                that provision will be modified to the minimum extent necessary to
+                make it enforceable, or if it cannot be so modified, severed, and
+                the remaining provisions will continue in full force and effect.
+              </P>
+              <P>
+                If the class-action waiver in Section 13 is found unenforceable as
+                to a particular claim, only that claim will be severed from
+                arbitration and proceed in court; the remainder of the
+                dispute-resolution provisions continue to apply to all other
+                claims.
+              </P>
+            </section>
+
+            {/* 17 */}
+            <section id="general">
+              <SN n={17} />
+              <h2 className="section-head">
+                Entire Agreement, Waiver, and Assignment
+              </h2>
+              <P>
+                These Terms, together with the{" "}
+                <Link href="/privacy" className="text-accent hover:text-ink transition-colors">
+                  Privacy Policy
+                </Link>{" "}
+                and any additional terms presented at the time of a paid
+                purchase, constitute the entire agreement between you and Riz
+                Management LLC regarding the Service and supersede all prior
+                agreements and understandings on the subject.
+              </P>
+              <P>
+                Our failure to enforce any provision of these Terms is not a
+                waiver of our right to enforce it later. A waiver is effective
+                only if made in writing by us.
+              </P>
+              <P>
+                You may not assign or transfer these Terms without our prior
+                written consent. We may assign these Terms, in whole or in part,
+                in connection with a merger, acquisition, reorganization, or sale
+                of assets, or by operation of law.
+              </P>
+            </section>
+
+            {/* 18 */}
             <section id="changes">
-              <SN n={13} />
+              <SN n={18} />
               <h2 className="section-head">Changes to These Terms</h2>
               <P>
                 We may modify these Terms from time to time. Material changes will
@@ -385,9 +542,9 @@ export default function TermsPage() {
               </P>
             </section>
 
-            {/* 14 */}
+            {/* 19 */}
             <section id="contact">
-              <SN n={14} />
+              <SN n={19} />
               <h2 className="section-head">Contact</h2>
               <P>
                 Questions about these Terms, or notices required under them, should
