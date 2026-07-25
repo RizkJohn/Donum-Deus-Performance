@@ -108,7 +108,7 @@ export default async function DashboardPage() {
                 </p>
                 {!isEngineError(current.program) && (
                   <DownloadPdfButton
-                    record={{ ...current, email: data.email, state_summary: data.state_summary } as ProgramRecord}
+                    record={{ ...current, state_summary: data.state_summary } as ProgramRecord}
                   />
                 )}
               </div>

@@ -26,6 +26,28 @@ async def test_generate_rejects_malformed_payload(client):
 
 
 @pytest.mark.asyncio
+async def test_generate_does_not_persist_orphan_run(client):
+    """/v1/generate returns a program but no id, so persisting the run would
+    leave an owner-less health record unreachable by export/erasure. It must
+    stay ephemeral."""
+    from sqlalchemy import func, select
+
+    from deus_api.db import session as db_session
+    from deus_api.db.models import ProgramRun
+
+    async with db_session._sessionmaker() as s:
+        before = (await s.execute(select(func.count()).select_from(ProgramRun))).scalar()
+
+    r = await client.post("/v1/generate", json=make_request().model_dump())
+    assert r.status_code == 200
+
+    async with db_session._sessionmaker() as s:
+        after = (await s.execute(select(func.count()).select_from(ProgramRun))).scalar()
+
+    assert after == before  # nothing persisted
+
+
+@pytest.mark.asyncio
 async def test_assess_and_fetch_roundtrip(client):
     r = await client.post("/v1/assess", json={
         "email": "athlete@example.com",
@@ -44,10 +66,17 @@ async def test_assess_and_fetch_roundtrip(client):
     r2 = await client.get(f"/v1/programs/{body['id']}")
     assert r2.status_code == 200
     fetched = r2.json()
-    assert fetched["email"] == "athlete@example.com"
     assert fetched["program"] == body["program"]
     assert fetched["assessment"]["training_state"] == body["assessment"]["training_state"]
     assert fetched["state_summary"]["cycle_count"] == 1
+
+    # The public share endpoint must not leak identifying or unused health data:
+    # no email, no body metrics, no injuries — only what the shared page renders.
+    assert "email" not in fetched
+    assert "client_profile" not in fetched["payload"]
+    assert "injuries" not in fetched["payload"]["state"]
+    assert set(fetched["payload"]["state"]) == {"sleep", "soreness", "energy", "stress"}
+    assert fetched["payload"]["goals"]["primary"] == "Strength"
 
 
 @pytest.mark.asyncio

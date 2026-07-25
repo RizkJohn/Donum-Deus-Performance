@@ -172,17 +172,26 @@ export interface AssessResponse {
   state_summary: AthleteStateSummary | null;
 }
 
+// The public program endpoint (GET /v1/programs/:id, reachable by anyone with
+// the share link) returns only this minimized, de-identified slice of the
+// payload — no email, body metrics, injuries, or preferences. See the API's
+// _public_payload in routes/assess.py.
+export interface PublicProgramPayload {
+  goals: { primary: Goal };
+  schedule: { available_days: Day[]; session_duration: number };
+  state: { sleep: number; soreness: number; energy: number; stress: number };
+}
+
 export interface ProgramRecord {
   id: string;
-  email: string;
-  payload: AssessPayload;
+  payload: PublicProgramPayload;
   program: ProgramOrError;
   assessment: TrainingAssessment | null;
   state_summary: AthleteStateSummary | null;
   created_at: string;
 }
 
-export type ProgramListItem = Omit<ProgramRecord, "email" | "state_summary">;
+export type ProgramListItem = Omit<ProgramRecord, "state_summary">;
 
 export interface MyProgramsResponse {
   email: string;

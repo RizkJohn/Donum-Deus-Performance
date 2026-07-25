@@ -83,6 +83,29 @@ async def assess(req: AssessRequest, db: AsyncSession = Depends(get_db)) -> dict
     }
 
 
+def _public_payload(payload: dict | None) -> dict:
+    """Minimized, de-identified slice of the stored payload for the public
+    program page (reachable by anyone holding the run's UUID share link).
+
+    Only the fields the shared page actually renders are returned. The
+    identifying email, body metrics (age/weight), injury sites, and training
+    preferences are intentionally withheld — they are health/PII the shared view
+    never displays and must not leak through a capability URL.
+    """
+    payload = payload or {}
+    goals = payload.get("goals") or {}
+    schedule = payload.get("schedule") or {}
+    state = payload.get("state") or {}
+    return {
+        "goals": {"primary": goals.get("primary")},
+        "schedule": {
+            "available_days": schedule.get("available_days") or [],
+            "session_duration": schedule.get("session_duration"),
+        },
+        "state": {k: state.get(k) for k in ("sleep", "soreness", "energy", "stress")},
+    }
+
+
 @router.get("/v1/programs/{run_id}")
 async def get_program(run_id: str, db: AsyncSession = Depends(get_db)) -> dict:
     run = await db.get(ProgramRun, run_id)
@@ -92,6 +115,9 @@ async def get_program(run_id: str, db: AsyncSession = Depends(get_db)) -> dict:
         await db.execute(select(Lead).where(Lead.run_id == run_id))
     ).scalar_one_or_none()
 
+    # The lead email is used only to look up persistent state — it is never
+    # returned. This endpoint is unauthenticated (share links), so the response
+    # carries no identifying information (see _public_payload).
     state_summary = None
     if lead is not None:
         state_row = await db.get(AthleteStateRow, lead.email)
@@ -100,8 +126,7 @@ async def get_program(run_id: str, db: AsyncSession = Depends(get_db)) -> dict:
 
     return {
         "id": run.id,
-        "email": lead.email if lead else None,
-        "payload": run.payload,
+        "payload": _public_payload(run.payload),
         "program": run.program,
         "assessment": run.assessment,
         "state_summary": state_summary,

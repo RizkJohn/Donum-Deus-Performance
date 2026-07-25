@@ -20,10 +20,20 @@ router = APIRouter()
 
 
 async def run_pipeline(
-    req: GenerateRequest, db: AsyncSession, *, state: AthleteState | None = None
+    req: GenerateRequest,
+    db: AsyncSession,
+    *,
+    state: AthleteState | None = None,
+    persist: bool = True,
 ) -> tuple[ProgramRun, PipelineResult]:
-    """Run the full pipeline and persist the run. Returns (row, result) so
-    callers (assess) can fold the generated program back into athlete state."""
+    """Run the full pipeline. Returns (row, result) so callers (assess) can fold
+    the generated program back into athlete state.
+
+    When ``persist`` is True the run is written to program_runs. Callers that do
+    not associate the run with an identity (see /v1/generate) pass
+    ``persist=False`` so no owner-less health payload is stored with no path to
+    export or erasure.
+    """
     provider = get_provider()
     settings = get_settings()
     result = await generate_program(
@@ -43,12 +53,17 @@ async def run_pipeline(
         attempts=result.attempts,
         qc_history=result.qc_history,
     )
-    db.add(run)
-    await db.commit()
+    if persist:
+        db.add(run)
+        await db.commit()
     return run, result
 
 
 @router.post("/v1/generate")
 async def generate(req: GenerateRequest, db: AsyncSession = Depends(get_db)) -> dict:
-    run, _ = await run_pipeline(req, db)
+    # Stateless: this endpoint returns the program only and never hands back an
+    # id, so a persisted run would be an orphaned health record — unreachable by
+    # the email-keyed export/erasure endpoints. Generate ephemerally; /v1/assess
+    # is the path that persists (and links a Lead for data-subject requests).
+    run, _ = await run_pipeline(req, db, persist=False)
     return run.program
