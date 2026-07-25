@@ -12,13 +12,14 @@
 # In the Netlify UI: New site → import this repo → the settings below are
 # picked up automatically. Then set the custom domain to donumdeiperformance.com.
 #
-# INTERIM STATUS (2026-07-25): this file only exists on the rebrand branch,
-# not yet on `main` — so Netlify's production deploy (which tracks `main`)
-# has no base-directory config and 404s. Until this merges, the website's
-# host of record is Vercel (native Git integration, already green), per an
-# explicit decision to hold off on Netlify until then or until it's
-# superseded by a planned Cloudflare Workers migration. This config is left
-# in place, unchanged, for whenever Netlify hosting resumes.
+# INTERIM STATUS (2026-07-25): production hosting is on Vercel, not Netlify,
+# by deliberate decision — independent of whether this file has merged to
+# `main` yet. (History: at the time this note was written, `main` didn't
+# have this file yet either, so Netlify's production build 404'd for that
+# additional reason — that specific cause resolves on merge, but the Vercel
+# decision does not.) Netlify hosting resumes only when explicitly revisited,
+# or is superseded outright by a planned Cloudflare Workers migration. This
+# config is left in place, unchanged, for whenever that happens.
 
 [build]
   base = "apps/web"

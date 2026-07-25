@@ -9,13 +9,13 @@ year for **well under $200**, most of it a single cheap server.
 
 Prices verified July 2026 — see Sources. Verify at signup; they move.
 
-> **Interim status (2026-07-25):** the website's host is temporarily
-> **Vercel**, not Netlify (Netlify's production build 404s until the rebrand
-> branch merges — see `docs/DEPLOYMENT.md`). This changes the $0 website line
-> below: Vercel's Hobby tier is free but its ToS prohibits commercial use
-> (cited above), so this business needs **Vercel Pro (~$20/mo)** for as long
-> as it stays on Vercel — confirm the team's current plan. Everything else in
-> this budget (the VPS backend line) is unaffected.
+> **Interim status (2026-07-25):** the website's host is **Vercel**, not
+> Netlify, by deliberate decision — see `docs/DEPLOYMENT.md`; this doesn't
+> auto-revert once the rebrand branch merges. This changes the $0 website
+> line below: Vercel's Hobby tier is free but its ToS prohibits commercial
+> use (cited above), so this business needs **Vercel Pro (~$20/mo)** for as
+> long as it stays on Vercel — confirm the team's current plan. Everything
+> else in this budget (the VPS backend line) is unaffected.
 
 ---
 

@@ -73,10 +73,10 @@ donum-dei-performance/
   one ~$5/mo VPS) decided and built; not yet live (domain purchase, VPS
   provisioning, and credentials are the remaining launch steps —
   `docs/DEPLOYMENT.md`, `docs/BUDGET.md`). Website hosting is **interim on
-  Vercel**: Netlify's production build 404s until this branch merges
-  (`netlify.toml` isn't on `main` yet), and Vercel stays the host until then
-  or until a planned Cloudflare Workers migration supersedes it — confirm a
-  paid Vercel plan, since its free Hobby tier prohibits commercial use.
+  Vercel** by deliberate decision (not merely pending this branch's merge)
+  until a planned Cloudflare Workers migration supersedes Netlify outright —
+  confirm a paid Vercel plan, since its free Hobby tier prohibits commercial
+  use.
 
 ---
 
