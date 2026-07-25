@@ -99,24 +99,36 @@ assessment users exercise their rights via the Correspondence/email channel,
 where identity is verified manually. (`apps/api/deus_api/routes/assess.py`,
 tests in `apps/api/tests/test_routes.py`.)
 
-### F2 — Public program endpoint leaks email + full health payload  ·  **High**  ·  ⚠ Open
-`GET /v1/programs/{run_id}` returns the associated **email address and the
+### F2 — Public program endpoint leaked email + full health payload  ·  **High**  ·  ✅ Fixed
+`GET /v1/programs/{run_id}` returned the associated **email address and the
 complete raw health payload** to anyone possessing the (unguessable) UUID. It is
 used by the public "share your program" link, so it is intentionally
-unauthenticated. The health payload in a share link the user controls is
-defensible; **returning the email address is not** — it is PII unnecessary to
-render a program.
-**Recommended:** drop `email` (and consider dropping `payload`) from this public
-response, or gate it behind auth. Requires a coordinated web
-(`apps/web/src/lib/api.ts`, `types.ts`, program page) + API change and was left
-out of this pass to avoid breaking the share-link rendering.
+unauthenticated — which made the email (identity) and unused health fields a
+leak through a capability URL.
 
-### F3 — Orphaned health records from `POST /v1/generate`  ·  **Medium**  ·  ⚠ Open
-`POST /v1/generate` persists a full health payload with **no linked email**, so
-those records are unreachable by the email-keyed export/erasure endpoints — a
-right-to-erasure gap.
-**Recommended:** either don't persist direct-`generate` runs, associate them
-with an identity, or add an administrative purge path.
+**Fix:** the endpoint now returns a **minimized, de-identified** record via a
+`_public_payload` helper — only the fields the shared page renders (primary
+goal, available days, session duration, and the four fatigue scores). The email
+address, body metrics (age/weight), **injury sites**, sport days, and training
+preferences are no longer returned. The `CheckInForm` already supported
+collecting the user's own email when none is supplied, so the check-in flow is
+unaffected. Web types were narrowed to a `PublicProgramPayload` to match.
+(`apps/api/deus_api/routes/assess.py`, `apps/web/src/lib/types.ts`, program &
+dashboard pages, test in `test_routes.py`.)
+
+### F3 — Orphaned health records from `POST /v1/generate`  ·  **Medium**  ·  ✅ Fixed
+`POST /v1/generate` persisted a full health payload with **no linked email**, so
+those records were unreachable by the email-keyed export/erasure endpoints — a
+right-to-erasure gap. (The endpoint never returns an id either, so the stored
+run was unreachable by anyone.)
+
+**Fix:** `run_pipeline` gained a `persist` flag; `/v1/generate` now runs
+**ephemerally** (`persist=False`) and stores nothing, while `/v1/assess`
+continues to persist and link a `Lead` for data-subject requests. A regression
+test asserts the `program_runs` count is unchanged after a `generate` call.
+(`apps/api/deus_api/routes/generate.py`, test in `test_routes.py`.) Note: this
+prevents *new* orphans; any pre-existing orphaned rows in a live database should
+be purged separately.
 
 ### F4 — Documented data-rights channel was non-functional  ·  **High**  ·  ✅ Fixed
 The Correspondence form (`CorrespondenceForm.tsx`) — named by both the Privacy
@@ -217,16 +229,19 @@ already promises.
    git history.
 3. **Confirm `privacy@` and `legal@deusperformance.com` inboxes are monitored**
    — they are now the operative rights-request channel.
-4. Address the open findings above (F2, F3, F7, F8, F9, F10, F11) on a risk-
-   prioritized basis; F2 is the next most important.
+4. Address the remaining open findings (F7, F8, F9, F10, F11) on a risk-
+   prioritized basis; F8 (encryption at rest for health data) is the next most
+   material.
 5. Harden the deploy runbook so the JWT secret (F7) cannot ship as the default.
 
 ---
 
 ## 6. Verification
 
-- API test suite: **491 passed** (`make test`), including the three
-  new/updated tests covering authenticated export/erasure and the
-  unauthenticated-access rejection.
-- Web app: **`tsc --noEmit` clean** after the Terms rewrite and the
-  Correspondence-form and consent-checkbox changes.
+- API test suite: **492 passed** (`make test`), including tests covering
+  authenticated export/erasure, unauthenticated-access rejection, the
+  minimized/de-identified public program response (F2), and ephemeral
+  `/v1/generate` (F3).
+- Web app: **`tsc --noEmit` clean** after the Terms rewrite, the
+  Correspondence-form and consent-checkbox changes, and the `PublicProgramPayload`
+  type narrowing.

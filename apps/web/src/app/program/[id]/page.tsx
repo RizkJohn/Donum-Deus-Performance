@@ -134,7 +134,7 @@ export default async function ProgramPage({
             </div>
             <ProgramView program={record.program} />
             <div className="mx-auto max-w-[1180px] px-6 md:px-12">
-              <CheckInForm runId={record.id} email={record.email} />
+              <CheckInForm runId={record.id} email={null} />
             </div>
             <section className="border-t border-line px-6 py-16 text-center md:px-12">
               <p className="mb-2 font-play text-[15px] italic text-warm">
