@@ -69,10 +69,14 @@ donum-dei-performance/
   Q&A → billing → monitoring → owner digest), verified end-to-end in Docker.
 - **Operations hub** — Notion HQ live with all 8 databases wired to the
   workflows (`automation/README.md` has every database ID).
-- **Deployment** — architecture decided and built: Netlify (site, free) +
-  one ~$5/mo VPS (API + Postgres + n8n behind Caddy). Not yet live — domain
-  purchase, VPS provisioning, and credentials are the remaining launch steps
-  (`docs/DEPLOYMENT.md`, `docs/BUDGET.md`).
+- **Deployment** — backend architecture (API + Postgres + n8n behind Caddy on
+  one ~$5/mo VPS) decided and built; not yet live (domain purchase, VPS
+  provisioning, and credentials are the remaining launch steps —
+  `docs/DEPLOYMENT.md`, `docs/BUDGET.md`). Website hosting is **interim on
+  Vercel**: Netlify's production build 404s until this branch merges
+  (`netlify.toml` isn't on `main` yet), and Vercel stays the host until then
+  or until a planned Cloudflare Workers migration supersedes it — confirm a
+  paid Vercel plan, since its free Hobby tier prohibits commercial use.
 
 ---
 

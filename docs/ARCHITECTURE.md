@@ -238,6 +238,17 @@ value.
 
 ## Deployment topology
 
+> **Interim status (2026-07-25):** the diagram below is the target
+> architecture, not the current live state. Netlify's production build
+> (tracking `main`) 404s today because `netlify.toml` — which tells Netlify
+> the app lives in `apps/web` — only exists on the unmerged rebrand branch;
+> `main` predates it. Until that merges (or Netlify is superseded by a
+> planned Cloudflare Workers migration), the website's interim host is
+> **Vercel** (already connected via native Git integration, Next.js
+> auto-detected, builds green) — note Vercel's Hobby tier prohibits
+> commercial use, so confirm the team is on a paid plan before relying on
+> it past short-term testing.
+
 Production splits the site from the always-on backend rather than running
 everything on one box — driven by cost (see `docs/BUDGET.md`) and by Vercel's
 free tier prohibiting commercial use:

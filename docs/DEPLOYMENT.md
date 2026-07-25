@@ -1,5 +1,16 @@
 # Deployment — Netlify Website + One Cheap VPS Backend
 
+> **Interim status (2026-07-25):** Part 2 below (Netlify) is paused. Netlify's
+> production build (tracking `main`) currently 404s because `netlify.toml`
+> only exists on the unmerged rebrand branch — `main` predates it, so Netlify
+> has nothing telling it the app lives in `apps/web`. Until that's resolved
+> (by merging, or superseded outright by a planned Cloudflare Workers
+> migration), **Vercel** is the interim production host — already connected
+> via native Git integration, Next.js auto-detected, builds green. Flag:
+> Vercel's Hobby (free) tier prohibits commercial use — confirm the team is
+> on a paid plan before relying on it past short-term testing. Part 1 (the
+> VPS backend) is unaffected and unchanged.
+
 The cost-optimal, low-ops production setup for a pre-revenue brand:
 
 ```
