@@ -1,8 +1,13 @@
-# Netlify deploy config — Donum Dei Performance website (Next.js 15).
+# Netlify deploy config — Donum Dei Performance website (Next.js).
 #
-# The site is the apps/web workspace of this monorepo. Netlify's Next.js
-# runtime handles SSR, middleware, and the dynamic routes (/program/[id],
-# /dashboard, the assessment funnel) natively — no code changes required.
+# The site is the apps/web workspace of this monorepo. Netlify auto-detects
+# Next.js and injects its Next.js Runtime (SSR, middleware, the dynamic
+# routes: /program/[id], /dashboard, the assessment funnel) with zero plugin
+# config — do NOT add an explicit `[[plugins]] package = "@netlify/plugin-nextjs"`
+# block; it isn't a listed dependency in apps/web/package.json, and manually
+# pinning it is legacy guidance that fails to resolve against current
+# Next.js majors (this app is on Next 16). Netlify's built-in framework
+# detection handles it correctly without any plugin declaration.
 #
 # In the Netlify UI: New site → import this repo → the settings below are
 # picked up automatically. Then set the custom domain to donumdeiperformance.com.
@@ -16,8 +21,5 @@
   # the VPS's public API URL. Override per-context in the Netlify UI if needed.
   NEXT_PUBLIC_API_URL = "https://api.donumdeiperformance.com"
   NEXT_TELEMETRY_DISABLED = "1"
-
-# Explicitly pin the Next.js runtime (Netlify auto-detects it too, but pinning
-# is more reliable for a monorepo subdirectory).
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  # Match the Node major used elsewhere in the repo (apps/web/Dockerfile).
+  NODE_VERSION = "22"
