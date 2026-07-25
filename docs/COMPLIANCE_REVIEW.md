@@ -35,7 +35,9 @@ is important to be direct about why:
   clause — it was code that contradicted the promises the legal pages already
   make.** A plaintiff's strongest case is "you said X in your privacy policy
   and did Y." The highest-value work in this review was closing those
-  code-vs-policy gaps (see Findings F1 and F4). That is done.
+  code-vs-policy gaps (see Findings F1 and F4). F4 is done; **F1 is only
+  partially done** — see F1 below for the remaining gap before it can be
+  called closed.
 
 The remedial work in this review therefore does two things: (a) strengthens the
 legitimate liability protections, and (b) makes the product's behavior match its
@@ -82,7 +84,7 @@ Canonical input schema: `engine/input_contract.md` ↔
 
 Severity reflects legal/privacy exposure. "Status" is as of this change set.
 
-### F1 — Unauthenticated data export & erasure  ·  **Critical**  ·  ✅ Fixed
+### F1 — Unauthenticated data export & erasure  ·  **Critical**  ·  ⚠ Partially fixed — do not mark closed
 `GET /v1/data` and `DELETE /v1/data` accepted an email address alone, with no
 authentication or ownership verification. Anyone who knew or guessed an email
 could **export another person's health/assessment data** or **permanently
@@ -91,12 +93,25 @@ will verify your identity before processing the request," creating both a
 privacy violation (GDPR Art. 15/32, CCPA verified-request rules) and a
 deceptive-practice exposure (FTC Act §5).
 
-**Fix:** Both endpoints now require an authenticated account
-(`get_current_user`) and operate strictly on the caller's own verified email,
-taken from the session token — never from client input. The web funnel never
-called these endpoints, so no user-facing behavior breaks. Anonymous
-assessment users exercise their rights via the Correspondence/email channel,
-where identity is verified manually. (`apps/api/donum_dei_api/routes/assess.py`,
+**Partial fix:** Both endpoints now require an authenticated account
+(`get_current_user`) and operate on `user.email` from the session token —
+never client input — which closes the fully-anonymous version of the attack.
+
+**Remaining gap (flagged in review — CodeRabbit):** `POST /v1/auth/signup`
+performs no email-ownership verification — it only checks that the email
+isn't already registered, then issues a session token immediately
+(`apps/api/donum_dei_api/routes/auth.py`). The `User` model
+(`apps/api/donum_dei_api/db/models.py`) has no verification field at all. So
+an attacker can sign up **claiming a stranger's email** — one that already
+has anonymous assessment records via the funnel — and use that session to
+export or erase the real owner's health data through these now-"authenticated"
+endpoints. The underlying vulnerability (claim someone's data by claiming
+their email string) survives F1's fix in a slightly harder-to-reach form.
+**This finding stays open until signup requires verified email ownership**
+(e.g. a confirmation link/code gating token issuance, or gating these two
+endpoints specifically) — not merely account authentication.
+(`apps/api/donum_dei_api/routes/assess.py`,
+`apps/api/donum_dei_api/routes/auth.py`, `apps/api/donum_dei_api/db/models.py`,
 tests in `apps/api/tests/test_routes.py`.)
 
 ### F2 — Public program endpoint leaked email + full health payload  ·  **High**  ·  ✅ Fixed
@@ -222,17 +237,21 @@ already promises.
 
 ## 5. Recommended follow-up before launch
 
-1. **Attorney review** of the Terms and Privacy Policy, confirming: Delaware
+1. **Close F1's remaining gap**: add email-ownership verification to signup
+   (or gate `/v1/data` specifically) before this finding can be called fixed
+   — see F1 above. This is the highest-priority open item; everything else in
+   this section assumes it's resolved before real user emails are at risk.
+2. **Attorney review** of the Terms and Privacy Policy, confirming: Delaware
    governing-law choice vs. the LLC's actual formation state; enforceability of
    the release and liability cap in target states; and effective dates.
-2. **Rotate the exposed Notion token** (F6) — redaction does not remove it from
+3. **Rotate the exposed Notion token** (F6) — redaction does not remove it from
    git history.
-3. **Confirm `privacy@` and `legal@donumdeiperformance.com` inboxes are monitored**
+4. **Confirm `privacy@` and `legal@donumdeiperformance.com` inboxes are monitored**
    — they are now the operative rights-request channel.
-4. Address the remaining open findings (F7, F8, F9, F10, F11) on a risk-
+5. Address the remaining open findings (F7, F8, F9, F10, F11) on a risk-
    prioritized basis; F8 (encryption at rest for health data) is the next most
    material.
-5. Harden the deploy runbook so the JWT secret (F7) cannot ship as the default.
+6. Harden the deploy runbook so the JWT secret (F7) cannot ship as the default.
 
 ---
 

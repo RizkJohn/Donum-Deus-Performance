@@ -9,6 +9,18 @@ const ROUTING_EMAIL = "privacy@donumdeiperformance.com";
 
 export default function CorrespondenceForm() {
   const [sent, setSent] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(ROUTING_EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable/denied — the address is still visible and
+      // selectable in the text above as a fallback.
+    }
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,9 +62,16 @@ export default function CorrespondenceForm() {
           >
             {ROUTING_EMAIL}
           </a>
-          . If your mail client did not open, please write to us there directly.
-          A reply will follow within one business day.
+          . If your mail client did not open, copy the address below and write
+          to us directly. A reply will follow within one business day.
         </p>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="mt-[16px] font-mono text-[9px] tracking-[0.15em] uppercase border border-line px-[16px] py-[9px] hover:border-accent hover:text-accent transition-colors"
+        >
+          {copied ? "Copied" : `Copy ${ROUTING_EMAIL}`}
+        </button>
       </div>
     );
   }
