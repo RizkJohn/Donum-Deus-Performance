@@ -32,8 +32,8 @@ async def test_generate_does_not_persist_orphan_run(client):
     stay ephemeral."""
     from sqlalchemy import func, select
 
-    from deus_api.db import session as db_session
-    from deus_api.db.models import ProgramRun
+    from donum_dei_api.db import session as db_session
+    from donum_dei_api.db.models import ProgramRun
 
     async with db_session._sessionmaker() as s:
         before = (await s.execute(select(func.count()).select_from(ProgramRun))).scalar()

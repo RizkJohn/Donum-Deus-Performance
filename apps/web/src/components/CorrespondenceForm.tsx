@@ -5,7 +5,7 @@ import { useState } from "react";
 // Where correspondence is routed. Privacy / data-rights requests and general
 // inquiries all reach a monitored inbox; the Privacy Policy and Terms name this
 // same address as the channel for exercising data rights.
-const ROUTING_EMAIL = "privacy@deusperformance.com";
+const ROUTING_EMAIL = "privacy@donumdeiperformance.com";
 
 export default function CorrespondenceForm() {
   const [sent, setSent] = useState(false);

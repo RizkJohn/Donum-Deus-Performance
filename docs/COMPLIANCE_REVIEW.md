@@ -1,6 +1,6 @@
-# Legal & Privacy Compliance Review — Deus Performance
+# Legal & Privacy Compliance Review — Donum Dei Performance
 
-**Entity:** Riz Management LLC (operating as Deus Performance)
+**Entity:** Riz Management LLC (operating as Donum Dei Performance)
 **Scope:** Entire codebase — landing/marketing site, assessment funnel, API
 pipeline, data persistence, third-party processors, and the existing legal
 pages.
@@ -73,7 +73,7 @@ The product is in far better shape than a typical pre-launch codebase:
 | Payment | Stripe-hosted checkout only | Stripe customer/subscription IDs only | Stripe |
 
 Canonical input schema: `engine/input_contract.md` ↔
-`apps/api/deus_api/models/input_contract.py`. Default provider is `mock`
+`apps/api/donum_dei_api/models/input_contract.py`. Default provider is `mock`
 (offline, no data leaves the server).
 
 ---
@@ -96,7 +96,7 @@ deceptive-practice exposure (FTC Act §5).
 taken from the session token — never from client input. The web funnel never
 called these endpoints, so no user-facing behavior breaks. Anonymous
 assessment users exercise their rights via the Correspondence/email channel,
-where identity is verified manually. (`apps/api/deus_api/routes/assess.py`,
+where identity is verified manually. (`apps/api/donum_dei_api/routes/assess.py`,
 tests in `apps/api/tests/test_routes.py`.)
 
 ### F2 — Public program endpoint leaked email + full health payload  ·  **High**  ·  ✅ Fixed
@@ -113,7 +113,7 @@ address, body metrics (age/weight), **injury sites**, sport days, and training
 preferences are no longer returned. The `CheckInForm` already supported
 collecting the user's own email when none is supplied, so the check-in flow is
 unaffected. Web types were narrowed to a `PublicProgramPayload` to match.
-(`apps/api/deus_api/routes/assess.py`, `apps/web/src/lib/types.ts`, program &
+(`apps/api/donum_dei_api/routes/assess.py`, `apps/web/src/lib/types.ts`, program &
 dashboard pages, test in `test_routes.py`.)
 
 ### F3 — Orphaned health records from `POST /v1/generate`  ·  **Medium**  ·  ✅ Fixed
@@ -126,7 +126,7 @@ run was unreachable by anyone.)
 **ephemerally** (`persist=False`) and stores nothing, while `/v1/assess`
 continues to persist and link a `Lead` for data-subject requests. A regression
 test asserts the `program_runs` count is unchanged after a `generate` call.
-(`apps/api/deus_api/routes/generate.py`, test in `test_routes.py`.) Note: this
+(`apps/api/donum_dei_api/routes/generate.py`, test in `test_routes.py`.) Note: this
 prevents *new* orphans; any pre-existing orphaned rows in a live database should
 be purged separately.
 
@@ -136,7 +136,7 @@ Policy and Terms as *the* channel for exercising data rights — only set local
 state and **transmitted nothing**. A non-working rights mechanism is itself a
 GDPR/CCPA deficiency.
 **Fix:** the form now routes submissions via `mailto:` to
-`privacy@deusperformance.com` (a monitored, published address), and the
+`privacy@donumdeiperformance.com` (a monitored, published address), and the
 confirmation state states the routing address explicitly so users have a real,
 verifiable channel with no server-side collection of the message body.
 
@@ -144,7 +144,7 @@ verifiable channel with no server-side collection of the message body.
 The 13+ minimum existed only in the React validator; the API accepted any age
 `> 0`. A modified client could submit data for a child under 13.
 **Fix:** `ClientProfile.age` now enforces `ge=13` in Pydantic
-(`apps/api/deus_api/models/input_contract.py`), matching the policy and COPPA.
+(`apps/api/donum_dei_api/models/input_contract.py`), matching the policy and COPPA.
 
 ### F6 — Committed live-looking Notion secret  ·  **High (secrets hygiene)**  ·  ✅ Redacted / ⚠ must rotate
 `apps/content_bot/.env.example` contained a real-looking Notion integration
@@ -227,7 +227,7 @@ already promises.
    the release and liability cap in target states; and effective dates.
 2. **Rotate the exposed Notion token** (F6) — redaction does not remove it from
    git history.
-3. **Confirm `privacy@` and `legal@deusperformance.com` inboxes are monitored**
+3. **Confirm `privacy@` and `legal@donumdeiperformance.com` inboxes are monitored**
    — they are now the operative rights-request channel.
 4. Address the remaining open findings (F7, F8, F9, F10, F11) on a risk-
    prioritized basis; F8 (encryption at rest for health data) is the next most
