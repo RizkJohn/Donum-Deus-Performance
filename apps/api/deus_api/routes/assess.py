@@ -2,18 +2,23 @@
 
 POST /v1/assess        — lead capture + persistent-state assessment + program
 GET  /v1/programs/{id} — fetch a stored run (program + coach's read + state)
-DELETE /v1/data        — GDPR/CCPA right to erasure: delete all records for an email
-GET  /v1/data          — GDPR right of access: export all records for an email
+DELETE /v1/data        — GDPR/CCPA right to erasure (authenticated: caller's own data)
+GET  /v1/data          — GDPR right of access (authenticated: caller's own data)
+
+The data-rights endpoints require an authenticated account. Identity is taken
+from the session token, never from a client-supplied email, so a caller can
+only ever export or erase records tied to their own verified email address.
+Anonymous assessment users exercise these rights through the Correspondence
+channel, where identity is verified manually before any disclosure or deletion.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, EmailStr, TypeAdapter
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-_email_adapter = TypeAdapter(EmailStr)
-
-from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun
+from ..auth.deps import get_current_user
+from ..db.models import AthleteStateRow, Feedback, Lead, ProgramRun, User
 from ..db.session import get_db
 from ..deps import get_lib
 from ..email.factory import get_email_provider
@@ -104,21 +109,19 @@ async def get_program(run_id: str, db: AsyncSession = Depends(get_db)) -> dict:
     }
 
 
-class DataDeleteRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    email: EmailStr
-
-
 @router.delete("/v1/data")
 async def delete_data(
-    req: DataDeleteRequest, db: AsyncSession = Depends(get_db)
+    user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
     """GDPR right to erasure / CCPA right to delete.
 
-    Permanently removes all leads, program runs, reinforcement feedback, and
-    persistent athlete state for the given email. Returns deletion counts.
+    Requires an authenticated account. Permanently removes all leads, program
+    runs, reinforcement feedback, and persistent athlete state tied to the
+    caller's own verified email address. The identity comes from the session
+    token — never a client-supplied email — so no caller can erase another
+    person's records. Returns deletion counts.
     """
-    email = str(req.email)
+    email = user.email
     leads = (
         await db.execute(select(Lead).where(Lead.email == email))
     ).scalars().all()
@@ -158,27 +161,22 @@ async def delete_data(
 
 @router.get("/v1/data")
 async def export_data(
-    email: str = Query(..., description="Email address as submitted in the assessment"),
-    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
     """GDPR right of access / CCPA right to know.
 
-    Returns all assessment inputs and program records associated with the
-    given email address in a structured, portable format.
-
-    Note: This endpoint requires only an email address for access. A future
-    improvement will add an email-verification step before disclosure.
+    Requires an authenticated account. Returns all assessment inputs and
+    program records tied to the caller's own verified email address, in a
+    structured, portable format. The identity comes from the session token —
+    never a client-supplied email — so no caller can read another person's data.
     """
-    try:
-        validated = _email_adapter.validate_python(email)
-    except Exception:
-        raise HTTPException(status_code=422, detail="Invalid email address.")
+    email = user.email
 
     rows = (
         await db.execute(
             select(Lead, ProgramRun)
             .join(ProgramRun, Lead.run_id == ProgramRun.id)
-            .where(Lead.email == str(validated))
+            .where(Lead.email == email)
         )
     ).all()
 
@@ -192,10 +190,10 @@ async def export_data(
         for lead, run in rows
     ]
 
-    state_row = await db.get(AthleteStateRow, str(validated))
+    state_row = await db.get(AthleteStateRow, email)
 
     return {
-        "email": str(validated),
+        "email": email,
         "record_count": len(records),
         "records": records,
         "athlete_state": state_row.state if state_row else None,
