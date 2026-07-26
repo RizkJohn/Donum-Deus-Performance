@@ -107,9 +107,9 @@ has anonymous assessment records via the funnel — and use that session to
 export or erase the real owner's health data through these now-"authenticated"
 endpoints. The underlying vulnerability (claim someone's data by claiming
 their email string) survives F1's fix in a slightly harder-to-reach form.
-**This finding stays open until signup requires verified email ownership**
-(e.g. a confirmation link/code gating token issuance, or gating these two
-endpoints specifically) — not merely account authentication.
+**This finding stays open until signup requires email ownership to be
+verified** (e.g. a confirmation link/code gating token issuance, or gating
+these two endpoints specifically) — not merely account authentication.
 (`apps/api/donum_dei_api/routes/assess.py`,
 `apps/api/donum_dei_api/routes/auth.py`, `apps/api/donum_dei_api/db/models.py`,
 tests in `apps/api/tests/test_routes.py`.)
