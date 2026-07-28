@@ -148,7 +148,7 @@ export function ProgramPdf({ record }: { record: ProgramRecord }) {
   const Footer = () => (
     <View style={s.footer} fixed>
       <Text style={s.footerMotto}>
-        Deus Performance is a practice of performance education. It does not
+        Donum Dei Performance is a practice of performance education. It does not
         constitute medical advice, rehabilitation guidance, or clinical
         counsel of any kind.
       </Text>
@@ -161,11 +161,11 @@ export function ProgramPdf({ record }: { record: ProgramRecord }) {
 
   if (isEngineError(program)) {
     return (
-      <Document title="Deus Performance — Program">
+      <Document title="Donum Dei Performance — Program">
         <Page size="A4" style={s.page}>
           <View style={s.header}>
             <View>
-              <Text style={s.wordmark}>DEUS</Text>
+              <Text style={s.wordmark}>DONUM DEI</Text>
               <Text style={s.sub}>PERFORMANCE</Text>
             </View>
             <Text style={s.motto}>Donum Dei.</Text>
@@ -186,11 +186,11 @@ export function ProgramPdf({ record }: { record: ProgramRecord }) {
   const a = record.assessment;
 
   return (
-    <Document title="Deus Performance — Weekly Program" author="Deus Performance">
+    <Document title="Donum Dei Performance — Weekly Program" author="Donum Dei Performance">
       <Page size="A4" style={s.page}>
         <View style={s.header}>
           <View>
-            <Text style={s.wordmark}>DEUS</Text>
+            <Text style={s.wordmark}>DONUM DEI</Text>
             <Text style={s.sub}>PERFORMANCE · DONUM DEI</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>

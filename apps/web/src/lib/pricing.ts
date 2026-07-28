@@ -66,7 +66,7 @@ export const TIERS: Tier[] = [
     ],
     includes: [
       "Everything in Foundation",
-      "Monthly 45-minute review with Deus Performance",
+      "Monthly 45-minute review with Donum Dei Performance",
       "Weekly movement review via video submission",
       "Substitutions built for specific restrictions",
       "In-cycle program adjustments between rebuilds",

@@ -25,14 +25,14 @@ export default function Principles() {
           className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[30px] text-ink"
           style={{ fontSize: "clamp(34px, 4.3vw, 56px)" }}
         >
-          What <em>Deus</em>
+          What <em>Donum Dei</em>
           <br />
           demands in <strong>practice.</strong>
         </h2>
         <div className="font-bask text-[15px] text-ink2 leading-[1.9]">
           <p className="mb-[17px]">
-            <strong className="text-ink font-bold">Deus</strong> — the divine
-            source. The body is given, not earned. A gift carries the obligation
+            <strong className="text-ink font-bold">Donum Dei</strong> — the
+            gift of God. The body is given, not earned. A gift carries the obligation
             to receive it well: you do not discard it or let it deteriorate
             through indifference. You develop it with the care the giver
             intended.

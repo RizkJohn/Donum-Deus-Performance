@@ -17,7 +17,7 @@ async def test_signup_returns_token_and_user(client):
 
 @pytest.mark.asyncio
 async def test_signup_sends_welcome_email(client):
-    from deus_api.email.factory import get_email_provider
+    from donum_dei_api.email.factory import get_email_provider
 
     await client.post(
         "/v1/auth/signup", json={"email": "welcome@example.com", "password": "correcthorse"}

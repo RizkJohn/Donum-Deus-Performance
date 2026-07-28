@@ -20,7 +20,10 @@ DAY_ORDER: list[str] = [
 
 class ClientProfile(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    age: float = Field(gt=0, lt=120)
+    # COPPA / policy floor: the Service is not directed at children under 13,
+    # and the Privacy Policy states a minimum age of 13. Enforce it server-side
+    # so the contract cannot be bypassed by a modified client.
+    age: float = Field(ge=13, lt=120)
     weight: float = Field(gt=0)
     training_age: TrainingAge
 

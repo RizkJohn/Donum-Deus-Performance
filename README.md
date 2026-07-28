@@ -1,23 +1,27 @@
-# Deus Performance
+# Donum Dei Performance
 *by Riz Management LLC*
 
-> *Deus — the body is a gift. Train it accordingly.*
+> *Donum Dei — the body is a gift. Train it accordingly.*
 
 ---
 
 ## Repository Structure
 
 ```
-deus-performance/
+donum-dei-performance/
 ├── apps/
 │   ├── api/             # FastAPI engine pipeline service (Python)
-│   │   ├── deus_api/               # models, engine (decision/QC/retry), llm providers, routes
+│   │   ├── donum_dei_api/               # models, engine (decision/QC/retry), llm providers, routes
 │   │   ├── data/                   # derived JSON (exercise library, substitutions)
 │   │   ├── scripts/port_library.py # markdown → JSON generator
 │   │   └── tests/                  # pytest suite incl. 400+ program contract test
 │   └── web/             # Next.js marketing site + assessment funnel (TypeScript)
 │
 ├── packages/schemas/    # Shared JSON Schemas (derived from engine/*.md)
+│
+├── automation/          # n8n workflow suite + ops automation guide
+│   ├── README.md                   # credentials, env vars, import steps, Notion IDs
+│   └── n8n/                        # 13 importable workflows (leads, billing, programs, content, Q&A…)
 │
 ├── engine/              # Core training system brain (SOURCE OF TRUTH)
 │   ├── engine_instructions.md      # System rules & CNS management
@@ -33,24 +37,52 @@ deus-performance/
 │   └── ARCHITECTURE_SUMMARY.md    # High-level system architecture
 │
 ├── frontend/            # Legacy static mockups (design reference)
-│   ├── deus_v1.html                # Initial landing page / engine interface
-│   └── deus_v2.html                # Redesigned DP site (basis for apps/web)
+│   ├── donum_dei_v1.html                # Initial landing page / engine interface
+│   └── donum_dei_v2.html                # Redesigned DDP site (basis for apps/web)
 │
 ├── business/            # Business strategy & planning
 │   └── DDHoldings_Business_Plan.md # Full blueprint, projections, brand system
 │
 ├── docs/                # Reference documentation
+│   ├── ARCHITECTURE.md              # Full system design for the live product
+│   ├── DEPLOYMENT.md               # Prod deploy: Netlify web + cheap VPS backend
+│   ├── BUDGET.md                   # First-year cost + spending plan (~$5/mo floor)
 │   ├── RedesignGuide.md            # Frontend redesign specifications
+│   ├── DATA_PLATFORM.md            # Centralization: Postgres + Notion HQ decision
 │   └── io-vs-com-org-guide.md      # Domain strategy guide
 │
+├── docker-compose.yml       # Local dev stack (+ `automation` profile: self-hosted n8n)
+├── docker-compose.prod.yml  # VPS backend: postgres + api + n8n + Caddy (auto-HTTPS)
+├── Caddyfile                 # Reverse proxy for the VPS backend
+├── netlify.toml               # Website deploy config (apps/web → Netlify)
+├── .env.prod.example          # VPS backend environment template
 └── README.md
 ```
+
+## Status
+
+- **Rebrand** — complete across code, specs, business docs, and legacy
+  mockups; verified with the full API test suite (489 passing) and a clean
+  web production build.
+- **Automation** — 13 n8n workflows covering the full lifecycle (leads →
+  conversion → onboarding → programs → check-ins → content → newsletter →
+  Q&A → billing → monitoring → owner digest), verified end-to-end in Docker.
+- **Operations hub** — Notion HQ live with all 8 databases wired to the
+  workflows (`automation/README.md` has every database ID).
+- **Deployment** — backend architecture (API + Postgres + n8n behind Caddy on
+  one ~$5/mo VPS) decided and built; not yet live (domain purchase, VPS
+  provisioning, and credentials are the remaining launch steps —
+  `docs/DEPLOYMENT.md`, `docs/BUDGET.md`). Website hosting is **interim on
+  Vercel** by deliberate decision (not merely pending this branch's merge)
+  until a planned Cloudflare Workers migration supersedes Netlify outright —
+  confirm a paid Vercel plan, since its free Hobby tier prohibits commercial
+  use.
 
 ---
 
 ## System Overview
 
-Deus Performance (DP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
+Donum Dei Performance (DDP) is a **constraint-driven adaptive training engine** operating under a fixed objective hierarchy:
 
 1. Joint Integrity
 2. Movement Quality
@@ -92,12 +124,18 @@ Equipment constraints, injury flags, fatigue-adjusted alternatives
 
 ## Running the product
 
-See `docs/ARCHITECTURE.md` for the full system design.
+See `docs/ARCHITECTURE.md` for the full system design. For production, the
+site deploys to **Netlify** (free) and the backend (API + Postgres + n8n) runs
+on **one ~$5/mo VPS** — full runbook in **`docs/DEPLOYMENT.md`**, costs in
+**`docs/BUDGET.md`**.
 
 ```bash
-docker compose up --build   # postgres + api (:8000) + web (:3000) — no API key needed
+docker compose up --build   # local dev: postgres + api (:8000) + web (:3000) — no API key needed
 make test                   # engine test suite (offline, mock provider)
 make seed-library           # regenerate derived JSON after editing engine/*.md
+
+# production backend, on the VPS (see docs/DEPLOYMENT.md):
+docker compose -f docker-compose.prod.yml up -d --build   # postgres + api + n8n + caddy
 ```
 
 The API defaults to `LLM_PROVIDER=mock` (deterministic, offline). For real
@@ -110,9 +148,9 @@ fatigue) → LLM exercise-fill → QC gate (one check per hard rule) → retry (
 
 ## Brand
 
-- **Institution**: Deus Performance
+- **Institution**: Donum Dei Performance
 - **Operating entity**: Riz Management LLC
-- **Tagline**: *Deus. The body is a gift. Train it accordingly.*
+- **Tagline**: *Donum Dei. The body is a gift. Train it accordingly.*
 - **Service model**: Fulfillment-as-a-service coaching practice
 
 ---

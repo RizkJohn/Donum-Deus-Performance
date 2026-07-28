@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import FaqAccordion from "@/components/FaqAccordion";
 
 export const metadata: Metadata = {
-  title: "Reference — Deus Performance",
+  title: "Reference — Donum Dei Performance",
   description:
     "Common questions on the practice: philosophy and training, custom programming, equipment, injury management, conditioning methods, and more.",
 };

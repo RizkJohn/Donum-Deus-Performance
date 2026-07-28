@@ -5,6 +5,7 @@ node_modules/
 *.env.*
 !.env.example
 !.env.local.example
+!.env.prod.example
 dist/
 .cache/
 
@@ -12,7 +13,7 @@ dist/
 __pycache__/
 *.egg-info/
 .pytest_cache/
-deus.db
+donum_dei.db
 
 # next.js
 .next/

@@ -14,7 +14,7 @@ export default function FinalCta() {
         body
       </div>
       <div className="relative z-[1]">
-        <p className="font-bask italic text-[14px] text-warm mb-[11px]">deus</p>
+        <p className="font-bask italic text-[14px] text-warm mb-[11px]">donum dei</p>
         <h2
           className="font-play font-normal leading-[0.97] tracking-[-0.02em] mb-[14px] text-ink"
           style={{ fontSize: "clamp(30px, 4.3vw, 56px)" }}

@@ -1,0 +1,137 @@
+{
+  "name": "DDP — 01 Lead Intake → CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ddp-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n1-webhook",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "ddp-lead"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize inbound lead from the assessment funnel or correspondence form.\n// Expected body: { name, email, source?, goal?, message? }\nconst b = $input.first().json.body ?? $input.first().json;\nconst allowedSources = ['Website Assessment', 'Correspondence Form', 'Instagram', 'TikTok', 'Threads', 'Referral', 'Other'];\nconst source = allowedSources.includes(b.source) ? b.source : 'Website Assessment';\nif (!b.email) { throw new Error('Lead payload missing email'); }\nreturn [{ json: {\n  name: b.name || b.email.split('@')[0],\n  email: String(b.email).trim().toLowerCase(),\n  source,\n  goal: b.goal || b.message || '',\n  isAssessment: source === 'Website Assessment'\n} }];"
+      },
+      "id": "n2-normalize",
+      "name": "Normalize Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '64097635-af29-43a7-bc79-654d3f6e2bca' }, properties: { 'Name': { title: [{ text: { content: $json.name } }] }, 'Email': { email: $json.email }, 'Source': { select: { name: $json.source } }, 'Status': { select: { name: 'New' } }, 'Goal': { rich_text: [{ text: { content: $json.goal.slice(0, 1900) } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n3-notion-lead",
+      "name": "Create Lead in Notion CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Normalize Lead').item.json.isAssessment }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n4-if-assessment",
+      "name": "Came From Assessment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$('Normalize Lead').item.json.email], subject: 'Your assessment is received — Donum Dei Performance', text: 'Your assessment has been received.\\n\\nThe engine is reviewing your profile, schedule, and constraints. Your complete weekly program will follow shortly. If anything about your situation needs explaining in your own words, reply to this email — it goes directly to the practice, not to a bot.\\n\\nDonum Dei. The body is a gift. Train it accordingly.\\n\\n— Donum Dei Performance · Riz Management LLC' }) }}",
+        "options": {}
+      },
+      "id": "n5-welcome",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -110],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Lead captured: ' + $('Normalize Lead').item.json.email } }] }, 'Workflow': { select: { name: 'lead-intake' } }, 'Status': { select: { name: 'success' } }, 'Detail': { rich_text: [{ text: { content: 'Source: ' + $('Normalize Lead').item.json.source } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n6-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true }) }}",
+        "options": {}
+      },
+      "id": "n7-respond",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 0]
+    }
+  ],
+  "connections": {
+    "Lead Webhook": { "main": [[{ "node": "Normalize Lead", "type": "main", "index": 0 }]] },
+    "Normalize Lead": { "main": [[{ "node": "Create Lead in Notion CRM", "type": "main", "index": 0 }]] },
+    "Create Lead in Notion CRM": { "main": [[{ "node": "Came From Assessment?", "type": "main", "index": 0 }]] },
+    "Came From Assessment?": {
+      "main": [
+        [{ "node": "Send Welcome Email", "type": "main", "index": 0 }],
+        [{ "node": "Automation Log", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Welcome Email": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] },
+    "Automation Log": { "main": [[{ "node": "Respond 200", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

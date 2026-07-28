@@ -4,9 +4,9 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Deus Performance",
+  title: "Privacy Policy — Donum Dei Performance",
   description:
-    "How Deus Performance collects, uses, and protects your personal information, and how to exercise your data rights.",
+    "How Donum Dei Performance collects, uses, and protects your personal information, and how to exercise your data rights.",
 };
 
 const EFFECTIVE_DATE = "28 June 2026";
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             Effective date — {EFFECTIVE_DATE} &nbsp;·&nbsp; Riz Management LLC
           </p>
           <p className="font-bask text-[15px] text-ink2 leading-[1.85] mb-[16px]">
-            Deus Performance is operated by Riz Management LLC, a US entity.
+            Donum Dei Performance is operated by Riz Management LLC, a US entity.
             Most of our clients are US residents. This policy is written
             primarily to satisfy US federal and state privacy requirements, and
             is structured to meet equivalent standards in any other jurisdiction
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
               <SectionNumber n={1} />
               <h2 className="section-head">Who We Are</h2>
               <P>
-                Deus Performance is operated by Riz Management LLC
+                Donum Dei Performance is operated by Riz Management LLC
                 (&ldquo;we,&rdquo; &ldquo;us,&rdquo; &ldquo;our&rdquo;). We
                 are a US-based company providing a constraint-driven adaptive
                 training engine that generates personalized weekly training
@@ -157,7 +157,7 @@ export default function PrivacyPage() {
               <P>
                 The state data collected in the assessment — injury sites, sleep
                 quality, soreness, energy, and stress scores — constitutes
-                health and wellness information. While Deus Performance is not a
+                health and wellness information. While Donum Dei Performance is not a
                 covered entity under HIPAA (we are a fitness education service,
                 not a healthcare provider), we treat this data with the
                 heightened protections required by US state laws that
@@ -300,7 +300,7 @@ export default function PrivacyPage() {
                 Cookies, Analytics, and Tracking
               </h2>
               <P>
-                Deus Performance does not use cookies, browser storage (localStorage
+                Donum Dei Performance does not use cookies, browser storage (localStorage
                 or sessionStorage), or client-side tracking of any kind. We do not
                 operate an analytics platform, advertising pixel, session-recording
                 tool, or fingerprinting script.
@@ -484,7 +484,7 @@ export default function PrivacyPage() {
               <SectionNumber n={11} />
               <h2 className="section-head">Children&rsquo;s Privacy (COPPA)</h2>
               <P>
-                Deus Performance is not directed at children under the age of 13.
+                Donum Dei Performance is not directed at children under the age of 13.
                 Our assessment enforces a minimum age of 13 and rejects
                 submissions below this threshold in compliance with the
                 Children&rsquo;s Online Privacy Protection Act (COPPA).
@@ -558,8 +558,8 @@ export default function PrivacyPage() {
                 assessment so we can locate your record.
               </P>
               <div className="border border-line bg-bg1 px-[20px] py-[18px] mb-[16px]">
-                <Row label="Data controller" value="Riz Management LLC · Deus Performance" />
-                <Row label="Email" value="privacy@deusperformance.com" />
+                <Row label="Data controller" value="Riz Management LLC · Donum Dei Performance" />
+                <Row label="Email" value="privacy@donumdeiperformance.com" />
                 <Row
                   label="Web"
                   value={
@@ -567,7 +567,7 @@ export default function PrivacyPage() {
                       href="/correspondence"
                       className="font-bask text-[14px] text-accent hover:text-ink transition-colors"
                     >
-                      deusperformance.com/correspondence
+                      donumdeiperformance.com/correspondence
                     </Link>
                   }
                 />

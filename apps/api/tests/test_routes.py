@@ -26,6 +26,28 @@ async def test_generate_rejects_malformed_payload(client):
 
 
 @pytest.mark.asyncio
+async def test_generate_does_not_persist_orphan_run(client):
+    """/v1/generate returns a program but no id, so persisting the run would
+    leave an owner-less health record unreachable by export/erasure. It must
+    stay ephemeral."""
+    from sqlalchemy import func, select
+
+    from donum_dei_api.db import session as db_session
+    from donum_dei_api.db.models import ProgramRun
+
+    async with db_session._sessionmaker() as s:
+        before = (await s.execute(select(func.count()).select_from(ProgramRun))).scalar()
+
+    r = await client.post("/v1/generate", json=make_request().model_dump())
+    assert r.status_code == 200
+
+    async with db_session._sessionmaker() as s:
+        after = (await s.execute(select(func.count()).select_from(ProgramRun))).scalar()
+
+    assert after == before  # nothing persisted
+
+
+@pytest.mark.asyncio
 async def test_assess_and_fetch_roundtrip(client):
     r = await client.post("/v1/assess", json={
         "email": "athlete@example.com",
@@ -44,10 +66,17 @@ async def test_assess_and_fetch_roundtrip(client):
     r2 = await client.get(f"/v1/programs/{body['id']}")
     assert r2.status_code == 200
     fetched = r2.json()
-    assert fetched["email"] == "athlete@example.com"
     assert fetched["program"] == body["program"]
     assert fetched["assessment"]["training_state"] == body["assessment"]["training_state"]
     assert fetched["state_summary"]["cycle_count"] == 1
+
+    # The public share endpoint must not leak identifying or unused health data:
+    # no email, no body metrics, no injuries — only what the shared page renders.
+    assert "email" not in fetched
+    assert "client_profile" not in fetched["payload"]
+    assert "injuries" not in fetched["payload"]["state"]
+    assert set(fetched["payload"]["state"]) == {"sleep", "soreness", "energy", "stress"}
+    assert fetched["payload"]["goals"]["primary"] == "Strength"
 
 
 @pytest.mark.asyncio
@@ -106,18 +135,48 @@ async def test_feedback_unknown_run_404(client):
 
 
 @pytest.mark.asyncio
+async def test_data_endpoints_require_auth(client):
+    # Erasure and access are privacy-sensitive: an unauthenticated caller must
+    # never be able to export or delete data for an arbitrary email.
+    d = await client.request("DELETE", "/v1/data")
+    assert d.status_code == 401
+    g = await client.get("/v1/data")
+    assert g.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_erasure_removes_state_and_feedback(client):
     email = "erase@example.com"
     r = await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
     run_id = r.json()["id"]
     await client.post("/v1/feedback", json={"email": email, "run_id": run_id, "completion_pct": 0.5})
 
-    d = await client.request("DELETE", "/v1/data", json={"email": email})
+    # Only the account owner (verified via session token) may erase their data.
+    signup = await client.post("/v1/auth/signup", json={"email": email, "password": "correcthorse"})
+    token = signup.json()["token"]
+
+    d = await client.request(
+        "DELETE", "/v1/data", headers={"Authorization": f"Bearer {token}"}
+    )
     assert d.status_code == 200
     body = d.json()
     assert body["deleted_programs"] >= 1
     assert body["deleted_feedback"] >= 1
     assert body["deleted_athlete_state"] == 1
+
+
+@pytest.mark.asyncio
+async def test_export_returns_only_own_records(client):
+    email = "export@example.com"
+    await client.post("/v1/assess", json={"email": email, "payload": make_request().model_dump()})
+    signup = await client.post("/v1/auth/signup", json={"email": email, "password": "correcthorse"})
+    token = signup.json()["token"]
+
+    r = await client.get("/v1/data", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["email"] == email
+    assert body["record_count"] >= 1
 
 
 @pytest.mark.asyncio

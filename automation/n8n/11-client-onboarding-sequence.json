@@ -1,0 +1,134 @@
+{
+  "name": "DDP — 11 Client Onboarding Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ddp-onboard",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "n1-webhook",
+      "name": "Onboarding Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "ddp-onboard"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Called by workflow 10 on conversion. Body: { email, name, tier }\nconst b = $input.first().json.body ?? $input.first().json;\nif (!b.email) { throw new Error('Onboarding missing email'); }\nreturn [{ json: { email: String(b.email).trim().toLowerCase(), name: b.name || String(b.email).split('@')[0], tier: b.tier || 'Foundation' } }];"
+      },
+      "id": "n2-prep",
+      "name": "Prepare",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'You are enrolled — how the practice works', text: $json.name + ',\\n\\nYou have joined at the ' + $json.tier + ' level. Welcome to the practice.\\n\\nWhat happens now: the engine builds your week from your assessment — schedule, fatigue, equipment, injuries — and every program clears a hard quality-control gate before it reaches you. Nervous-system load is managed. Movement coverage is complete. You will never be sent training to failure on a primary lift.\\n\\nYour first program is on its way. Read it in full before your first session. The block order is deliberate: Warmup, Power, Strength, Accessory, Core, Mobility. Follow it as written.\\n\\nOne instruction for this week: do less than you think you should, and do it exactly. Precision compounds. Excess does not.\\n\\nDonum Dei. The body is a gift. Train it accordingly.\\n\\n— Donum Dei Performance · Riz Management LLC' }) }}",
+        "options": {}
+      },
+      "id": "n3-day0",
+      "name": "Day 0 — Welcome",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": { "amount": 3, "unit": "days" },
+      "id": "n4-wait3",
+      "name": "Wait 3 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [660, 0],
+      "webhookId": "ddp-onboard-wait3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$('Prepare').item.json.email], subject: 'The one habit that makes the engine work', text: $('Prepare').item.json.name + ',\\n\\nThree days in. The system only adapts if you tell it the truth.\\n\\nEvery Sunday you will get a check-in: fatigue on a 0–5 scale, sessions completed, anything that hurt. Sixty seconds. That check-in is not admin — it is the input the engine uses to decide whether next week progresses, holds, or deloads. Skip it and next week is a guess. Complete it and next week is precise.\\n\\nThere is no penalty for a hard week honestly reported. There is a real cost to a hard week hidden. Report accurately and the programming protects you.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n5-day3",
+      "name": "Day 3 — The Check-in Habit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": { "amount": 4, "unit": "days" },
+      "id": "n6-wait4",
+      "name": "Wait 4 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1100, 0],
+      "webhookId": "ddp-onboard-wait4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$('Prepare').item.json.email], subject: 'One week in — the horizon is decades, not days', text: $('Prepare').item.json.name + ',\\n\\nYou have completed a week. Whatever it felt like, you have started something the practice measures in decades.\\n\\nThe objective hierarchy never reorders: joint integrity first, then movement quality, then strength, then work capacity, then hypertrophy, then sport. Most training inverts this and pays for it later. This practice does not.\\n\\nIf anything is unclear — a movement, a constraint, a decision the engine made — reply to this email or use the Correspondence page. A question is answered in your own words, not routed to a bot.\\n\\nHold the standard. The results are downstream of the standard.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n7-day7",
+      "name": "Day 7 — The Long Horizon",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Onboarding sequence completed: ' + $('Prepare').item.json.email } }] }, 'Workflow': { select: { name: 'checkin-reminder' } }, 'Status': { select: { name: 'success' } }, 'Detail': { rich_text: [{ text: { content: 'Days 0/3/7 delivered.' } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n8-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Onboarding Webhook": { "main": [[{ "node": "Prepare", "type": "main", "index": 0 }]] },
+    "Prepare": { "main": [[{ "node": "Day 0 — Welcome", "type": "main", "index": 0 }]] },
+    "Day 0 — Welcome": { "main": [[{ "node": "Wait 3 Days", "type": "main", "index": 0 }]] },
+    "Wait 3 Days": { "main": [[{ "node": "Day 3 — The Check-in Habit", "type": "main", "index": 0 }]] },
+    "Day 3 — The Check-in Habit": { "main": [[{ "node": "Wait 4 Days", "type": "main", "index": 0 }]] },
+    "Wait 4 Days": { "main": [[{ "node": "Day 7 — The Long Horizon", "type": "main", "index": 0 }]] },
+    "Day 7 — The Long Horizon": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

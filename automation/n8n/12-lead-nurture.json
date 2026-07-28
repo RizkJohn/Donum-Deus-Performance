@@ -1,0 +1,115 @@
+{
+  "name": "DDP — 12 Lead Nurture (assessment follow-up)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "days", "triggerAtHour": 11, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Daily 11:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/64097635-af29-43a7-bc79-654d3f6e2bca/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: 'Status', select: { equals: 'Assessed' } }, { timestamp: 'created_time', created_time: { on_or_before: new Date(Date.now() - 3 * 86400000).toISOString() } } ] }, page_size: 50 }) }}",
+        "options": {}
+      },
+      "id": "n2-query",
+      "name": "Assessed, Not Converted (3d+)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nreturn results.map(r => ({ json: {\n  pageId: r.id,\n  email: r.properties?.Email?.email || null,\n  name: (r.properties?.Name?.title?.[0]?.plain_text) || 'there',\n  goal: r.properties?.Goal?.rich_text?.map(t => t.plain_text).join('') || ''\n} })).filter(i => i.json.email);"
+      },
+      "id": "n3-split",
+      "name": "Each Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'Your program is built. The question is whether you run it.', text: $json.name + ',\\n\\nYou completed the assessment and the engine built you a complete week — CNS-managed, movement-complete, constraint-honest. That program does not expire, and it does not change into something generic if you wait.\\n\\nWhat a membership adds is continuity: every week rebuilt from your check-in, progression decided by data instead of guesswork, equipment and injury constraints resolved automatically, and a decade-long horizon instead of a single good week.\\n\\nThree levels, one methodology — the method does not vary by price:\\n' + ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/curriculum\\n\\nIf a specific constraint kept you from starting — schedule, an injury, a question about level — reply to this email. It reaches the practice directly.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n4-nudge",
+      "name": "Conversion Nudge",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"properties\": {\"Status\": {\"select\": {\"name\": \"Contacted\"}}}}",
+        "options": {}
+      },
+      "id": "n5-mark",
+      "name": "Mark Contacted",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Lead nurture sent: ' + $items().length + ' assessed leads' } }] }, 'Workflow': { select: { name: 'lead-intake' } }, 'Status': { select: { name: 'success' } } } }) }}",
+        "options": {}
+      },
+      "id": "n6-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Daily 11:00": { "main": [[{ "node": "Assessed, Not Converted (3d+)", "type": "main", "index": 0 }]] },
+    "Assessed, Not Converted (3d+)": { "main": [[{ "node": "Each Lead", "type": "main", "index": 0 }]] },
+    "Each Lead": { "main": [[{ "node": "Conversion Nudge", "type": "main", "index": 0 }]] },
+    "Conversion Nudge": { "main": [[{ "node": "Mark Contacted", "type": "main", "index": 0 }]] },
+    "Mark Contacted": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

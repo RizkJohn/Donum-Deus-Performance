@@ -18,7 +18,7 @@ export default function Hero() {
           It is a <em className="text-accent">practice.</em>
         </h1>
         <p className="font-bask text-[16px] text-ink2 leading-[1.9] max-w-[430px] mb-[24px] pl-[16px] border-l border-line2">
-          Deus Performance is a philosophy-driven practice that bridges ancient
+          Donum Dei Performance is a philosophy-driven practice that bridges ancient
           wisdom and modern athletic discipline. Every plateau is a philosophical
           problem before it becomes a physical one — the Stoics, the
           existentialists, and the Eastern masters resolved the questions every

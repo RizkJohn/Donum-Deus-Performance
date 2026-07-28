@@ -38,11 +38,11 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Does this institution provide medical or rehabilitation advice?",
-    a: "No. Deus Performance is a practice of performance education. It does not constitute medical advice, rehabilitation guidance, or clinical counsel of any kind. Practitioners with active medical conditions should consult a licensed clinician before enrolling in any program.",
+    a: "No. Donum Dei Performance is a practice of performance education. It does not constitute medical advice, rehabilitation guidance, or clinical counsel of any kind. Practitioners with active medical conditions should consult a licensed clinician before enrolling in any program.",
   },
   {
     q: "Who administers the program?",
-    a: "Deus Performance operates as an independent practice. All program delivery, correspondence, and review is handled through the institution. For any inquiry outside the scope of this reference, use the Correspondence page.",
+    a: "Donum Dei Performance operates as an independent practice. All program delivery, correspondence, and review is handled through the institution. For any inquiry outside the scope of this reference, use the Correspondence page.",
   },
 ];
 

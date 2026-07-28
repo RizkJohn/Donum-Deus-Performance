@@ -1,0 +1,223 @@
+{
+  "name": "DDP — 05 Content & Blog Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "weeks", "triggerAtDay": [1], "triggerAtHour": 8, "triggerAtMinute": 0 } ] }
+      },
+      "id": "n1-cron",
+      "name": "Every Monday 08:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/88bf899d-a0aa-4c8a-9d24-c243a87008f3/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"and\": [{\"property\": \"Platform\", \"select\": {\"equals\": \"Blog\"}}, {\"property\": \"Status\", \"select\": {\"equals\": \"Idea\"}}]}, \"page_size\": 1}",
+        "options": {}
+      },
+      "id": "n2-nextidea",
+      "name": "Next Queued Blog Idea",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nif (results.length === 0) { return [{ json: { mode: 'ideate' } }]; }\nconst r = results[0];\nreturn [{ json: {\n  mode: 'draft',\n  pageId: r.id,\n  title: r.properties?.Title?.title?.[0]?.plain_text || 'Untitled',\n  hook: r.properties?.Hook?.rich_text?.[0]?.plain_text || ''\n} }];"
+      },
+      "id": "n3-route",
+      "name": "Idea or Ideate?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "leftValue": "={{ $json.mode }}", "rightValue": "draft", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n4-if",
+      "name": "Has Queued Idea?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $env.DDP_CLAUDE_MODEL || 'claude-sonnet-5', max_tokens: 4000, system: 'You write for Donum Dei Performance, a constraint-driven adaptive training practice operated by Riz Management LLC. Voice: precise, disciplined, no hype, no exclamation marks, no emojis. Grounded in joint integrity first, movement quality, CNS load management, and long-horizon physical development, with philosophical anchors in Stoicism, Existentialism, Eastern philosophy, and Greek virtue ethics. Tagline: Donum Dei. The body is a gift. Train it accordingly. Never give medical advice; anything clinical is referred to a licensed clinician.', messages: [{ role: 'user', content: 'Write a complete blog post (a Dispatch) for the Donum Dei Performance site.\\n\\nTitle: ' + $json.title + '\\nAngle/hook: ' + ($json.hook || 'choose the sharpest defensible angle') + '\\n\\nRequirements: 700-1000 words, markdown, one h1, short sections with h2s, no bullet-point listicles, close with one practical directive the reader can apply this week. No medical claims.' }] }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "n5-draft",
+      "name": "Claude: Draft Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -130],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_ANTHROPIC", "name": "Anthropic (x-api-key)" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Notion rich_text items cap at 2000 chars — chunk the draft.\nconst text = ($input.first().json.content?.[0]?.text) || '';\nif (!text) { throw new Error('Claude returned no draft'); }\nconst chunks = [];\nfor (let i = 0; i < text.length && chunks.length < 90; i += 1900) { chunks.push({ text: { content: text.slice(i, i + 1900) } }); }\nreturn [{ json: { pageId: $('Idea or Ideate?').first().json.pageId, title: $('Idea or Ideate?').first().json.title, chunks } }];"
+      },
+      "id": "n6-chunk",
+      "name": "Chunk Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, -130]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { 'Body': { rich_text: $json.chunks }, 'Status': { select: { name: 'Drafted' } } } }) }}",
+        "options": {}
+      },
+      "id": "n7-save",
+      "name": "Save Draft to Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -130],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: 'Blog draft ready for review: ' + $('Chunk Draft').item.json.title, text: 'A new Dispatch draft is in the Content Calendar with Status = Drafted.\\n\\nTitle: ' + $('Chunk Draft').item.json.title + '\\n\\nReview it in Notion, edit as needed, then set Status = Scheduled with a Publish Date to queue it for the site.' }) }}",
+        "options": {}
+      },
+      "id": "n8-notify",
+      "name": "Notify for Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, -130],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $env.DDP_CLAUDE_MODEL || 'claude-sonnet-5', max_tokens: 1500, system: 'You plan editorial for Donum Dei Performance, a constraint-driven adaptive training practice. Topics live where training science meets philosophy of practice: CNS management, joint integrity, movement quality, fatigue, long-horizon development, Stoic/Existentialist/Eastern/virtue-ethics framing. Output strict JSON only.', messages: [{ role: 'user', content: 'Generate 3 blog post ideas for the Dispatches section. Respond with STRICT JSON only: [{\"title\": \"...\", \"hook\": \"one-sentence angle\"}] — no prose around it.' }] }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "n9-ideate",
+      "name": "Claude: Generate Ideas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 130],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_ANTHROPIC", "name": "Anthropic (x-api-key)" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = ($input.first().json.content?.[0]?.text) || '[]';\nconst match = text.match(/\\[[\\s\\S]*\\]/);\nlet ideas = [];\ntry { ideas = JSON.parse(match ? match[0] : text); } catch (e) { throw new Error('Could not parse ideas JSON: ' + text.slice(0, 200)); }\nreturn ideas.slice(0, 3).map(i => ({ json: { title: String(i.title || '').slice(0, 200), hook: String(i.hook || '').slice(0, 500) } }));"
+      },
+      "id": "n10-parseideas",
+      "name": "Parse Ideas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 130]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '88bf899d-a0aa-4c8a-9d24-c243a87008f3' }, properties: { 'Title': { title: [{ text: { content: $json.title } }] }, 'Platform': { select: { name: 'Blog' } }, 'Type': { select: { name: 'Educational' } }, 'Status': { select: { name: 'Idea' } }, 'Hook': { rich_text: [{ text: { content: $json.hook } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n11-saveideas",
+      "name": "Queue Ideas in Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 130],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Content pipeline run (' + $('Idea or Ideate?').first().json.mode + ')' } }] }, 'Workflow': { select: { name: 'content-pipeline' } }, 'Status': { select: { name: 'success' } } } }) }}",
+        "options": {}
+      },
+      "id": "n12-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 0],
+      "executeOnce": true,
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Every Monday 08:00": { "main": [[{ "node": "Next Queued Blog Idea", "type": "main", "index": 0 }]] },
+    "Next Queued Blog Idea": { "main": [[{ "node": "Idea or Ideate?", "type": "main", "index": 0 }]] },
+    "Idea or Ideate?": { "main": [[{ "node": "Has Queued Idea?", "type": "main", "index": 0 }]] },
+    "Has Queued Idea?": {
+      "main": [
+        [{ "node": "Claude: Draft Post", "type": "main", "index": 0 }],
+        [{ "node": "Claude: Generate Ideas", "type": "main", "index": 0 }]
+      ]
+    },
+    "Claude: Draft Post": { "main": [[{ "node": "Chunk Draft", "type": "main", "index": 0 }]] },
+    "Chunk Draft": { "main": [[{ "node": "Save Draft to Calendar", "type": "main", "index": 0 }]] },
+    "Save Draft to Calendar": { "main": [[{ "node": "Notify for Review", "type": "main", "index": 0 }]] },
+    "Notify for Review": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] },
+    "Claude: Generate Ideas": { "main": [[{ "node": "Parse Ideas", "type": "main", "index": 0 }]] },
+    "Parse Ideas": { "main": [[{ "node": "Queue Ideas in Calendar", "type": "main", "index": 0 }]] },
+    "Queue Ideas in Calendar": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

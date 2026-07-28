@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dispatch = DISPATCHES.find((d) => d.slug === slug);
   if (!dispatch) return {};
   return {
-    title: `${dispatch.tag} — Deus Performance Dispatches`,
+    title: `${dispatch.tag} — Donum Dei Performance Dispatches`,
     description: dispatch.dek,
   };
 }

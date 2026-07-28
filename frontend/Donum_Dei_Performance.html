@@ -3,20 +3,20 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deus Performance</title>
-<meta name="description" content="Deus Performance. A practice of physical stewardship grounded in joint integrity, movement quality, and the long-term development of human capacity.">
-<meta name="theme-color" content="#e9e1d1">
+<title>Donum Dei Performance</title>
+<meta name="description" content="Donum Dei Performance. A practice of physical stewardship grounded in joint integrity, movement quality, and the long-term development of human capacity.">
+<meta name="theme-color" content="#f3efe8">
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="Donum Dei%20Performance_files/css2.css" rel="stylesheet">
 <style>
 :root{
-  --bg:#e9e1d1;--bg1:#e2d9c6;--bg2:#dacfb9;--bg3:#cfc3a9;
-  --border:#c4b89e;--border2:#ab9d7e;
-  --text:#1d2a44;--text2:#3a4862;--text3:#857f6e;
-  --accent:#1f3a5f;--accent2:rgba(31,58,95,.07);--accent3:rgba(31,58,95,.2);
-  --warm:#94763c;--warm2:rgba(148,118,60,.10);--warm3:rgba(148,118,60,.28);
-  --red:#7c3b3b;--red2:rgba(124,59,59,.09);
+  --bg:#f3efe8;--bg1:#ede8e0;--bg2:#e6e0d6;--bg3:#ddd7cc;
+  --border:#ccc8be;--border2:#b8b2a6;
+  --text:#1a1f1b;--text2:#4a5e48;--text3:#8a9e86;
+  --accent:#336659;--accent2:rgba(51,102,89,.07);--accent3:rgba(51,102,89,.2);
+  --warm:#8c5e2a;--warm2:rgba(140,94,42,.09);--warm3:rgba(140,94,42,.26);
+  --red:#963232;--red2:rgba(150,50,50,.09);
   --play:'Playfair Display',serif;--mono:'DM Mono',monospace;--bask:'Libre Baskerville',serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -29,7 +29,7 @@ button{min-height:34px;}
 a{color:inherit;text-decoration:none;}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);}
 .grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.13;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;background-size:128px 128px;}
-.grid-line{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(31,58,95,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(31,58,95,.045) 1px,transparent 1px);background-size:80px 80px;}
+.grid-line{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(51,102,89,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(51,102,89,.04) 1px,transparent 1px);background-size:80px 80px;}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;border-bottom:1px solid var(--border);background:rgba(243,239,232,.97);backdrop-filter:blur(14px);}
@@ -44,8 +44,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;display:flex;ali
 .nav-enroll{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:7px 18px;border:1px solid var(--accent);color:var(--accent);background:none;cursor:pointer;transition:background .15s,color .15s;}
 .nav-enroll:hover{background:var(--accent);color:#f3efe8;}
 .nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;}
-.nav-mobile-cta{display:none;font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:9px 18px;border:1px solid var(--accent);color:var(--accent);background:none;cursor:pointer;text-align:center;width:100%;transition:background .15s,color .15s;}
-.nav-mobile-cta:hover{background:var(--accent);color:#f3efe8;}
 
 .page{display:none;position:relative;z-index:1;}
 .page.active{display:block;}
@@ -80,7 +78,7 @@ h1.inst em{font-style:italic;color:var(--accent);}
 
 /* DOCTRINE BAND */
 .doctrine-band{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:40px 52px;position:relative;overflow:hidden;}
-.doctrine-band::before{content:'\201C';position:absolute;top:-90px;left:12px;font-family:var(--play);font-size:500px;font-weight:900;color:rgba(31,58,95,.05);line-height:1;pointer-events:none;}
+.doctrine-band::before{content:'\201C';position:absolute;top:-90px;left:12px;font-family:var(--play);font-size:500px;font-weight:900;color:rgba(51,102,89,.04);line-height:1;pointer-events:none;}
 .db-inner{max-width:840px;margin:0 auto;position:relative;z-index:1;}
 .db-text{font-family:var(--bask);font-size:clamp(19px,2.6vw,32px);font-style:italic;color:var(--text);line-height:1.65;margin-bottom:20px;}
 .db-text em{font-style:normal;font-weight:700;color:var(--accent);}
@@ -152,7 +150,7 @@ h1.inst em{font-style:italic;color:var(--accent);}
 
 /* ENROL BAND */
 .enrol-band{padding:56px 52px;border-top:1px solid var(--border);text-align:center;position:relative;overflow:hidden;}
-.enrol-band::before{content:'body';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--play);font-style:italic;font-weight:400;font-size:clamp(80px,14vw,200px);color:rgba(31,58,95,.05);pointer-events:none;z-index:0;line-height:1;white-space:nowrap;}
+.enrol-band::before{content:'body';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--play);font-style:italic;font-weight:400;font-size:clamp(80px,14vw,200px);color:rgba(51,102,89,.04);pointer-events:none;z-index:0;line-height:1;white-space:nowrap;}
 .eb-inner{position:relative;z-index:1;}
 .eb-kicker{font-family:var(--bask);font-style:italic;font-size:14px;color:var(--warm);margin-bottom:11px;}
 .eb-title{font-family:var(--play);font-weight:400;font-size:clamp(30px,4.3vw,56px);line-height:.97;letter-spacing:-.02em;margin-bottom:14px;color:var(--text);}
@@ -307,7 +305,7 @@ footer{border-top:1px solid var(--border);padding:22px 52px;}
 .height-dual{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 input[type="number"],input[type="text"],input[type="email"],select,textarea{width:100%;min-width:0;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:9px 11px;outline:none;transition:border-color .15s;border-radius:0;appearance:none;-webkit-appearance:none;}
 input:focus,select:focus,textarea:focus{border-color:var(--accent3);}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23857f6e'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:29px;cursor:pointer;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a9e86'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:29px;cursor:pointer;}
 textarea{resize:vertical;min-height:64px;}
 .days-picker{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
 .dp-btn{padding:8px 3px;text-align:center;font-family:var(--mono);font-size:7px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .12s;user-select:none;}
@@ -417,21 +415,15 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
 .dp-cell-value{font-family:var(--mono);font-weight:500;font-size:10px;color:var(--text);}
 .dp-cell-value.em{color:var(--accent);}
 
-@media print{.grain,.grid-line,nav,.ph-actions,footer{display:none!important;}:root{--bg:#fff;--bg1:#f7f4ee;--bg2:#efe9df;--text:#000;--text2:#2a3142;--text3:#666;--border:#ddd;--accent:#1f3a5f;--warm:#6b4418;}}
+@media print{.grain,.grid-line,nav,.ph-actions,footer{display:none!important;}:root{--bg:#fff;--bg1:#f8f5ef;--bg2:#f0ece3;--text:#000;--text2:#333;--text3:#666;--border:#ddd;--accent:#1e4d42;--warm:#6b4418;}}
 @media(max-width:960px){
   nav{padding:0 18px;}
   .nav-links{display:none;position:absolute;top:58px;left:0;right:0;background:var(--bg);flex-direction:column;align-items:flex-start;padding:13px 18px;border-bottom:1px solid var(--border);gap:13px;z-index:99;}
   .nav-links.show{display:flex;}
   .nav-toggle{display:block;}
   .nav-enroll{display:none;}
-  .nav-mobile-cta{display:block;margin-top:5px;}
-  .hero{grid-template-columns:1fr;padding:44px 20px 36px;gap:30px;}
-  #hero-etym-panel{display:block;}
-  #hero-etym-panel .etym-panel{margin-top:2px;}
-  .er-word{min-width:92px;font-size:16px;padding:12px 15px;}
-  .er-def{padding:12px 15px;}
-  .etym-panel-hdr{padding:9px 15px;}
-  .etym-compound{padding:13px 15px;}
+  .hero{grid-template-columns:1fr;padding:40px 20px 34px;gap:0;}
+  #hero-etym-panel{display:none;}
   .principles,.order-section{grid-template-columns:1fr;padding:36px 20px;gap:28px;}
   .order-grid{grid-template-columns:1fr;}
   .doctrine-band,.inscription,.enrol-band,.accent-band{padding:28px 20px;}
@@ -472,96 +464,6 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
   .flags-wrap{display:grid;grid-template-columns:1fr;}
   .flags-wrap>div{margin-left:0!important;}
 }
-@media(max-width:480px){
-  .hero{padding:26px 16px 24px;gap:24px;}
-  h1.inst{font-size:40px;line-height:1.04;}
-  .hero-kicker{margin-bottom:11px;}
-  .hero-prose{font-size:14px;line-height:1.8;padding-left:13px;margin-bottom:22px;}
-  .er-row{flex-direction:column;}
-  .er-word{min-width:0;width:100%;border-right:none;border-bottom:1px solid var(--border);font-size:17px;padding:10px 15px;}
-  .er-note{font-size:10px;}
-}
-/* PHILOSOPHICAL SCHOOLS */
-.thesis-band{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg1);padding:54px 52px;margin-top:48px;}
-.thesis-inner{max-width:880px;margin:0 auto;text-align:center;}
-.thesis-text{font-family:var(--play);font-size:clamp(22px,2.8vw,34px);font-weight:400;line-height:1.34;color:var(--text);letter-spacing:-.01em;}
-.thesis-text em{font-style:italic;color:var(--accent);}
-.thesis-src{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-top:22px;}
-.schools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--border);}
-.school{padding:32px 30px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
-.school:nth-child(2n){border-right:none;}
-.school:nth-child(3),.school:nth-child(4){border-bottom:none;}
-.school-idx{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--warm);text-transform:uppercase;margin-bottom:14px;}
-.school-name{font-family:var(--play);font-size:25px;font-weight:700;color:var(--text);margin-bottom:5px;}
-.school-greek{font-family:var(--bask);font-style:italic;font-size:13px;color:var(--text3);margin-bottom:15px;}
-.school-body{font-family:var(--bask);font-size:14px;line-height:1.72;color:var(--text2);}
-.school-figures{font-family:var(--mono);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);margin-top:16px;padding-top:13px;border-top:1px solid var(--border);}
-
-/* DISPATCHES — INDEX */
-.dispatch-lead{display:grid;grid-template-columns:0.9fr 1.1fr;gap:0;border:1px solid var(--accent);margin-bottom:0;cursor:pointer;transition:background .18s;}
-.dispatch-lead:hover{background:var(--accent2);}
-.dl-left{padding:40px 38px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;}
-.dl-tag{font-family:var(--mono);font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--warm);margin-bottom:18px;}
-.dl-featured{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:inline-block;}
-.dl-title{font-family:var(--play);font-size:clamp(30px,3.6vw,46px);font-weight:700;line-height:1.05;letter-spacing:-.015em;color:var(--text);margin-bottom:18px;}
-.dl-title em{font-style:italic;color:var(--accent);}
-.dl-dek{font-family:var(--bask);font-size:15px;line-height:1.72;color:var(--text2);}
-.dl-right{padding:40px 38px;display:flex;flex-direction:column;justify-content:center;background:var(--bg1);}
-.dl-quote{font-family:var(--play);font-style:italic;font-size:22px;line-height:1.42;color:var(--text);}
-.dl-meta{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:24px;}
-.dl-read{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-top:8px;}
-.dispatch-list{border:1px solid var(--border);border-top:none;}
-.dispatch-item{display:grid;grid-template-columns:64px 1fr auto;gap:26px;align-items:baseline;padding:28px 34px;border-top:1px solid var(--border);cursor:pointer;transition:background .15s;}
-.dispatch-item:first-child{border-top:none;}
-.dispatch-item:hover{background:var(--bg1);}
-.dispatch-item:hover .di-read{color:var(--accent);}
-.di-num{font-family:var(--play);font-size:30px;font-style:italic;color:var(--border2);line-height:1;}
-.di-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--warm);margin-bottom:8px;}
-.di-title{font-family:var(--play);font-size:23px;font-weight:700;color:var(--text);line-height:1.1;margin-bottom:8px;}
-.di-dek{font-family:var(--bask);font-size:13.5px;line-height:1.62;color:var(--text2);max-width:62ch;}
-.di-right{text-align:right;white-space:nowrap;}
-.di-thinker{font-family:var(--bask);font-style:italic;font-size:12px;color:var(--text3);margin-bottom:6px;}
-.di-read{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);transition:color .15s;}
-
-/* DISPATCHES — POST */
-.post-wrap{max-width:720px;margin:0 auto;padding:0 32px;}
-.post-back{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;margin-bottom:40px;transition:color .15s;}
-.post-back:hover{color:var(--accent);}
-.post-tag{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--warm);margin-bottom:20px;}
-.post-title{font-family:var(--play);font-size:clamp(36px,5vw,58px);font-weight:700;line-height:1.04;letter-spacing:-.02em;color:var(--text);margin-bottom:22px;}
-.post-title em{font-style:italic;color:var(--accent);}
-.post-dek{font-family:var(--bask);font-style:italic;font-size:19px;line-height:1.55;color:var(--text2);margin-bottom:26px;}
-.post-byline{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding-bottom:26px;border-bottom:1px solid var(--border);margin-bottom:34px;}
-.post-body{font-family:var(--bask);font-size:16.5px;line-height:1.82;color:var(--text);}
-.post-body p{margin-bottom:22px;}
-.post-body p.lead-cap::first-letter{font-family:var(--play);font-size:62px;font-weight:700;float:left;line-height:.78;padding:6px 12px 0 0;color:var(--accent);}
-.post-pull{font-family:var(--play);font-size:26px;font-style:italic;line-height:1.36;color:var(--text);border-left:2px solid var(--accent);padding:6px 0 6px 26px;margin:36px 0;}
-.post-divider{width:38px;height:1px;background:var(--border2);margin:34px auto;}
-.post-foot{margin-top:54px;padding-top:30px;border-top:1px solid var(--border);}
-.post-cta{background:var(--bg1);border:1px solid var(--border);padding:30px;text-align:center;margin-top:14px;}
-.post-cta-text{font-family:var(--bask);font-style:italic;font-size:15px;color:var(--text2);margin-bottom:16px;}
-.post-nav{display:flex;justify-content:space-between;gap:16px;margin-top:30px;}
-.post-nav button{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;text-align:left;max-width:46%;transition:color .15s;}
-.post-nav button:last-child{text-align:right;}
-.post-nav button:hover{color:var(--accent);}
-.post-nav .pn-dir{display:block;color:var(--border2);margin-bottom:5px;}
-
-@media(max-width:760px){
-  .schools-grid{grid-template-columns:1fr;}
-  .school{border-right:none!important;border-bottom:1px solid var(--border)!important;}
-  .school:last-child{border-bottom:none!important;}
-  .thesis-band{padding:40px 22px;}
-  .dispatch-lead{grid-template-columns:1fr;}
-  .dl-left{border-right:none;border-bottom:1px solid var(--border);padding:32px 26px;}
-  .dl-right{padding:32px 26px;}
-  .dispatch-item{grid-template-columns:38px 1fr;gap:16px;padding:24px 22px;}
-  .di-right{grid-column:2;text-align:left;margin-top:10px;}
-  .di-num{font-size:24px;}
-  .post-wrap{padding:0 20px;}
-  .post-body{font-size:15.5px;}
-  .post-body p.lead-cap::first-letter{font-size:50px;}
-  .post-pull{font-size:21px;padding-left:18px;}
-}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .fade-up{animation:fadeUp .42s ease forwards;}
 </style>
@@ -576,16 +478,14 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
       <path d="M1.5 7L7.5 1.5L13.5 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M3 5.8V12.5H6V9H9V12.5H12V5.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div class="nav-wordmark"><em>Deus</em> <strong>Performance</strong></div>
+    <div class="nav-wordmark"><em>Donum Dei</em> <strong>Performance</strong></div>
   </div>
   <div class="nav-links" id="nav-links">
     <button class="nav-link" onclick="goTo('philosophy')">Philosophy</button>
     <button class="nav-link" onclick="goTo('methodology')">Methodology</button>
     <button class="nav-link" onclick="goTo('curriculum')">Curriculum</button>
-    <button class="nav-link" onclick="goTo('blog')">Dispatches</button>
     <button class="nav-link" onclick="goTo('reference')">Reference</button>
     <button class="nav-link" onclick="goTo('correspondence')">Correspondence</button>
-    <button class="nav-mobile-cta" onclick="startIntake()">Begin Assessment</button>
   </div>
   <button class="nav-enroll" onclick="startIntake()">Begin Assessment</button>
   <button class="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('show')">☰</button>
@@ -595,12 +495,12 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
 <div id="page-landing" class="page active">
   <section class="hero">
     <div>
-      <div class="hero-kicker">Train the mind. The body follows.</div>
+      <div class="hero-kicker">A doctrine of physical stewardship</div>
       <h1 class="inst">The body is not<br>a project.<br>It is a <em>practice.</em></h1>
-      <p class="hero-prose">Deus Performance is a philosophy-driven practice that bridges ancient wisdom and modern athletic discipline. Every plateau is a philosophical problem before it becomes a physical one — the Stoics, the existentialists, and the Eastern masters resolved the questions every serious athlete eventually meets. We build the mind that builds the body.</p>
+      <p class="hero-prose">Donum Dei Performance is a structured practice of physical development grounded in one doctrine: the body was given without condition, and demands to be treated accordingly. Every programme produced here is built from that premise.</p>
       <div class="hero-actions">
         <button class="btn-primary" onclick="startIntake()">Begin the Assessment</button>
-        <button class="btn-ghost" onclick="goTo('blog')">Read the Dispatches →</button>
+        <button class="btn-ghost" onclick="goTo('philosophy')">Read the doctrine →</button>
       </div>
     </div>
     <div id="hero-etym-panel">
@@ -615,7 +515,7 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
           </div>
         </div>
         <div class="etym-row">
-          <div class="er-word">deus</div>
+          <div class="er-word">dei</div>
           <div class="er-def">
             <div class="er-pos">Latin noun · masculine · second declension</div>
             <div class="er-meaning">God; the divine source</div>
@@ -623,7 +523,7 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
           </div>
         </div>
         <div class="etym-compound">
-          <div class="ec-word">deus dedit</div>
+          <div class="ec-word">donum dei</div>
           <div class="ec-def">God has given. A statement of origin and obligation in two words. The institution's name is its doctrine.</div>
         </div>
       </div>
@@ -636,7 +536,7 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
  through which everything you will ever accomplish passes. To neglect it
  diminishes the gift. To develop it with intelligence — that is the only
  act of gratitude that remains."</div>
-      <div class="db-source">Founding Doctrine · Deus Performance</div>
+      <div class="db-source">Founding Doctrine · Donum Dei Performance</div>
     </div>
   </div>
 
@@ -644,9 +544,9 @@ table.ex-tbl th:not(:first-child),table.ex-tbl td:not(:first-child){padding-left
     <div class="principles">
       <div>
         <div class="ps-kicker">Foundational Principles</div>
-        <div class="ps-title">What <em>Deus</em><br>demands in <strong>practice.</strong></div>
+        <div class="ps-title">What <em>Donum Dei</em><br>demands in <strong>practice.</strong></div>
         <div class="ps-prose">
-          <p><strong>Deus</strong> — the divine source. The body is
+          <p><strong>Donum Dei</strong> — the divine source. The body is
 given, not earned. A gift carries the obligation to receive it well: you
  do not discard it or let it deteriorate through indifference. You
 develop it with the care the giver intended.</p>
@@ -683,7 +583,7 @@ the strategy that makes sustained performance possible.</div></div>
   <div class="inscription">
     <div class="inscription-inner">
       <div class="ins-text">"Do you not know that your body is a temple? <em>Honor it</em> — with every session, every recovery, every decision made in full awareness of what it is."</div>
-      <div class="ins-source">The Standard · Deus Performance</div>
+      <div class="ins-source">The Standard · Donum Dei Performance</div>
     </div>
   </div>
 
@@ -713,7 +613,7 @@ aesthetics. The order is non-negotiable.</div>
 
   <div class="enrol-band">
     <div class="eb-inner">
-      <div class="eb-kicker">deus</div>
+      <div class="eb-kicker">donum dei</div>
       <div class="eb-title">The gift was given.<br><strong>Now honor it.</strong></div>
       <p class="eb-sub">Complete the intake. A programme is constructed around your current state, your schedule, and your body's actual constraints — from first principles, not from defaults.</p>
       <button class="btn-primary" style="font-size:11px;padding:13px 40px;" onclick="startIntake()">Begin the Assessment</button>
@@ -740,10 +640,10 @@ founded to work against every part of that.</p>
 obligation nonetheless creates a debt of respect toward the giver's 
 intention. To receive a gift and treat it carelessly is not neutrality. 
 It is refusal.</div></div></div>
-      <div class="ef-row"><div class="ef-word">deus</div><div class="ef-def"><div class="ef-pos">Latin noun · masculine · second declension · from Proto-Indo-European <em>*dyew-</em></div><div class="ef-meaning">God; a divine being; the ultimate and originating source</div><div class="ef-note">Root of English: deity, divine, divinity. <em>Deus</em>
+      <div class="ef-row"><div class="ef-word">dei</div><div class="ef-def"><div class="ef-pos">Latin noun · masculine · genitive singular of deus · from Proto-Indo-European <em>*dyew-</em></div><div class="ef-meaning">God; a divine being; the ultimate and originating source</div><div class="ef-note">Root of English: deity, divine, divinity. <em>Donum Dei</em>
  positions the source of the gift as categorically greater than both the
  gift and its recipient. The capacity you carry in your body was not constructed by you. It arrived through a process that exceeds your authorship.</div></div></div>
-      <div class="ef-compound"><div class="ef-compound-word">deus dedit</div><div class="ef-compound-def">God
+      <div class="ef-compound"><div class="ef-compound-word">donum dei</div><div class="ef-compound-def">God
  has given. A statement of origin that is also a statement of 
 responsibility. If the body is a gift of divine origin, then how it is 
 trained is a moral question, not merely a technical one. This 
@@ -757,54 +657,9 @@ doctrine.</div></div>
       <div class="ab-text">"Most practitioners do not fail because they 
 lack effort. They fail because no one built a system around their actual
  life — their schedule, their body, their current state. <strong>That is the problem this institution was built to solve.</strong>"</div>
-      <div class="ab-source">Founding Premise · Deus Performance</div>
+      <div class="ab-source">Founding Premise · Donum Dei Performance</div>
     </div>
   </div>
-
-  <div class="thesis-band">
-    <div class="thesis-inner">
-      <div class="thesis-text">Every athletic plateau is a <em>philosophical</em> problem before it becomes a physical one. The Stoics, the existentialists, and the Eastern masters solved the same questions the modern athlete faces: how to govern what cannot be controlled, how to find meaning in suffering, how to <em>perform without forcing.</em></div>
-      <div class="thesis-src">Core Thesis · Deus Performance</div>
-    </div>
-  </div>
-
-  <section class="sec">
-    <div class="sec-kicker">The Intellectual Foundation</div>
-    <div class="sec-title">Four traditions that<br>govern the <em>practice.</em></div>
-    <p class="sec-lede">The methodology is physical. The framework beneath it is not. Every programme this institution builds rests on four bodies of thought that have spent two thousand years answering the questions a training plan alone cannot.</p>
-    <div class="schools-grid">
-      <div class="school">
-        <div class="school-idx">i · Stoicism</div>
-        <div class="school-name">The Dichotomy of Control</div>
-        <div class="school-greek">prohairesis — the faculty of choice</div>
-        <div class="school-body">The result is never yours to own — the clock, the podium, the verdict of others. What is yours is the rep you did not skip, the breath you governed, the standard you held when no one was watching. Master the input; release the outcome. The Stoics built an entire discipline on that division, and it is the only game an athlete can actually win.</div>
-        <div class="school-figures">Epictetus · Marcus Aurelius · Seneca</div>
-      </div>
-      <div class="school">
-        <div class="school-idx">ii · Existentialism</div>
-        <div class="school-name">Meaning in the Effort</div>
-        <div class="school-greek">amor fati — love of one's fate</div>
-        <div class="school-body">Everyone wants the result. Nietzsche asked for something harder: to love the fate that produces it — the dawn sessions no one applauds, the plateaus that test patience, the setbacks that expose character. Not to tolerate the grind, but to will it. The athlete who finds meaning in the work never runs out of reason to return to it.</div>
-        <div class="school-figures">Nietzsche · Sartre · Camus · Frankl</div>
-      </div>
-      <div class="school">
-        <div class="school-idx">iii · Eastern Philosophy</div>
-        <div class="school-name">Effortless Action</div>
-        <div class="school-greek">wú wéi — acting without forcing</div>
-        <div class="school-body">Wu wei is not passivity. It is what remains when training runs so deep that execution stops being a decision. Forcing creates tension; tension creates error; error destroys performance. You cannot grip your way to a personal best. The practice is built to be drilled until it disappears — so that on the day, you trust it and let the result arrive.</div>
-        <div class="school-figures">Laozi · Zhuangzi · Zen tradition</div>
-      </div>
-      <div class="school">
-        <div class="school-idx">iv · Greek Virtue Ethics</div>
-        <div class="school-name">Excellence as a Way of Being</div>
-        <div class="school-greek">aretē — excellence · eudaimonia — flourishing</div>
-        <div class="school-body">Arete was never a medal. It was the full, consistent expression of one's highest capability — in how you train, how you rest, how you show up unobserved. Eudaimonia, human flourishing, is built across thousands of decisions no one sees. Build the person, and the results follow. Your pursuit is not a season. It is a standard.</div>
-        <div class="school-figures">Aristotle · the Hellenic tradition</div>
-      </div>
-    </div>
-    <div style="margin-top:30px;text-align:center;"><button class="btn-ghost" onclick="goTo('blog')">Read these worked out in full — the Dispatches →</button></div>
-  </section>
-
   <section class="sec">
     <div class="sec-kicker">Institutional Commitments</div>
     <div class="sec-title">Four <em>premises</em> that<br>define the practice.</div>
@@ -860,7 +715,7 @@ expenditures with commensurate returns are permitted.</div></div>
   <section class="sec">
     <div class="sec-kicker">Methodology</div>
     <div class="sec-title">Six <em>principles</em><br>of programme construction.</div>
-    <p class="sec-lede">The mind is trained first; the body follows. But conviction is not a method — every programme produced by this institution is a
+    <p class="sec-lede">Every programme produced by this institution is a
  structured weekly training system resolved against a fixed set of 
 constraints. No session is delivered unless all constraints are 
 satisfied. The principles below are non-negotiable components of that 
@@ -944,7 +799,7 @@ accordingly, the degree of direct oversight that relationship requires.</p>
         <div class="level-period">Per month · No minimum term</div>
         <ul class="level-list">
           <li class="level-inc">Everything in Foundation</li>
-          <li class="level-inc">Monthly 45-minute review with Deus Performance</li>
+          <li class="level-inc">Monthly 45-minute review with Donum Dei Performance</li>
           <li class="level-inc">Weekly movement review via video submission</li>
           <li class="level-inc">Substitutions built for specific restrictions</li>
           <li class="level-inc">In-cycle programme adjustments between rebuilds</li>
@@ -982,7 +837,6 @@ accordingly, the degree of direct oversight that relationship requires.</p>
     <div class="sec-kicker">Reference</div>
     <div class="sec-title">Common <em>questions</em><br>on the practice.</div>
     <div class="faq-list">
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What does philosophy have to do with training?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Everything that a training plan alone cannot reach. The mechanical problems of programming — load, volume, recovery — are solved. The problems that actually stall athletes are not mechanical: governing what you cannot control, sustaining effort without motivation, performing without forcing, holding a standard no one is watching. The Stoics, existentialists, and Eastern traditions worked these out over two thousand years. The methodology is physical; the framework beneath it is not. The Dispatches set out the connection in full.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What distinguishes this institution from a generic coaching application?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Generic applications produce templates. This institution produces programmes through a two-stage process: an assessment engine first classifies the practitioner's training state, producing a structured directive — training phase, fatigue index, progression direction, movement priorities. That directive is then used to construct the sessions. No two intake profiles produce the same output.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Is access to a training facility required?</span><span class="faq-q-icon">+</span></div><div class="faq-a">No.
  The intake captures equipment context — full facility, dumbbells only, 
@@ -1010,11 +864,11 @@ shorter horizons, and the Stewardship level is designed specifically for
  long-horizon development. After the initial period, engagement 
 continues month to month or transitions to a lower level.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Does this institution provide medical or rehabilitation advice?</span><span class="faq-q-icon">+</span></div><div class="faq-a">No.
- Deus Performance is a practice of performance education. It does 
+ Donum Dei Performance is a practice of performance education. It does 
 not constitute medical advice, rehabilitation guidance, or clinical 
 counsel of any kind. Practitioners with active medical conditions should
  consult a licensed clinician before enrolling in any programme.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Who administers the programme?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Deus Performance operates as an independent practice. All programme 
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Who administers the programme?</span><span class="faq-q-icon">+</span></div><div class="faq-a">Donum Dei Performance operates as an independent practice. All programme 
 delivery, correspondence, and review is handled through the institution.
  For any enquiry outside the scope of this reference, use the 
 Correspondence page.</div></div>
@@ -1032,7 +886,7 @@ any matter that falls outside the intake process. All correspondence is
 reviewed within one business day.</p>
     <div class="corr-grid">
       <div class="ci">
-        <div class="ci-row"><div class="ci-label">Address</div><div class="ci-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c1f1312081d1f083c18131209111819090f521f1311">[email&#160;protected]</a></div><div class="ci-desc">Direct correspondence. No automated routing.</div></div>
+        <div class="ci-row"><div class="ci-label">Address</div><div class="ci-value">contact@donumdeiperformance.com</div><div class="ci-desc">Direct correspondence. No automated routing.</div></div>
         <div class="ci-row"><div class="ci-label">Format</div><div class="ci-value">Remote · In-person (select locations)</div><div class="ci-desc">In-person engagement available for Stewardship practitioners.</div></div>
         <div class="ci-row"><div class="ci-label">Response window</div><div class=”ci-value”>Monday – Friday · 09:00 – 18:00</div><div class="ci-desc">Stewardship practitioners: urgent matters are addressed outside these hours.</div></div>
       </div>
@@ -1060,31 +914,11 @@ reviewed within one business day.</p>
   </section>
 </div>
 
-<!-- DISPATCHES (BLOG) -->
-<div id="page-blog" class="page">
-  <section class="sec">
-    <div class="sec-kicker">Dispatches</div>
-    <div class="sec-title">Commentary on mind<br><em>and</em> practice.</div>
-    <p class="sec-lede">The doctrine, worked out one idea at a time. Each dispatch takes a single principle from the philosophical foundation and follows it into the training hall — where the abstraction either holds or it does not.</p>
-    <div id="dispatch-body"></div>
-  </section>
-</div>
-
-<!-- DISPATCH — POST READER -->
-<div id="page-post" class="page">
-  <section class="sec">
-    <div class="post-wrap">
-      <button class="post-back" onclick="goTo('blog')">← All Dispatches</button>
-      <div id="post-body-wrap"></div>
-    </div>
-  </section>
-</div>
-
 <!-- INTAKE -->
 <div id="page-intake" class="page">
   <div class="intake-layout">
     <div class="intake-sidebar">
-      <div class="intake-wordmark"><em>Deus</em> <strong>Performance</strong></div>
+      <div class="intake-wordmark"><em>Donum Dei</em> <strong>Performance</strong></div>
       <div class="intake-sub">practitioner intake</div>
       <div class="steps-list">
         <div class="step-item done" id="step-nav-1"><div class="step-circle">✓</div><div><div class="step-title">Profile</div><div class="step-sub">Metrics &amp; training age</div></div></div>
@@ -1145,7 +979,7 @@ reviewed within one business day.</p>
 <!-- GENERATING -->
 <div id="page-generating" class="page">
   <div class="gen-inner">
-    <div class="gen-wordmark"><em>Deus</em> <strong>Performance</strong></div>
+    <div class="gen-wordmark"><em>Donum Dei</em> <strong>Performance</strong></div>
     <div class="gen-sub">constructing programme</div>
     <div class="gen-title">Building Your Programme</div>
     <div class="gen-msg" id="gen-msg">Assembling sessions from directives...</div>
@@ -1165,7 +999,7 @@ reviewed within one business day.</p>
 <div id="page-program" class="page">
   <div class="program-header">
     <div>
-      <div class="ph-kicker">Programme · Deus Performance</div>
+      <div class="ph-kicker">Programme · Donum Dei Performance</div>
       <div class="ph-name" id="ph-name">Advanced · Work Capacity</div>
       <div class="ph-meta" id="ph-meta"><span class="ph-tag">4×/week</span><span class="ph-tag">60 min</span><span class="ph-tag">170 lbs</span><span class="ph-tag accent">Fatigue: moderate</span><span class="ph-tag" style="border-color:var(--accent)44;color:var(--accent);">// PROGRESS</span></div>
     </div>
@@ -1179,12 +1013,11 @@ reviewed within one business day.</p>
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-doctrine">deus · the gift of God</div>
+    <div class="footer-doctrine">donum dei · the gift of God</div>
     <nav class="footer-nav">
       <button class="fnl" onclick="goTo('philosophy')">Philosophy</button>
       <button class="fnl" onclick="goTo('methodology')">Methodology</button>
       <button class="fnl" onclick="goTo('curriculum')">Curriculum</button>
-      <button class="fnl" onclick="goTo('blog')">Dispatches</button>
       <button class="fnl" onclick="goTo('reference')">Reference</button>
       <button class="fnl" onclick="goTo('correspondence')">Correspondence</button>
       <button class="fnl" onclick="startIntake()">Assessment</button>
@@ -1192,7 +1025,7 @@ reviewed within one business day.</p>
     <div class="footer-legal">
       © <span id="footer-year">2026</span> Riz Management. All rights 
 reserved. &nbsp;·&nbsp;
-      Deus Performance is a practice of performance education. It 
+      Donum Dei Performance is a practice of performance education. It 
 does not constitute medical, rehabilitation, or clinical advice of any 
 kind. Consult a licensed clinician before beginning any new training 
 programme. &nbsp;·&nbsp;
@@ -1202,9 +1035,9 @@ programme. &nbsp;·&nbsp;
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ============================================================
-   DEUS DP — TIERED DECISION LOGIC ENGINE
+   DONUM DEI DDP — TIERED DECISION LOGIC ENGINE
    Architecture per Redesign Guide:
    
    LAYER 1 — Assessment Engine
@@ -1229,8 +1062,8 @@ programme. &nbsp;·&nbsp;
    ============================================================ */
 
 const CONFIG = {
-  assessEndpoint:  window.DEUS_ASSESS_ENDPOINT  || null,
-  programEndpoint: window.DEUS_PROGRAM_ENDPOINT || null,
+  assessEndpoint:  window.DONUM_DEI_ASSESS_ENDPOINT  || null,
+  programEndpoint: window.DONUM_DEI_PROGRAM_ENDPOINT || null,
   assessModel:     'claude-opus-4-5',
   programModel:    'claude-sonnet-4-20250514',
   maxTokens:       3000
@@ -1245,7 +1078,6 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   window.scrollTo(0,0);
   document.getElementById('nav-links').classList.remove('show');
-  if(id==='blog') renderDispatches();
 }
 function goTo(id){showPage(id);}
 function startIntake(){currentStep=1;selectedDays=[];selectedBusyDays=[];secondaryGoals=[];injuries=[];fatigueScore=null;resetForm();showPage('intake');updateStepUI();}
@@ -1253,168 +1085,6 @@ if(!document.querySelector('.page.active')) showPage('landing');
 function selectTier(t){goTo('correspondence');setTimeout(()=>{const s=document.getElementById('cf-type');if(s)s.value=t;document.getElementById('cf-msg').focus();},80);}
 function toggleFaq(el){el.parentElement.classList.toggle('open');}
 function submitContact(e){e.preventDefault();const s=document.getElementById('cf-success');s.classList.add('show');setTimeout(()=>{e.target.reset();s.classList.remove('show');},4500);}
-
-/* --- DISPATCHES (BLOG) --- */
-const DISPATCHES = [
-  {
-    school: 'Stoicism · Epictetus', thinker: 'after Epictetus',
-    tag: 'The Dichotomy of Control',
-    title: 'You are keeping the wrong', titleEm: 'scoreboard.',
-    dek: 'The single division the Stoics built a discipline on — and the only game an athlete can actually win.',
-    quote: 'Master the input. Release the outcome. That is not weakness — it is the only game you can win.',
-    read: '4 min',
-    body: [
-      'The result is not yours to own. The time on the clock, the place on the podium, whether the room clapped — none of it sits inside your hands. Epictetus, born a slave, built an entire philosophy on this one division: some things are up to us, and most things are not. Confuse the two and you suffer. Separate them cleanly and you are free.',
-      'For the athlete the line is unusually sharp. You do not control the conditions, the draw, the judging, the weather, or the body your opponent woke up in. You control the rep you did not skip. The breath you governed under load. The standard you held in the session no one watched. That is the whole of your jurisdiction — and it is enough.',
-      'This is not resignation. The Stoic trains harder than anyone, precisely because effort is the one province fully under command. What he refuses is to stake his peace on a verdict delivered by forces outside himself. He pours everything into the input and then, having done so, lets the outcome be what it will be.',
-      'Most athletes invert this. They obsess over the result they cannot touch and grow careless with the inputs they can. They are anxious about the scoreboard and casual about the warm-up. The dispatch from antiquity is to reverse it: be ruthless about what is yours, and indifferent to what is not.'
-    ],
-    cta: 'A programme built around inputs you control — your schedule, your state, your constraints.'
-  },
-  {
-    school: 'Stoicism · Marcus Aurelius', thinker: 'after Marcus Aurelius',
-    tag: 'The Obstacle Is the Way',
-    title: 'The thing blocking you', titleEm: 'is the path.',
-    dek: 'Marcus Aurelius did not tolerate adversity. He understood it as the work itself.',
-    quote: 'The obstacle does not stand in the way of the work. The obstacle is the work.',
-    read: '4 min',
-    body: [
-      'An emperor at the head of a collapsing frontier, Marcus Aurelius wrote a private note to himself that has outlived his empire: the impediment to action advances action. What stands in the way becomes the way. He did not merely endure obstacles. He recognised them as the material from which everything worth having is made.',
-      'The athlete meets this constantly and usually misreads it. The injury that forces a rebuild of your mechanics. The plateau that demands you abandon an approach you were attached to. The loss that strips away a confidence that was never earned. Each of these feels like an interruption to the training. Each of them is the training.',
-      'There is no version of progress that routes around difficulty — difficulty is the medium progress moves through. The wall is not evidence that you took a wrong turn. It is the precise location where adaptation is available, if you are willing to treat it as a problem to be worked rather than a fate to be lamented.',
-      'The athletes who last are not the ones who found a path without obstacles. They are the ones who stopped trying to. They learned to ask a different question at the wall — not "how do I get around this," but "what is this here to build."'
-    ],
-    cta: 'Restrictions are not exclusions from the work. The methodology routes them into it.'
-  },
-  {
-    school: 'Existentialism · Nietzsche', thinker: 'after Friedrich Nietzsche',
-    tag: 'Amor Fati',
-    title: 'What if the grind', titleEm: 'was the point?',
-    dek: 'Nietzsche asked for more than endurance. He asked you to love the fate that forges you.',
-    quote: 'Not to tolerate it. Not to endure it. To love it. The athlete who loves the grind never runs out of reason to show up.',
-    read: '3 min',
-    body: [
-      'Everyone wants the result — the time, the title, the transformation. Nietzsche proposed something far more demanding and far more durable. Amor fati: love of fate. Not a grim acceptance of what befalls you, but an active embrace of all of it, especially the hard parts.',
-      'For the athlete that means the five a.m. sessions no one will ever see. The plateaus that try your patience until it frays. The setbacks that walk in uninvited and expose exactly what your character is made of. The instruction is not to grit your teeth through these. It is to want them — to recognise them as inseparable from the life you claim to be choosing.',
-      'This is the difference between motivation and something sturdier. Motivation is a feeling that comes and goes, and the athlete who waits for it has outsourced their performance to a mood. The one who has learned to love the work itself has removed the feeling from the equation entirely. There is always a reason to show up, because showing up is the thing being loved.',
-      'You do not get to keep only the triumphant parts of a pursuit. You take the whole of it or none of it. Amor fati is the decision to take the whole of it — and to find, in the taking, that the grind was never the price of the prize. It was the prize.'
-    ],
-    cta: 'Build a practice you can return to on the days the feeling does not come.'
-  },
-  {
-    school: 'Eastern Philosophy · Taoism', thinker: 'after Laozi',
-    tag: 'Wu Wei',
-    title: 'You are trying so hard', titleEm: "it's working against you.",
-    dek: 'The Taoist principle of effortless action — and why you cannot grip your way to a personal best.',
-    quote: 'Trust the training. Release the result. That is wu wei.',
-    read: '3 min',
-    body: [
-      'There is a Taoist principle called wu wei — usually rendered as "effortless action," which makes it sound passive. It is not. Wu wei is what happens when training has run so deep that execution stops being a decision. The action arrives on its own, without the interference of a mind straining to direct it.',
-      'You have seen it: the athlete who looks as though they are barely trying. They did not get the event easier. They got themselves deeper. The mechanics have been drilled below the level of conscious control, and what remains looks like ease because, in a sense, it is — the effort was all spent earlier, in the hall, on the days that did not count.',
-      'Forcing creates tension. Tension creates error. Error destroys performance. The harder you grip in the moment that matters, the more certainly you tighten the very system you are asking to move freely. You cannot will your way to a personal best by clenching. The clench is the obstacle.',
-      'This is why the practice is built to be repeated until it disappears. The work of training is to make trust possible — to earn, through thousands of unglamorous repetitions, the right to let go on the day and allow the result to come. Trust the training. Release the result. That is wu wei.'
-    ],
-    cta: 'Drilled patterns, calibrated to your state, until execution stops being a decision.'
-  },
-  {
-    school: 'Greek Virtue Ethics · Aristotle', thinker: 'after the Hellenic tradition',
-    tag: 'Arete',
-    title: 'Excellence is not a trophy.', titleEm: '',
-    dek: 'The Greeks had a word for excellence — and it described a way of moving through the world, not a result.',
-    quote: 'Your pursuit is not a season. It is a standard. And standards do not come off when the competition ends.',
-    read: '4 min',
-    body: [
-      'The ancient Greeks had a word: arete. It is usually translated as "excellence," and that translation misses almost everything. Arete was not a result. It was not a medal or a milestone or a number on a board. It was a way of being — the full, consistent expression of your highest capability, in every moment, not only the ones that are scored in public.',
-      'The Greek who embodied arete was not excellent only in the arena. He was excellent in how he trained, how he recovered, how he conducted himself when there was no audience and no consequence. Excellence was not something he produced on demand. It was something he was, continuously, whether or not anyone was there to certify it.',
-      'For the modern athlete this is a quietly radical demand. It moves the standard off the competition calendar and into the ordinary day. The quality of your warm-up. The honesty of your last set. The decision to do the unglamorous thing correctly when cutting the corner would cost you nothing visible. These are not preparation for the test. They are the test.',
-      'Your athletic pursuit is not a season that opens and closes. It is a standard you carry. And a standard, unlike a result, does not come off when the competition ends — it is either who you are or it is a costume you put on for the occasion. Arete is the refusal to wear the costume.'
-    ],
-    cta: 'A standard held every session — built into the structure, not left to motivation.'
-  },
-  {
-    school: 'Stoicism · Seneca', thinker: 'after Seneca',
-    tag: 'Memento Mori',
-    title: 'Your prime has an', titleEm: 'expiration date.',
-    dek: 'The Stoics contemplated death daily — not morbidly, but as the sharpest instrument of focus they had.',
-    quote: 'Anxiety is panic. Urgency is clarity. One makes you spiral. The other makes you move.',
-    read: '4 min',
-    body: [
-      'The Stoics kept a practice that sounds dark until you understand its purpose: memento mori, the daily contemplation of death. Not to dwell in dread, but to sharpen attention. A thing you might lose at any moment is a thing you stop wasting. Mortality, held in view, is the most honest accountant of how you spend a day.',
-      'The athlete has a smaller, sharper version of this clock. You have a finite number of seasons. A finite number of mornings on which the body answers the way it should. A finite number of repetitions available at full capacity. None of it is renewable, and most of it is spent before anyone realises it was being spent.',
-      'Most athletes pass their best years in a comfortable fog — distracted, inconsistent, certain there will be time to get serious later. Then they look up and the window has quietly closed, and the regret is not about the sessions that were hard but the ones that were never attempted.',
-      'The correction is urgency, and urgency must be distinguished from anxiety. Anxiety is panic about an outcome you cannot control; it makes you spiral. Urgency is clarity about a window that is closing; it makes you move. Train as though this window were closing — because it is — and the fog burns off on its own.'
-    ],
-    cta: 'Stop deferring. A programme built around where you actually are, starting now.'
-  },
-  {
-    school: 'Greek Virtue Ethics · Aristotle', thinker: 'after Aristotle',
-    tag: 'Eudaimonia',
-    title: 'The goal was never', titleEm: 'the trophy.',
-    dek: "Aristotle's idea of flourishing is built across thousands of decisions no one sees. Build the person; the results follow.",
-    quote: 'The goal was never the trophy. The goal was to become someone who deserved it.',
-    read: '3 min',
-    body: [
-      'Aristotle gave us eudaimonia — usually translated as "happiness," though "flourishing" is closer. It is not a feeling and not a moment. It is the condition of a life lived fully in accordance with its highest capacities, realised over time. Crucially, it is not achieved the instant you win. It is built across thousands of decisions no one will ever see.',
-      'This reframes the entire project. Chasing results while neglecting the person who has to produce them is a trap that closes slowly. You can optimise for the outcome and arrive at it hollow, having become someone who got the trophy without becoming someone who could carry it. The win exposes the gap rather than filling it.',
-      'The alternative is to build the person. Make the decisions — in training, in recovery, in conduct — that compound into a particular kind of character, and let the results arrive as a byproduct of who you have become rather than as a substitute for it. The athlete who is built this way does not collapse when a result fails to come, because the result was never the point.',
-      'The goal, in the end, was never the trophy. The goal was to become someone who deserved it — and that person, once built, does not depend on the trophy to confirm it. Ask of today not what it wins you, but what it builds in you.'
-    ],
-    cta: 'Build the athlete you are becoming — one structured decision at a time.'
-  }
-];
-
-function renderDispatches(){
-  const c = document.getElementById('dispatch-body');
-  if(!c || c.dataset.rendered) return;
-  const lead = DISPATCHES[0];
-  let html = '<div class="dispatch-lead" onclick="openPost(0)">'+
-    '<div class="dl-left"><span class="dl-featured">Featured Dispatch</span>'+
-    '<div class="dl-tag">'+lead.tag+'</div>'+
-    '<div class="dl-title">'+lead.title+' <em>'+lead.titleEm+'</em></div>'+
-    '<div class="dl-dek">'+lead.dek+'</div></div>'+
-    '<div class="dl-right"><div class="dl-quote">\u201C'+lead.quote+'\u201D</div>'+
-    '<div class="dl-meta">'+lead.school+'  ·  '+lead.read+'</div>'+
-    '<div class="dl-read">Read the dispatch →</div></div></div>';
-  html += '<div class="dispatch-list">';
-  for(let i=1;i<DISPATCHES.length;i++){
-    const p = DISPATCHES[i];
-    const n = String(i+1).padStart(2,'0');
-    html += '<div class="dispatch-item" onclick="openPost('+i+')">'+
-      '<div class="di-num">'+n+'</div>'+
-      '<div><div class="di-tag">'+p.tag+'</div>'+
-      '<div class="di-title">'+p.title+(p.titleEm?' '+p.titleEm:'')+'</div>'+
-      '<div class="di-dek">'+p.dek+'</div></div>'+
-      '<div class="di-right"><div class="di-thinker">'+p.thinker+'</div>'+
-      '<div class="di-read">'+p.read+' · Read →</div></div></div>';
-  }
-  html += '</div>';
-  c.innerHTML = html;
-  c.dataset.rendered = '1';
-}
-
-function openPost(i){
-  const p = DISPATCHES[i];
-  const w = document.getElementById('post-body-wrap');
-  const prev = i>0 ? DISPATCHES[i-1] : null;
-  const next = i<DISPATCHES.length-1 ? DISPATCHES[i+1] : null;
-  let body = '';
-  p.body.forEach((para,idx)=>{ body += '<p'+(idx===0?' class="lead-cap"':'')+'>'+para+'</p>'; if(idx===0){ body += '<div class="post-pull">\u201C'+p.quote+'\u201D</div>'; } });
-  let nav = '<div class="post-nav">';
-  nav += prev ? '<button onclick="openPost('+(i-1)+')"><span class="pn-dir">← Previous</span>'+prev.tag+'</button>' : '<span></span>';
-  nav += next ? '<button onclick="openPost('+(i+1)+')"><span class="pn-dir">Next →</span>'+next.tag+'</button>' : '<span></span>';
-  nav += '</div>';
-  w.innerHTML =
-    '<div class="post-tag">'+p.tag+'</div>'+
-    '<h1 class="post-title">'+p.title+(p.titleEm?' <em>'+p.titleEm+'</em>':'')+'</h1>'+
-    '<div class="post-dek">'+p.dek+'</div>'+
-    '<div class="post-byline">'+p.school+'  ·  '+p.thinker+'  ·  '+p.read+' read</div>'+
-    '<div class="post-body">'+body+'</div>'+
-    '<div class="post-divider"></div>'+
-    '<div class="post-foot"><div class="post-cta"><div class="post-cta-text">'+p.cta+'</div>'+
-    '<button class="btn-primary" onclick="startIntake()">Begin the Assessment</button></div>'+
-    nav+'</div>';
-  showPage('post');
-}
 
 /* --- HIERARCHY ANIMATION --- */
 const orderObs=new IntersectionObserver(entries=>{entries.forEach(x=>{if(x.isIntersecting)document.querySelectorAll('.osv-fill').forEach(b=>{b.style.width=b.dataset.w;});});},{threshold:.3});

@@ -1,9 +1,9 @@
 """Assessment Layer — deterministic abstractions, not workouts."""
 
 from conftest import make_request
-from deus_api.engine.assessment import assess
-from deus_api.engine.athlete_state import load_or_init
-from deus_api.models.assessment import TrainingAssessment
+from donum_dei_api.engine.assessment import assess
+from donum_dei_api.engine.athlete_state import load_or_init
+from donum_dei_api.models.assessment import TrainingAssessment
 
 
 def _assess(library, **kw):

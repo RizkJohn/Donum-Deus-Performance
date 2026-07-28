@@ -1,0 +1,342 @@
+{
+  "name": "DDP — 10 Stripe Billing Lifecycle → Clients",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["checkout.session.completed", "invoice.payment_failed", "customer.subscription.deleted"]
+      },
+      "id": "n1-trigger",
+      "name": "Stripe Events",
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "webhookId": "ddp-stripe",
+      "credentials": { "stripeApi": { "id": "REPLACE_ME_STRIPE", "name": "Stripe API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Native Stripe Trigger already verified the signature. Normalize to a common shape.\nconst ev = $json;\nconst t = ev.type;\nconst o = (ev.data && ev.data.object) || {};\nlet route = 'ignore', email = null, customerId = o.customer || null, subscriptionId = null, tier = null, amount = null;\nif (t === 'checkout.session.completed') {\n  route = 'converted';\n  email = (o.customer_details && o.customer_details.email) || o.customer_email || null;\n  subscriptionId = o.subscription || null;\n  tier = (o.metadata && o.metadata.tier) || null;\n  amount = typeof o.amount_total === 'number' ? o.amount_total / 100 : null;\n} else if (t === 'invoice.payment_failed') {\n  route = 'payment_failed';\n  email = o.customer_email || null;\n} else if (t === 'customer.subscription.deleted') {\n  route = 'churned';\n  tier = (o.metadata && o.metadata.tier) || null;\n}\nconst tierName = tier ? (tier.charAt(0).toUpperCase() + tier.slice(1)) : null;\nreturn [{ json: { route, email, customerId, subscriptionId, tier: tierName, amount, rawType: t } }];"
+      },
+      "id": "n2-normalize",
+      "name": "Normalize Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [ { "leftValue": "={{ $json.route }}", "rightValue": "converted", "operator": { "type": "string", "operation": "equals" } } ], "combinator": "and" }, "renameOutput": true, "outputKey": "converted" },
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [ { "leftValue": "={{ $json.route }}", "rightValue": "payment_failed", "operator": { "type": "string", "operation": "equals" } } ], "combinator": "and" }, "renameOutput": true, "outputKey": "payment_failed" },
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [ { "leftValue": "={{ $json.route }}", "rightValue": "churned", "operator": { "type": "string", "operation": "equals" } } ], "combinator": "and" }, "renameOutput": true, "outputKey": "churned" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n3-route",
+      "name": "Route by Event",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { property: 'Email', email: { equals: $json.email } }, page_size: 1 }) }}",
+        "options": {}
+      },
+      "id": "n4-findclient",
+      "name": "Find Client by Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, -200],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ev = $('Normalize Event').first().json;\nconst res = $input.first().json;\nconst page = (res.results || [])[0];\nreturn [{ json: { ...ev, clientPageId: page ? page.id : null, today: new Date().toISOString().slice(0, 10) } }];"
+      },
+      "id": "n5-decide",
+      "name": "Decide Create or Patch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, -200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [ { "leftValue": "={{ $json.clientPageId }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty", "singleValue": true } } ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n6-exists",
+      "name": "Client Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1100, -200]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.clientPageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: Object.assign({ 'Status': { select: { name: 'Active' } }, 'Stripe Customer ID': { rich_text: [{ text: { content: String($json.customerId || '') } }] } }, $json.tier ? { 'Tier': { select: { name: $json.tier } } } : {}) }) }}",
+        "options": {}
+      },
+      "id": "n7-patch",
+      "name": "Reactivate Client",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -300],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '8880de55-6bcb-4b72-a9a1-3932a1f774f8' }, properties: Object.assign({ 'Name': { title: [{ text: { content: $json.email.split('@')[0] } }] }, 'Email': { email: $json.email }, 'Status': { select: { name: 'Active' } }, 'Start Date': { date: { start: $json.today } }, 'Fatigue Flag': { select: { name: 'low' } }, 'Stripe Customer ID': { rich_text: [{ text: { content: String($json.customerId || '') } }] } }, $json.tier ? { 'Tier': { select: { name: $json.tier } } } : {}) }) }}",
+        "options": {}
+      },
+      "id": "n8-create",
+      "name": "Create Client",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -120],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.N8N_WEBHOOK_BASE || 'http://localhost:5678') + '/webhook/ddp-onboard' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $('Decide Create or Patch').item.json.email, name: $('Decide Create or Patch').item.json.email.split('@')[0], tier: $('Decide Create or Patch').item.json.tier || 'Foundation' }) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "id": "n9-onboard",
+      "name": "Kick Onboarding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, -200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Client converted: ' + $('Decide Create or Patch').item.json.email + ($('Decide Create or Patch').item.json.tier ? ' (' + $('Decide Create or Patch').item.json.tier + ')' : '') } }] }, 'Workflow': { select: { name: 'program-generation' } }, 'Status': { select: { name: 'success' } }, 'Detail': { rich_text: [{ text: { content: 'Stripe checkout completed. Onboarding kicked.' } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n10-logconv",
+      "name": "Log Conversion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, -200],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'A payment needs your attention — Donum Dei Performance', text: 'A scheduled payment for your membership did not go through.\\n\\nNo access has been interrupted yet. Update your card here and the matter closes itself:\\n' + ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/dashboard\\n\\nIf something has changed and you would rather pause or step away, reply to this email — it reaches the practice directly.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n11-dunning",
+      "name": "Dunning Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 40],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Payment failed: ' + $('Normalize Event').item.json.email } }] }, 'Workflow': { select: { name: 'program-generation' } }, 'Status': { select: { name: 'needs attention' } }, 'Detail': { rich_text: [{ text: { content: 'Stripe invoice.payment_failed. Dunning email sent.' } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n12-logdun",
+      "name": "Log Dunning",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 40],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { property: 'Stripe Customer ID', rich_text: { equals: String($json.customerId || 'none') } }, page_size: 1 }) }}",
+        "options": {}
+      },
+      "id": "n13-findchurn",
+      "name": "Find Client by Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 260],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ev = $('Normalize Event').first().json;\nconst page = ($input.first().json.results || [])[0];\nif (!page) { return [{ json: { ...ev, clientPageId: null, email: null } }]; }\nreturn [{ json: { ...ev, clientPageId: page.id, email: page.properties?.Email?.email || null } }];"
+      },
+      "id": "n14-extractchurn",
+      "name": "Extract Churn Target",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 260]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [ { "leftValue": "={{ $json.clientPageId }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty", "singleValue": true } } ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n15-ifchurn",
+      "name": "Churn Client Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1100, 260]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.clientPageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"properties\": {\"Status\": {\"select\": {\"name\": \"Churned\"}}}}",
+        "options": {}
+      },
+      "id": "n16-markchurn",
+      "name": "Mark Churned",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 180],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'The door stays open — Donum Dei Performance', text: 'Your membership has ended, and that is entirely yours to decide.\\n\\nThe body does not stop being a gift because a subscription lapsed. When you want structure again — the same constraint-driven programming, the same standard — the practice will be here, and your history is kept.\\n\\nReturn whenever it serves you: ' + ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/curriculum\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n17-winback",
+      "name": "Win-back Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 180],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: 'Client churned: ' + ($('Extract Churn Target').item.json.email || $('Normalize Event').item.json.customerId) } }] }, 'Workflow': { select: { name: 'program-generation' } }, 'Status': { select: { name: 'needs attention' } }, 'Detail': { rich_text: [{ text: { content: 'Stripe subscription deleted. Win-back email sent.' } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n18-logchurn",
+      "name": "Log Churn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 180],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Stripe Events": { "main": [[{ "node": "Normalize Event", "type": "main", "index": 0 }]] },
+    "Normalize Event": { "main": [[{ "node": "Route by Event", "type": "main", "index": 0 }]] },
+    "Route by Event": {
+      "main": [
+        [{ "node": "Find Client by Email", "type": "main", "index": 0 }],
+        [{ "node": "Dunning Email", "type": "main", "index": 0 }],
+        [{ "node": "Find Client by Customer", "type": "main", "index": 0 }]
+      ]
+    },
+    "Find Client by Email": { "main": [[{ "node": "Decide Create or Patch", "type": "main", "index": 0 }]] },
+    "Decide Create or Patch": { "main": [[{ "node": "Client Exists?", "type": "main", "index": 0 }]] },
+    "Client Exists?": {
+      "main": [
+        [{ "node": "Reactivate Client", "type": "main", "index": 0 }],
+        [{ "node": "Create Client", "type": "main", "index": 0 }]
+      ]
+    },
+    "Reactivate Client": { "main": [[{ "node": "Kick Onboarding", "type": "main", "index": 0 }]] },
+    "Create Client": { "main": [[{ "node": "Kick Onboarding", "type": "main", "index": 0 }]] },
+    "Kick Onboarding": { "main": [[{ "node": "Log Conversion", "type": "main", "index": 0 }]] },
+    "Dunning Email": { "main": [[{ "node": "Log Dunning", "type": "main", "index": 0 }]] },
+    "Find Client by Customer": { "main": [[{ "node": "Extract Churn Target", "type": "main", "index": 0 }]] },
+    "Extract Churn Target": { "main": [[{ "node": "Churn Client Found?", "type": "main", "index": 0 }]] },
+    "Churn Client Found?": {
+      "main": [
+        [{ "node": "Mark Churned", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Mark Churned": { "main": [[{ "node": "Win-back Email", "type": "main", "index": 0 }]] },
+    "Win-back Email": { "main": [[{ "node": "Log Churn", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

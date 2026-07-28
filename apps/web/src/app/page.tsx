@@ -9,7 +9,7 @@ import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Deus Performance — A Practice of Physical Stewardship",
+  title: "Donum Dei Performance — A Practice of Physical Stewardship",
   description:
     "A philosophy-driven training practice grounded in joint integrity, movement quality, and the long-term development of human capacity. The body is a gift. Train it accordingly.",
 };

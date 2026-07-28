@@ -1,0 +1,203 @@
+{
+  "name": "DDP — 07 Q&A Autoresponder (human-approved)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ddp-question",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n1-webhook",
+      "name": "Question Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, -140],
+      "webhookId": "ddp-question"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expected body: { email, subject?, message, channel? }\nconst b = $input.first().json.body ?? $input.first().json;\nif (!b.email || !b.message) { throw new Error('Question missing email or message'); }\nconst channels = ['Correspondence Form', 'Email', 'Instagram DM', 'Other'];\nreturn [{ json: {\n  email: String(b.email).trim().toLowerCase(),\n  subject: (b.subject || 'Correspondence').slice(0, 200),\n  message: String(b.message).slice(0, 4000),\n  channel: channels.includes(b.channel) ? b.channel : 'Correspondence Form'\n} }];"
+      },
+      "id": "n2-normalize",
+      "name": "Normalize Question",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, -140]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $env.DDP_CLAUDE_MODEL || 'claude-sonnet-5', max_tokens: 1500, system: 'You draft replies for Donum Dei Performance, a constraint-driven adaptive training practice (Riz Management LLC). Voice: precise, disciplined, courteous, no hype, no emojis. Scope you may answer: how the practice works (2-minute assessment builds a complete weekly program governed by hard rules — CNS load limits, movement coverage, fixed block order, 1-3 reps in reserve on primary lifts), the three tiers (Foundation $20/mo, Practice $120/mo, Stewardship $240/mo), scheduling, equipment and injury substitutions (fixed substitution map preserving movement pattern and CNS cost), and the philosophy (Stoicism, virtue ethics, the body as a gift). HARD RULES: never give medical, rehabilitation, or clinical advice — refer to a licensed clinician; never promise outcomes; never invent policies, prices, or features not listed here; billing disputes, refunds, legal matters, medical questions, and complaints always require a human. Output strict JSON only.', messages: [{ role: 'user', content: 'Question from ' + $json.email + ' via ' + $json.channel + ':\\n\\n' + $json.message + '\\n\\nRespond with STRICT JSON only: {\"answer\": \"the reply email body, plain text, sign off as Donum Dei Performance\", \"needs_human\": true|false, \"reason\": \"one line on why a human is or is not needed\"}' }] }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "n3-draft",
+      "name": "Claude: Draft Answer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, -140],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_ANTHROPIC", "name": "Anthropic (x-api-key)" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = $('Normalize Question').first().json;\nconst text = ($input.first().json.content?.[0]?.text) || '{}';\nconst match = text.match(/\\{[\\s\\S]*\\}/);\nlet out = { answer: '', needs_human: true, reason: 'parse failure' };\ntry { out = { ...out, ...JSON.parse(match ? match[0] : text) }; } catch (e) { /* keep needs_human */ }\nif (!out.answer || out.answer.length < 20) { out.needs_human = true; out.reason = out.reason || 'empty answer'; }\nconst chunks = [];\nconst a = String(out.answer || '');\nfor (let i = 0; i < a.length && chunks.length < 90; i += 1900) { chunks.push({ text: { content: a.slice(i, i + 1900) } }); }\nreturn [{ json: { ...q, answerChunks: chunks, needsHuman: Boolean(out.needs_human), reason: String(out.reason || '') } }];"
+      },
+      "id": "n4-parse",
+      "name": "Parse Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, -140]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '8646ee02-f6f2-439d-95f7-5d59fd297d2f' }, properties: { 'Subject': { title: [{ text: { content: $json.subject } }] }, 'From Email': { email: $json.email }, 'Channel': { select: { name: $json.channel } }, 'Question': { rich_text: [{ text: { content: $json.message.slice(0, 1900) } }] }, 'Draft Answer': { rich_text: $json.answerChunks }, 'Status': { select: { name: $json.needsHuman ? 'Needs Human' : 'Drafted' } } } }) }}",
+        "options": {}
+      },
+      "id": "n5-inbox",
+      "name": "File in Q&A Inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -140],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: ($('Parse Draft').item.json.needsHuman ? 'NEEDS HUMAN: ' : 'Draft ready: ') + $('Parse Draft').item.json.subject, text: 'From: ' + $('Parse Draft').item.json.email + '\\nWhy: ' + $('Parse Draft').item.json.reason + '\\n\\nQuestion:\\n' + $('Parse Draft').item.json.message + '\\n\\nA draft reply is in the Q&A Inbox. Edit if needed, then set Status = Approved — the dispatcher sends it within 15 minutes. Nothing sends without your approval.' }) }}",
+        "options": {}
+      },
+      "id": "n6-notify",
+      "name": "Notify Owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, -140],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": true, \"message\": \"Received. The practice will reply directly.\"}",
+        "options": {}
+      },
+      "id": "n7-respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, -140]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "minutes", "minutesInterval": 15 } ] }
+      },
+      "id": "n8-cron",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8646ee02-f6f2-439d-95f7-5d59fd297d2f/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\": {\"property\": \"Status\", \"select\": {\"equals\": \"Approved\"}}, \"page_size\": 20}",
+        "options": {}
+      },
+      "id": "n9-approved",
+      "name": "Fetch Approved Replies",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 160],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nreturn results.map(r => ({ json: {\n  pageId: r.id,\n  email: r.properties?.['From Email']?.email,\n  subject: r.properties?.Subject?.title?.[0]?.plain_text || 'Correspondence — Donum Dei Performance',\n  answer: (r.properties?.['Draft Answer']?.rich_text || []).map(t => t.plain_text).join('')\n} })).filter(i => i.json.email && i.json.answer);"
+      },
+      "id": "n10-split",
+      "name": "Each Approved Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$json.email], subject: 'Re: ' + $json.subject, text: $json.answer }) }}",
+        "options": {}
+      },
+      "id": "n11-send",
+      "name": "Send Approved Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 160],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"properties\": {\"Status\": {\"select\": {\"name\": \"Sent\"}}}}",
+        "options": {}
+      },
+      "id": "n12-marksent",
+      "name": "Mark Sent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 160],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    }
+  ],
+  "connections": {
+    "Question Webhook": { "main": [[{ "node": "Normalize Question", "type": "main", "index": 0 }]] },
+    "Normalize Question": { "main": [[{ "node": "Claude: Draft Answer", "type": "main", "index": 0 }]] },
+    "Claude: Draft Answer": { "main": [[{ "node": "Parse Draft", "type": "main", "index": 0 }]] },
+    "Parse Draft": { "main": [[{ "node": "File in Q&A Inbox", "type": "main", "index": 0 }]] },
+    "File in Q&A Inbox": { "main": [[{ "node": "Notify Owner", "type": "main", "index": 0 }]] },
+    "Notify Owner": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] },
+    "Every 15 Minutes": { "main": [[{ "node": "Fetch Approved Replies", "type": "main", "index": 0 }]] },
+    "Fetch Approved Replies": { "main": [[{ "node": "Each Approved Reply", "type": "main", "index": 0 }]] },
+    "Each Approved Reply": { "main": [[{ "node": "Send Approved Reply", "type": "main", "index": 0 }]] },
+    "Send Approved Reply": { "main": [[{ "node": "Mark Sent", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

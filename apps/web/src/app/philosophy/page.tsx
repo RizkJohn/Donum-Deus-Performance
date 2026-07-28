@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Philosophy — Deus Performance",
+  title: "Philosophy — Donum Dei Performance",
   description:
     "Why this institution exists. Performance education grounded in Stoicism, Existentialism, Eastern philosophy, and Greek Virtue Ethics.",
 };
@@ -101,16 +101,16 @@ export default function PhilosophyPage() {
             <div className="flex flex-col gap-[1px] bg-line max-w-[860px]">
               {[
                 {
-                  word: "corpus",
-                  pos: "Latin noun · neuter · third declension",
-                  meaning: "The body; a thing freely given without prior obligation",
+                  word: "donum",
+                  pos: "Latin noun · neuter · second declension · from Proto-Indo-European *deh₃- (to give)",
+                  meaning: "A gift; a thing freely given without prior obligation",
                   note: "The body is given freely. A gift carries a specific social weight — a gift received without reciprocal obligation nonetheless creates a debt of respect toward the giver's intention. To receive a gift and treat it carelessly is not neutrality. It is refusal.",
                 },
                 {
-                  word: "deus",
-                  pos: "Latin noun · masculine · second declension · from Proto-Indo-European *dyew-",
-                  meaning: "God; a divine being; the ultimate and originating source",
-                  note: "Root of English: deity, divine, divinity. Deus positions the source of the gift as categorically greater than both the gift and its recipient. The capacity you carry in your body was not constructed by you. It arrived through a process that exceeds your authorship.",
+                  word: "dei",
+                  pos: "Latin noun · masculine · genitive singular of deus · from Proto-Indo-European *dyew-",
+                  meaning: "Of God; of the divine and originating source",
+                  note: "Root of English: deity, divine, divinity. The genitive case marks origin and possession: the gift belongs to a source categorically greater than both the gift and its recipient. The capacity you carry in your body was not constructed by you. It arrived through a process that exceeds your authorship.",
                 },
               ].map((row) => (
                 <div
@@ -135,10 +135,10 @@ export default function PhilosophyPage() {
               ))}
               <div className="bg-bg2 px-[17px] py-[16px]">
                 <div className="font-play italic text-[20px] text-accent mb-[6px]">
-                  deus dedit
+                  donum dei
                 </div>
                 <div className="font-bask italic text-[13px] text-ink2 leading-[1.7] max-w-[620px]">
-                  God has given. A statement of origin that is also a statement
+                  The gift of God. A statement of origin that is also a statement
                   of responsibility. If the body is a gift of divine origin, then
                   how it is trained is a moral question, not merely a technical
                   one. This institution holds that the answer to that question is
@@ -172,7 +172,7 @@ export default function PhilosophyPage() {
               className="font-mono text-[8px] tracking-[0.22em] uppercase"
               style={{ color: "rgba(243,239,232,0.5)" }}
             >
-              Founding Premise · Deus Performance
+              Founding Premise · Donum Dei Performance
             </div>
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function PhilosophyPage() {
               <em className="text-warm">perform without forcing.</em>
             </p>
             <div className="font-mono text-[8px] tracking-[0.22em] uppercase text-ink3">
-              Core Thesis · Deus Performance
+              Core Thesis · Donum Dei Performance
             </div>
           </div>
         </div>

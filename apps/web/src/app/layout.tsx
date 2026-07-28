@@ -26,28 +26,28 @@ const baskerville = Libre_Baskerville({
   display: "swap",
 });
 
-const SITE_URL = "https://deusperformance.com";
+const SITE_URL = "https://donumdeiperformance.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Deus Performance — Adaptive Training Engine",
-    template: "%s — Deus Performance",
+    default: "Donum Dei Performance — Adaptive Training Engine",
+    template: "%s — Donum Dei Performance",
   },
   description:
     "Constraint-driven adaptive training. A two-minute assessment becomes a complete, CNS-managed weekly program — built by an engine, governed by hard rules. The body is a gift. Train it accordingly.",
   openGraph: {
-    title: "Deus Performance — Adaptive Training Engine",
+    title: "Donum Dei Performance — Adaptive Training Engine",
     description:
       "Constraint-driven adaptive training. A two-minute assessment becomes a complete, CNS-managed weekly program.",
     url: SITE_URL,
-    siteName: "Deus Performance",
+    siteName: "Donum Dei Performance",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Deus Performance — Adaptive Training Engine",
+    title: "Donum Dei Performance — Adaptive Training Engine",
     description:
       "Constraint-driven adaptive training. A two-minute assessment becomes a complete, CNS-managed weekly program.",
   },
@@ -56,10 +56,10 @@ export const metadata: Metadata = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Deus Performance",
+  name: "Donum Dei Performance",
   legalName: "Riz Management LLC",
   url: SITE_URL,
-  slogan: "Deus. The body is a gift. Train it accordingly.",
+  slogan: "Donum Dei. The body is a gift. Train it accordingly.",
   description:
     "Constraint-driven adaptive training engine. Personalized weekly programs governed by hard safety rules: CNS load management, complete movement coverage, fatigue-adaptive volume.",
 };

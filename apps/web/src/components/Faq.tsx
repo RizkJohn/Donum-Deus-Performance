@@ -5,11 +5,11 @@ import { useState } from "react";
 const FAQS = [
   {
     q: "How is this different from a template app?",
-    a: "Template apps assign you a pre-written plan and rename it. Deus generates your week from your actual constraints — schedule, sport days, fatigue, injuries — and every program must pass a hard quality-control gate before you see it: nervous-system load limits, complete movement coverage, fixed block order, no training to failure on primary lifts. If a valid program cannot be built from your constraints, the engine says so rather than handing you a compromised one.",
+    a: "Template apps assign you a pre-written plan and rename it. Donum Dei generates your week from your actual constraints — schedule, sport days, fatigue, injuries — and every program must pass a hard quality-control gate before you see it: nervous-system load limits, complete movement coverage, fixed block order, no training to failure on primary lifts. If a valid program cannot be built from your constraints, the engine says so rather than handing you a compromised one.",
   },
   {
     q: "What if I'm injured?",
-    a: "You declare injury sites in the assessment, and the engine resolves them through a fixed substitution map — each blocked exercise swaps to an approved alternative that preserves the same movement pattern and the same nervous-system cost. Your week stays complete; the irritated joint stays out of the line of fire. Deus is not medical care: train within the guidance of your physician or physical therapist.",
+    a: "You declare injury sites in the assessment, and the engine resolves them through a fixed substitution map — each blocked exercise swaps to an approved alternative that preserves the same movement pattern and the same nervous-system cost. Your week stays complete; the irritated joint stays out of the line of fire. Donum Dei is not medical care: train within the guidance of your physician or physical therapist.",
   },
   {
     q: "What equipment do I need?",

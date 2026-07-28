@@ -1,9 +1,9 @@
 import pytest
 
 from conftest import make_request
-from deus_api.engine.decision_engine import build_plan
-from deus_api.engine.qc.validator import validate
-from deus_api.llm.mock import MockProvider
+from donum_dei_api.engine.decision_engine import build_plan
+from donum_dei_api.engine.qc.validator import validate
+from donum_dei_api.llm.mock import MockProvider
 
 
 @pytest.fixture

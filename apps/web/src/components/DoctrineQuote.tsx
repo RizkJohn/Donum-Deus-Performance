@@ -30,7 +30,7 @@ export default function DoctrineQuote() {
         </p>
         <div className="flex items-center gap-[13px] font-mono text-[8px] tracking-[0.24em] uppercase text-ink3">
           <span className="w-[22px] h-px bg-line2 flex-shrink-0" aria-hidden="true" />
-          Founding Doctrine · Deus Performance
+          Founding Doctrine · Donum Dei Performance
         </div>
       </div>
     </div>

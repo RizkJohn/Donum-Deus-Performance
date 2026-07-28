@@ -1,0 +1,214 @@
+{
+  "name": "DDP — 04 Check-in Ingest → Progression",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ddp-checkin",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n1-webhook",
+      "name": "Check-in Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "ddp-checkin"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expected body: { email, fatigue_score (0-5), sessions_completed, sessions_planned, pain?, notes? }\nconst b = $input.first().json.body ?? $input.first().json;\nif (!b.email) { throw new Error('Check-in missing email'); }\nconst fatigue = Math.max(0, Math.min(5, Number(b.fatigue_score ?? 3)));\nconst planned = Number(b.sessions_planned ?? 0) || 0;\nconst done = Number(b.sessions_completed ?? 0) || 0;\nconst adherence = planned > 0 ? Math.round((done / planned) * 100) / 100 : null;\nreturn [{ json: {\n  email: String(b.email).trim().toLowerCase(),\n  fatigue,\n  adherence,\n  pain: b.pain || '',\n  notes: b.notes || '',\n  date: new Date().toISOString().slice(0, 10),\n  raw: b\n} }];"
+      },
+      "id": "n2-normalize",
+      "name": "Normalize Check-in",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.DONUM_DEI_API_URL || 'http://localhost:8000') + '/v1/feedback' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.raw) }}",
+        "options": { "response": { "response": { "neverError": true, "fullResponse": true } } }
+      },
+      "id": "n3-feedback",
+      "name": "Post to Engine /v1/feedback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Decide the flag. Engine owns progression; this only routes attention.\nconst c = $('Normalize Check-in').first().json;\nconst apiRes = $input.first().json;\nconst apiBody = apiRes.body ?? apiRes;\nlet flag = 'none';\nif (c.fatigue >= 4 || (c.adherence !== null && c.adherence < 0.5) || c.pain) { flag = 'coach review'; }\nelse if (apiBody.progression_flag === 'deload' || apiBody.progression === 'deload' || c.fatigue >= 3.5) { flag = 'deload suggested'; }\nconst fatigueBand = c.fatigue >= 4 ? 'high' : (c.fatigue >= 2.5 ? 'moderate' : 'low');\nreturn [{ json: { ...c, flag, fatigueBand, apiOk: apiRes.statusCode ? apiRes.statusCode < 400 : true } }];"
+      },
+      "id": "n4-flag",
+      "name": "Compute Flag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '878cac7c-3a3b-4379-b7fe-e79a12ca9431' }, properties: Object.assign({ 'Check-in': { title: [{ text: { content: $json.email + ' — ' + $json.date } }] }, 'Client Email': { email: $json.email }, 'Date': { date: { start: $json.date } }, 'Fatigue Score': { number: $json.fatigue }, 'Flag': { select: { name: $json.flag } }, 'Notes': { rich_text: [{ text: { content: (($json.pain ? 'PAIN: ' + $json.pain + '\\n' : '') + $json.notes).slice(0, 1900) } }] } }, $json.adherence === null ? {} : { 'Adherence %': { number: $json.adherence } }) }) }}",
+        "options": {}
+      },
+      "id": "n5-notion",
+      "name": "Record Check-in in Notion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases/8880de55-6bcb-4b72-a9a1-3932a1f774f8/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ filter: { property: 'Email', email: { equals: $('Compute Flag').item.json.email } }, page_size: 1 }) }}",
+        "options": {}
+      },
+      "id": "n6-findclient",
+      "name": "Find Client Row",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const res = $input.first().json;\nconst c = $('Compute Flag').first().json;\nconst page = (res.results || [])[0];\nreturn [{ json: { ...c, clientPageId: page ? page.id : null } }];"
+      },
+      "id": "n7-merge",
+      "name": "Merge Client Page",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "leftValue": "={{ $json.clientPageId }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty", "singleValue": true } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n8-ifclient",
+      "name": "Client Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1540, 0]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://api.notion.com/v1/pages/' + $json.clientPageId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { 'Fatigue Flag': { select: { name: $json.fatigueBand } } } }) }}",
+        "options": {}
+      },
+      "id": "n9-updateclient",
+      "name": "Update Client Fatigue Flag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, -110],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "leftValue": "={{ $('Compute Flag').item.json.flag }}", "rightValue": "coach review", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n10-ifreview",
+      "name": "Needs Coach?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1760, 110]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: 'Coach review: ' + $('Compute Flag').item.json.email, text: 'Check-in flagged for review.\\n\\nClient: ' + $('Compute Flag').item.json.email + '\\nFatigue: ' + $('Compute Flag').item.json.fatigue + '/5\\nAdherence: ' + ($('Compute Flag').item.json.adherence === null ? 'n/a' : Math.round($('Compute Flag').item.json.adherence * 100) + '%') + '\\nPain: ' + ($('Compute Flag').item.json.pain || 'none reported') + '\\nNotes: ' + ($('Compute Flag').item.json.notes || '—') }) }}",
+        "options": {}
+      },
+      "id": "n11-alert",
+      "name": "Alert Coach",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1980, 110],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, flag: $('Compute Flag').item.json.flag }) }}",
+        "options": {}
+      },
+      "id": "n12-respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2200, 0]
+    }
+  ],
+  "connections": {
+    "Check-in Webhook": { "main": [[{ "node": "Normalize Check-in", "type": "main", "index": 0 }]] },
+    "Normalize Check-in": { "main": [[{ "node": "Post to Engine /v1/feedback", "type": "main", "index": 0 }]] },
+    "Post to Engine /v1/feedback": { "main": [[{ "node": "Compute Flag", "type": "main", "index": 0 }]] },
+    "Compute Flag": { "main": [[{ "node": "Record Check-in in Notion", "type": "main", "index": 0 }]] },
+    "Record Check-in in Notion": { "main": [[{ "node": "Find Client Row", "type": "main", "index": 0 }]] },
+    "Find Client Row": { "main": [[{ "node": "Merge Client Page", "type": "main", "index": 0 }]] },
+    "Merge Client Page": { "main": [[{ "node": "Client Found?", "type": "main", "index": 0 }]] },
+    "Client Found?": {
+      "main": [
+        [{ "node": "Update Client Fatigue Flag", "type": "main", "index": 0 }, { "node": "Needs Coach?", "type": "main", "index": 0 }],
+        [{ "node": "Needs Coach?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Needs Coach?": {
+      "main": [
+        [{ "node": "Alert Coach", "type": "main", "index": 0 }],
+        [{ "node": "Respond", "type": "main", "index": 0 }]
+      ]
+    },
+    "Alert Coach": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}

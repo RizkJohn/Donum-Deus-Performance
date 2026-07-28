@@ -1,13 +1,13 @@
 """Variation Engine — novelty scoring + priority ordering (no library edits)."""
 
-from deus_api.engine.variation import (
+from donum_dei_api.engine.variation import (
     avoid_recent_ids,
     derive_metadata,
     exercise_novelty,
     prioritized_groups,
     prioritize_pool,
 )
-from deus_api.models.athlete_state import AthleteState
+from donum_dei_api.models.athlete_state import AthleteState
 
 
 def test_derive_metadata_from_library_fields(library):

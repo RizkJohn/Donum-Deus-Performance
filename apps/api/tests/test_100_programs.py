@@ -7,8 +7,8 @@ import itertools
 import pytest
 
 from conftest import make_request
-from deus_api.engine.pipeline import generate_program
-from deus_api.llm.mock import MockProvider
+from donum_dei_api.engine.pipeline import generate_program
+from donum_dei_api.llm.mock import MockProvider
 
 TRAINING_AGES = ["Beginner", "Intermediate", "Advanced"]
 DAY_SETS = [

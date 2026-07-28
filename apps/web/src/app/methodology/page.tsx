@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Methodology — Deus Performance",
+  title: "Methodology — Donum Dei Performance",
   description:
     "Six principles of program construction. CNS management, movement inventory, session architecture, and constraint-first training design.",
 };

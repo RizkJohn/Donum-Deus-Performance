@@ -1,0 +1,16 @@
+# Donum Dei Performance — VPS reverse proxy with automatic HTTPS.
+# Serves the two backend subdomains only; the website is on Netlify.
+# Caddy fetches and renews Let's Encrypt certs automatically as long as the
+# DNS A records point here and ports 80 + 443 are open. Domains come from
+# .env via docker-compose.prod.yml.
+
+# Engine API (assessment, generation, feedback, auth, billing, health)
+{$API_DOMAIN} {
+	encode gzip zstd
+	reverse_proxy api:8000
+}
+
+# n8n automation (editor UI + webhooks + Stripe Trigger)
+{$N8N_DOMAIN} {
+	reverse_proxy n8n:5678
+}

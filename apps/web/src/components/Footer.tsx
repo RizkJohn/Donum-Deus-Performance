@@ -57,7 +57,7 @@ export default function Footer() {
           </nav>
         </div>
         <p className="font-mono text-[8px] text-ink3 tracking-[0.04em] leading-[1.7]">
-          Deus Performance is a practice of performance education. It does not
+          Donum Dei Performance is a practice of performance education. It does not
           constitute medical, rehabilitation, or clinical advice of any kind.
           Consult a licensed clinician before beginning any new training
           program.

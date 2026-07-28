@@ -1,4 +1,4 @@
-from deus_api.engine.fatigue import (
+from donum_dei_api.engine.fatigue import (
     apply_volume_reduction,
     compute_fatigue_score,
     progression_flag,
@@ -26,7 +26,7 @@ def test_score_average_clamped():
 
 
 def test_state_model_computes_score_and_state():
-    from deus_api.models.input_contract import State
+    from donum_dei_api.models.input_contract import State
 
     # low: all 2 → score=2.0
     s = State(sleep=2, soreness=2, energy=2, stress=2, injuries=[])

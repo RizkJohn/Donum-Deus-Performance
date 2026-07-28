@@ -1,11 +1,11 @@
-"""Billing tests never touch the network — `deus_api.billing.client`'s
+"""Billing tests never touch the network — `donum_dei_api.billing.client`'s
 functions (the only place that calls the Stripe SDK) are monkeypatched, so
 these assert on request/response shape and DB side effects, not Stripe
 itself."""
 
 import pytest
 
-from deus_api.config import get_settings
+from donum_dei_api.config import get_settings
 
 
 class _FakeSession:
@@ -55,7 +55,7 @@ async def test_checkout_success_returns_stripe_url(client, monkeypatch):
     monkeypatch.setenv("STRIPE_PRICE_FOUNDATION", "price_foundation_123")
     get_settings.cache_clear()
 
-    from deus_api.billing import client as billing_client
+    from donum_dei_api.billing import client as billing_client
 
     captured = {}
 
@@ -97,7 +97,7 @@ async def test_webhook_checkout_completed_updates_user(client, monkeypatch):
     me = await client.get("/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
     user_id = me.json()["id"]
 
-    from deus_api.billing import client as billing_client
+    from donum_dei_api.billing import client as billing_client
 
     fake_event = {
         "type": "checkout.session.completed",
@@ -141,7 +141,7 @@ async def test_webhook_invalid_signature_rejected(client, monkeypatch):
     monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_x")
     get_settings.cache_clear()
 
-    from deus_api.billing import client as billing_client
+    from donum_dei_api.billing import client as billing_client
 
     def raise_error(*a, **k):
         raise ValueError("bad signature")

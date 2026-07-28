@@ -1,0 +1,34 @@
+# Netlify deploy config — Donum Dei Performance website (Next.js).
+#
+# The site is the apps/web workspace of this monorepo. Netlify auto-detects
+# Next.js and injects its Next.js Runtime (SSR, middleware, the dynamic
+# routes: /program/[id], /dashboard, the assessment funnel) with zero plugin
+# config — do NOT add an explicit `[[plugins]] package = "@netlify/plugin-nextjs"`
+# block; it isn't a listed dependency in apps/web/package.json, and manually
+# pinning it is legacy guidance that fails to resolve against current
+# Next.js majors (this app is on Next 16). Netlify's built-in framework
+# detection handles it correctly without any plugin declaration.
+#
+# In the Netlify UI: New site → import this repo → the settings below are
+# picked up automatically. Then set the custom domain to donumdeiperformance.com.
+#
+# INTERIM STATUS (2026-07-25): production hosting is on Vercel, not Netlify,
+# by deliberate decision — independent of whether this file has merged to
+# `main` yet. (History: at the time this note was written, `main` didn't
+# have this file yet either, so Netlify's production build 404'd for that
+# additional reason — that specific cause resolves on merge, but the Vercel
+# decision does not.) Netlify hosting resumes only when explicitly revisited,
+# or is superseded outright by a planned Cloudflare Workers migration. This
+# config is left in place, unchanged, for whenever that happens.
+
+[build]
+  base = "apps/web"
+  command = "npm run build"
+
+[build.environment]
+  # Public API origin, baked into the browser bundle at build time. It must be
+  # the VPS's public API URL. Override per-context in the Netlify UI if needed.
+  NEXT_PUBLIC_API_URL = "https://api.donumdeiperformance.com"
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Match the Node major used elsewhere in the repo (apps/web/Dockerfile).
+  NODE_VERSION = "22"

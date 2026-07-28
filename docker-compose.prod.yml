@@ -1,0 +1,119 @@
+# Donum Dei Performance — VPS BACKEND stack (recommended architecture).
+#
+#   postgres · api · n8n · caddy (auto-HTTPS reverse proxy)
+#
+# The website is NOT here — it deploys to Netlify (free, commercial-OK) from
+# apps/web via netlify.toml. This box runs only the always-on backend:
+# the engine API, its database, and the n8n automation suite. One cheap VPS
+# (Hetzner CX22, ~€4.50/mo) is plenty since the memory-hungry Next.js build
+# lives on Netlify.
+#
+# Caddy serves two subdomains with automatic HTTPS:
+#   api.<domain>  -> api:8000     n8n.<domain> -> n8n:5678
+# The apex (donumdeiperformance.com) is served by Netlify, not this box.
+#
+# Usage on the server (full runbook: docs/DEPLOYMENT.md):
+#   cp .env.prod.example .env      # then fill it in
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   ./automation/import-workflows.sh n8n
+#
+# Requires these DNS records:
+#   api.<domain>  A  -> this server IP
+#   n8n.<domain>  A  -> this server IP
+#   <domain>/www     -> Netlify (set in the Netlify dashboard)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: donum_dei
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: donum_dei
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U donum_dei"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://donum_dei:${POSTGRES_PASSWORD}@postgres:5432/donum_dei
+      LLM_PROVIDER: ${LLM_PROVIDER:-claude}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # The browser origin is the Netlify-served apex domain.
+      CORS_ORIGINS: https://${WEB_DOMAIN}
+      WEB_URL: https://${WEB_DOMAIN}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:?set AUTH_JWT_SECRET in .env}
+      AUTH_TOKEN_TTL_DAYS: ${AUTH_TOKEN_TTL_DAYS:-30}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${DDP_EMAIL_FROM:-Donum Dei Performance <programs@donumdeiperformance.com>}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PRICE_FOUNDATION: ${STRIPE_PRICE_FOUNDATION}
+      STRIPE_PRICE_PRACTICE: ${STRIPE_PRICE_PRACTICE}
+      STRIPE_PRICE_STEWARDSHIP: ${STRIPE_PRICE_STEWARDSHIP}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    environment:
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?set N8N_ENCRYPTION_KEY in .env (openssl rand -hex 32)}
+      N8N_HOST: ${N8N_DOMAIN}
+      N8N_PROTOCOL: https
+      N8N_LISTEN_ADDRESS: 0.0.0.0
+      N8N_PROXY_HOPS: "1"
+      WEBHOOK_URL: https://${N8N_DOMAIN}/
+      N8N_WEBHOOK_BASE: https://${N8N_DOMAIN}
+      N8N_SECURE_COOKIE: "true"
+      GENERIC_TIMEZONE: ${TZ:-America/New_York}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      # n8n blocks $env access inside node expressions by default. The
+      # workflows read every DDP_* var below via $env (with hardcoded
+      # fallbacks) — without this, configured values are silently ignored.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      DONUM_DEI_API_URL: http://api:8000
+      DDP_WEB_URL: https://${WEB_DOMAIN}
+      DDP_EMAIL_FROM: ${DDP_EMAIL_FROM:-Donum Dei Performance <programs@donumdeiperformance.com>}
+      DDP_OWNER_EMAIL: ${DDP_OWNER_EMAIL}
+      DDP_CLAUDE_MODEL: ${DDP_CLAUDE_MODEL:-claude-sonnet-5}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./automation/n8n:/workflows:ro
+    expose:
+      - "5678"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+      N8N_DOMAIN: ${N8N_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - n8n
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  n8n_data:
+  caddy_data:
+  caddy_config:

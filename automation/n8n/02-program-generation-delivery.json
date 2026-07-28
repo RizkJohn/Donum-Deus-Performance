@@ -1,0 +1,179 @@
+{
+  "name": "DDP — 02 Program Generation → Delivery",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ddp-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n1-webhook",
+      "name": "Generate Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "ddp-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expected body: { email, name?, payload } where payload conforms to engine/input_contract.md\nconst b = $input.first().json.body ?? $input.first().json;\nif (!b.email || !b.payload) { throw new Error('Body must include email and payload (input_contract client payload)'); }\nreturn [{ json: { email: String(b.email).trim().toLowerCase(), name: b.name || b.email, payload: b.payload } }];"
+      },
+      "id": "n2-validate",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.DONUM_DEI_API_URL || 'http://localhost:8000') + '/v1/generate' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": { "response": { "response": { "neverError": true, "fullResponse": true } }, "timeout": 180000 }
+      },
+      "id": "n3-generate",
+      "name": "Call Engine /v1/generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// The engine returns a program that already passed the QC gate, or UNSATISFIABLE_CONSTRAINTS.\nconst res = $input.first().json;\nconst body = res.body ?? res;\nconst req = $('Validate Request').first().json;\nconst unsatisfiable = res.statusCode >= 400 || body.error === 'UNSATISFIABLE_CONSTRAINTS' || (body.detail && String(JSON.stringify(body.detail)).includes('UNSATISFIABLE'));\nreturn [{ json: {\n  email: req.email,\n  name: req.name,\n  ok: !unsatisfiable,\n  runId: body.run_id || body.id || '',\n  progression: body.progression_flag || body.progression || 'maintain',\n  reasons: unsatisfiable ? JSON.stringify(body.reasons || body.detail || body.error || res.statusCode) : '',\n  weekStart: new Date().toISOString().slice(0, 10)\n} }];"
+      },
+      "id": "n4-parse",
+      "name": "Parse Engine Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "leftValue": "={{ $json.ok }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "n5-if",
+      "name": "QC Passed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: 'c535740b-0d1c-4985-9c9c-15b8ed7218a3' }, properties: { 'Program': { title: [{ text: { content: $json.name + ' — week of ' + $json.weekStart } }] }, 'Client Email': { email: $json.email }, 'Run ID': { rich_text: [{ text: { content: String($json.runId) } }] }, 'Week Start': { date: { start: $json.weekStart } }, 'Status': { select: { name: 'QC Passed' } }, 'Progression': { select: { name: $json.progression } }, 'Program Link': { url: ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/program/' + $json.runId } } }) }}",
+        "options": {}
+      },
+      "id": "n6-notion-program",
+      "name": "Mirror Program to Notion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, -120],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$('Parse Engine Result').item.json.email], subject: 'Your weekly program is ready — Donum Dei Performance', text: 'Your program for the week of ' + $('Parse Engine Result').item.json.weekStart + ' has passed quality control and is ready.\\n\\nView and download it here: ' + ($env.DDP_WEB_URL || 'https://donumdeiperformance.com') + '/program/' + $('Parse Engine Result').item.json.runId + '\\n\\nEvery session in it was built from your constraints — schedule, fatigue, equipment, injuries — and checked against the doctrine: CNS load managed, movement coverage complete, no training to failure on primary lifts.\\n\\nDonum Dei. The body is a gift. Train it accordingly.' }) }}",
+        "options": {}
+      },
+      "id": "n7-deliver",
+      "name": "Deliver Program Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -120],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: $env.DDP_EMAIL_FROM || 'Donum Dei Performance <programs@donumdeiperformance.com>', to: [$env.DDP_OWNER_EMAIL || 'johnrizkalla2300@gmail.com'], subject: 'UNSATISFIABLE constraints — ' + $('Parse Engine Result').item.json.email, text: 'The engine could not build a valid program for ' + $('Parse Engine Result').item.json.email + '.\\n\\nReasons: ' + $('Parse Engine Result').item.json.reasons + '\\n\\nThis client needs a human decision: relax a constraint, adjust schedule density, or handle via correspondence.' }) }}",
+        "options": {}
+      },
+      "id": "n8-escalate",
+      "name": "Escalate to Coach",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 140],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_ME_RESEND", "name": "Resend (Bearer)" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "Notion-Version", "value": "2022-06-28" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: '82f1b617-35af-423c-9780-65166c39adc4' }, properties: { 'Event': { title: [{ text: { content: ($('Parse Engine Result').item.json.ok ? 'Program delivered: ' : 'UNSATISFIABLE: ') + $('Parse Engine Result').item.json.email } }] }, 'Workflow': { select: { name: 'program-generation' } }, 'Status': { select: { name: $('Parse Engine Result').item.json.ok ? 'success' : 'needs attention' } }, 'Detail': { rich_text: [{ text: { content: ('run ' + $('Parse Engine Result').item.json.runId + ' ' + $('Parse Engine Result').item.json.reasons).slice(0, 1900) } }] } } }) }}",
+        "options": {}
+      },
+      "id": "n9-log",
+      "name": "Automation Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "credentials": { "notionApi": { "id": "REPLACE_ME_NOTION", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: $('Parse Engine Result').item.json.ok, run_id: $('Parse Engine Result').item.json.runId }) }}",
+        "options": {}
+      },
+      "id": "n10-respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1760, 0]
+    }
+  ],
+  "connections": {
+    "Generate Webhook": { "main": [[{ "node": "Validate Request", "type": "main", "index": 0 }]] },
+    "Validate Request": { "main": [[{ "node": "Call Engine /v1/generate", "type": "main", "index": 0 }]] },
+    "Call Engine /v1/generate": { "main": [[{ "node": "Parse Engine Result", "type": "main", "index": 0 }]] },
+    "Parse Engine Result": { "main": [[{ "node": "QC Passed?", "type": "main", "index": 0 }]] },
+    "QC Passed?": {
+      "main": [
+        [{ "node": "Mirror Program to Notion", "type": "main", "index": 0 }],
+        [{ "node": "Escalate to Coach", "type": "main", "index": 0 }]
+      ]
+    },
+    "Mirror Program to Notion": { "main": [[{ "node": "Deliver Program Email", "type": "main", "index": 0 }]] },
+    "Deliver Program Email": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] },
+    "Escalate to Coach": { "main": [[{ "node": "Automation Log", "type": "main", "index": 0 }]] },
+    "Automation Log": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "active": false,
+  "tags": []
+}
